@@ -1,0 +1,3 @@
+spec: ./out/tests/**/*.js
+ui: tdd
+color: true
