@@ -1,0 +1,12 @@
+.vscode/
+.github/
+build/
+out/tests/
+out/**/*.js.map
+out/*/*/*.d.ts
+src/
+test/
+.gitignore
+tslint.yaml
+.mocharc.yml
+scripts/
