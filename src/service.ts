@@ -35,7 +35,7 @@ export const getLanguageService: GetLanguageServiceFunc = function(params) {
         schemas: [
             {
                 uri: 'asl',
-                fileMatch: ['*.asl', '*.asl.json'],
+                fileMatch: ['*'],
                 schema: aslSchema
             }
         ]
