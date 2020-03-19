@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+// tslint:disable:no-floating-promises
+
 import * as assert from 'assert'
 import {
   CompletionItemKind} from 'vscode-json-languageservice'
@@ -162,6 +164,45 @@ const documentNested = `
   }
 }
 `
+const completionsEdgeCase1 = `{
+  "Comment": "An example of the Amazon States Language using a map state to process elements of an array with a max concurrency of 2.",
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "ResultPath": "\"\"\"$$$$$.array$$$",
+          "MaxConcurrency": 2,
+          "Next": "Final State",
+          "Iterator": {
+              "StartAt": "Pass",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "Result": "Done!",
+                      "End": true
+                  }
+              }
+          }
+      },
+      "
+      "Net 2": {
+          "Type": "Fail",
+          "Next": "Final State"
+      },
+      "Final State": {
+          "Type": "Pass",
+          "Next": "Net 2"
+      }
+  }
+}`
+
+const completionsEdgeCase2 = `{
+  "StartAt": "MyState",
+  "States": {
+      "
+  }
+}`
 
 const itemLabels = ['FirstState', 'ChoiceState', 'FirstMatchState', 'SecondMatchState', 'DefaultState', 'NextState', 'ChoiceStateX']
 const nestedItemLabels = ['Nested1', 'Nested2', 'Nested3', 'Nested4']
@@ -171,7 +212,7 @@ interface TestCompletionOptions {
   json: string,
   position: [number, number],
   start: [number, number],
-  end: [number, number]
+  end: [number, number],
   labelToInsertText(label: string): string
 }
 
@@ -182,15 +223,18 @@ interface TestScenario {
   end: [number, number],
 }
 
-async function testCompletions(options: TestCompletionOptions) {
-    const { labels, json, position, start, end, labelToInsertText } = options
+async function getCompletions(json: string, position: [number, number]) {
     const { textDoc, jsonDoc } = toDocument(json)
-
     const pos = Position.create(...position)
-
     const ls = getLanguageService({})
 
-    const res = await ls.doComplete(textDoc, pos, jsonDoc)
+    return await ls.doComplete(textDoc, pos, jsonDoc)
+}
+
+async function testCompletions(options: TestCompletionOptions) {
+    const { labels, json, position, start, end, labelToInsertText } = options
+
+    const res = await getCompletions(json, position)
 
     assert.strictEqual(res?.items.length, labels.length)
 
@@ -457,6 +501,20 @@ suite('ASL context-aware completion', () => {
           end: [14, 27]
         })
         assert.deepEqual(getArrayIntersection(suggestedSnippets, notExpectedSnippets), [])
+      })
+    })
+
+    suite('Edge Cases', () => {
+      test('Requested completion in state name position does not throw error', async () => {
+        await assert.doesNotReject(
+          getCompletions(completionsEdgeCase1, [22, 7]),
+          TypeError
+        )
+
+        await assert.doesNotReject(
+          getCompletions(completionsEdgeCase2, [4, 7]),
+          TypeError
+        )
       })
     })
 })

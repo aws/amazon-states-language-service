@@ -8,12 +8,14 @@ import {
     CompletionItem,
     CompletionItemKind,
     InsertTextFormat,
-    ObjectASTNode} from 'vscode-json-languageservice'
+    ObjectASTNode,
+    PropertyASTNode} from 'vscode-json-languageservice'
 
 import {
     findPropChildByName,
     insideStateNode,
     isChildOfStates,
+    isObjectNode,
 } from '../utils/astUtilityFunctions'
 
 import errorHandlingSnippetsRaw from '../snippets/error_handling.json'
@@ -42,7 +44,11 @@ function parseSnippetsFromJson(json: Snippet[]): CompletionItem[] {
 }
 
 function doesStateSupportErrorHandling(node: ASTNode): boolean {
-    const typeNode = findPropChildByName(node as ObjectASTNode, 'Type')
+    let typeNode: PropertyASTNode
+
+    if(isObjectNode(node)) {
+        typeNode = findPropChildByName(node, 'Type')
+    }
 
     return ERROR_HANDLING_STATES.includes(typeNode?.valueNode?.value as string)
 }

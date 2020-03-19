@@ -6,7 +6,7 @@
 import { ArrayASTNode, ASTNode, JSONDocument, ObjectASTNode, PropertyASTNode, StringASTNode } from 'vscode-json-languageservice'
 
 export interface ASTTree extends JSONDocument {
-    root?: ObjectASTNode | null
+    root?: ASTNode
 }
 
 export function isStringNode(node: ASTNode): node is StringASTNode {
