@@ -534,7 +534,7 @@ const documentParallelCatchTemplateInvalidNext = `{
   }
 }`
 
-interface TestValidationOptions {
+export interface TestValidationOptions {
     json: string,
     diagnostics: {
         message: string,
@@ -544,12 +544,17 @@ interface TestValidationOptions {
     filterMessages?: string[]
 }
 
-async function testValidations(options: TestValidationOptions) {
-    const { json, diagnostics, filterMessages } = options
+async function getValidations(json: string) {
     const { textDoc, jsonDoc } = toDocument(json);
     const ls = getLanguageService({});
 
-    let res = await ls.doValidation(textDoc, jsonDoc)
+    return await ls.doValidation(textDoc, jsonDoc)
+}
+
+async function testValidations(options: TestValidationOptions) {
+    const { json, diagnostics, filterMessages } = options
+
+    let res = await getValidations(json)
 
     res = res.filter(diagnostic => {
         if (filterMessages && filterMessages.find(message => message === diagnostic.message) ) {
@@ -577,6 +582,19 @@ async function testValidations(options: TestValidationOptions) {
 }
 
 suite('ASL context-aware validation', () => {
+    suite('Invalid JSON Input', () => {
+      test("Empty string doesn't throw errors", async () => {
+        await getValidations('')
+      })
+
+      test("[] string doesn't throw type errors", async () => {
+        await assert.doesNotReject(
+          getValidations('[]'),
+          TypeError
+        )
+      })
+    })
+
     suite('StartAt', () => {
         test('Shows Diagnostic for state name that doesn\'t exist', async () => {
             await testValidations({

@@ -13,6 +13,7 @@ import aslSchema from './json-schema/bundled.json';
 
 import {
     ASTTree,
+    isObjectNode
 } from './utils/astUtilityFunctions'
 
 import completeAsl from './completion/completeAsl'
@@ -55,7 +56,7 @@ export const getLanguageService: GetLanguageServiceFunc = function(params) {
 
         const rootNode = (jsonDocument as ASTTree).root
 
-        if (rootNode) {
+        if (rootNode && isObjectNode(rootNode)) {
             const aslDiagnostics = validateStates(rootNode, document)
 
             return diagnostics.concat(aslDiagnostics)
