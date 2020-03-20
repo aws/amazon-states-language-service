@@ -26,6 +26,46 @@ export const MESSAGES = {
     NO_TERMINAL_STATE: 'No terminal state'
 }
 
+function stateNameExistsInNextPropNode(nextPropNode: PropertyASTNode, stateNames: string[], document: TextDocument): Diagnostic | void {
+    const stateNameExists = (stateNames as unknown[]).includes(nextPropNode?.valueNode?.value)
+
+    if (nextPropNode && nextPropNode.valueNode && !stateNameExists) {
+        const { length, offset } = nextPropNode.valueNode
+        const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
+
+        return Diagnostic.create(range, MESSAGES.INVALID_NEXT, DiagnosticSeverity.Error)
+    }
+}
+
+interface ValidateCatchResult {
+    diagnostics: Diagnostic[],
+    reachedStates: { [ix: string]: boolean }
+}
+
+function validateCatch(oneStateValueNode: ObjectASTNode, stateNames: string[], document: TextDocument): ValidateCatchResult {
+    const catchPropNode = findPropChildByName(oneStateValueNode, 'Catch')
+    const diagnostics: Diagnostic[] = []
+    const reachedStates: { [ix: string]: boolean } = {}
+
+    if (catchPropNode?.valueNode && isArrayNode(catchPropNode.valueNode)) {
+        catchPropNode.valueNode.items.forEach(item => {
+            if (isObjectNode(item)) {
+                const nextProp = findPropChildByName(item, 'Next')
+                const nextPropValue = nextProp?.valueNode?.value
+
+                const diagnostic = stateNameExistsInNextPropNode(nextProp, stateNames, document)
+                if (diagnostic) {
+                    diagnostics.push(diagnostic)
+                } else if (typeof nextPropValue === 'string') {
+                    reachedStates[nextPropValue] = true
+                }
+            }
+        })
+    }
+
+    return { diagnostics, reachedStates }
+}
+
 export default function validateStates(rootNode: ObjectASTNode, document: TextDocument): Diagnostic[] {
     const statesNode = findPropChildByName(rootNode, 'States')
     const startAtNode = findPropChildByName(rootNode, 'StartAt')
@@ -49,7 +89,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
         if (statesValueNode && isObjectNode(statesValueNode)) {
             // keep track of reached states and unreached states to avoid multiple loops
             const unreachedStates: { [ix: string]: PropertyASTNode } = {}
-            const reachedStates: { [ix: string]: boolean } = {}
+            let reachedStates: { [ix: string]: boolean } = {}
             let hasTerminalState = false
 
             const startAtValue = startAtNode?.valueNode?.value
@@ -106,6 +146,9 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         // it the type of state is "Parallel" recursively run validateStates for each child of value node (an array)
                         case 'Parallel': {
                             const branchesPropNode = findPropChildByName(oneStateValueNode, 'Branches')
+                            const validateCatchResult = validateCatch(oneStateValueNode, stateNames, document)
+                            diagnostics = diagnostics.concat(validateCatchResult.diagnostics)
+                            reachedStates = { ...reachedStates, ...validateCatchResult.reachedStates }
 
                             if (branchesPropNode && branchesPropNode.valueNode && isArrayNode(branchesPropNode.valueNode)) {
                                 branchesPropNode.valueNode.children.forEach(branchItem => {
@@ -119,6 +162,14 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                             break
                         }
 
+                        case 'Task': {
+                            const validateCatchResult = validateCatch(oneStateValueNode, stateNames, document)
+                            diagnostics = diagnostics.concat(validateCatchResult.diagnostics)
+                            reachedStates = { ...reachedStates, ...validateCatchResult.reachedStates }
+
+                            break
+                        }
+
                         case 'Succeed':
                         case 'Fail': {
                             hasTerminalState = true
@@ -126,13 +177,10 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         }
                     }
 
-                    const stateNameExists = (stateNames as unknown[]).includes(nextPropNode?.valueNode?.value)
+                    const nextStateDiagnostic = stateNameExistsInNextPropNode(nextPropNode, stateNames, document)
 
-                    if (nextPropNode && nextPropNode.valueNode && !stateNameExists) {
-                        const { length, offset } = nextPropNode.valueNode
-                        const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
-
-                        diagnostics.push(Diagnostic.create(range, MESSAGES.INVALID_NEXT, DiagnosticSeverity.Error))
+                    if (nextStateDiagnostic) {
+                        diagnostics.push(nextStateDiagnostic)
                     }
                 }
             })

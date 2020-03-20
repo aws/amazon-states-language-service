@@ -374,6 +374,166 @@ const documentSucceedFailTerminalState = `{
   }
 }`
 
+const documentTaskCatchTemplate = `{
+  "Comment": "A Catch example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "HelloWorld",
+  "States": {
+      "HelloWorld": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:myFunction",
+          "Catch": [
+              {
+                  "ErrorEquals": [
+                      "CustomError"
+                  ],
+                  "Next": "CustomErrorFallback"
+              },
+              {
+                  "ErrorEquals": [
+                      "States.TaskFailed"
+                  ],
+                  "Next": "ReservedTypeFallback"
+              },
+              {
+                  "ErrorEquals": [
+                      "States.ALL"
+                  ],
+                  "Next": "CatchAllFallback"
+              }
+          ],
+          "End": true
+      },
+      "CustomErrorFallback": {
+          "Type": "Pass",
+          "Result": "This is a fallback from a custom lambda function exception",
+          "End": true
+      },
+      "ReservedTypeFallback": {
+          "Type": "Pass",
+          "Result": "This is a fallback from a reserved error code",
+          "End": true
+      },
+      "CatchAllFallback": {
+          "Type": "Pass",
+          "Result": "This is a fallback from a reserved error code",
+          "End": true
+      }
+  }
+}`
+
+const documentParallelCatchTemplate = `{
+  "StartAt": "Parallel",
+  "States": {
+    "Parallel": {
+      "Type": "Parallel",
+      "Next": "Final State",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "CatchState"
+        }
+      ],
+      "Branches": [
+        {
+          "StartAt": "Wait 20s",
+          "States": {
+            "Wait 20s": {
+              "Type": "Wait",
+              "Seconds": 20,
+              "End": true
+            }
+          }
+        }
+      ]
+    },
+    "Final State": {
+      "Type": "Pass",
+      "End": true
+    },
+    "CatchState": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}`
+
+const documentTaskCatchTemplateInvalidNext = `{
+  "Comment": "A Catch example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "HelloWorld",
+  "States": {
+      "HelloWorld": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:myFunction",
+          "Catch": [
+              {
+                  "ErrorEquals": [
+                      "CustomError"
+                  ],
+                  "Next": "CustomErrorFallback"
+              },
+              {
+                  "ErrorEquals": [
+                      "States.TaskFailed"
+                  ],
+                  "Next": "ReservedType"
+              },
+              {
+                  "ErrorEquals": [
+                      "States.ALL"
+                  ],
+                  "Next": "CatchAllFallback"
+              }
+          ],
+          "End": true
+      },
+      "CustomErrorFallback": {
+          "Type": "Pass",
+          "Result": "This is a fallback from a custom lambda function exception",
+          "End": true
+      }
+  }
+}`
+
+const documentParallelCatchTemplateInvalidNext = `{
+  "StartAt": "Parallel",
+  "States": {
+    "Parallel": {
+      "Type": "Parallel",
+      "Next": "Final State",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Next": "Catchddd"
+        }
+      ],
+      "Branches": [
+        {
+          "StartAt": "Wait 20s",
+          "States": {
+            "Wait 20s": {
+              "Type": "Wait",
+              "Seconds": 20,
+              "End": true
+            }
+          }
+        }
+      ]
+    },
+    "Final State": {
+      "Type": "Pass",
+      "End": true
+    },
+    "CatchState": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}`
+
 interface TestValidationOptions {
     json: string,
     diagnostics: {
@@ -580,5 +740,54 @@ suite('ASL context-aware validation', () => {
                 diagnostics: []
             })
         })
+    })
+
+    suite('Catch property of "Parallel" and "Task" state', async () => {
+      test('Does not show diagnostic on valid next property within Catch block of Task state', async () => {
+        await testValidations({
+            json: documentTaskCatchTemplate,
+            diagnostics: []
+        })
+      })
+
+      test('Does not show diagnostic on valid next property within Catch block of Parallel state', async () => {
+        await testValidations({
+            json: documentParallelCatchTemplate,
+            diagnostics: []
+        })
+      })
+
+      test('Shows diagnostics on invalid next property within Catch block of Task state', async () => {
+        await testValidations({
+            json: documentTaskCatchTemplateInvalidNext,
+            diagnostics: [
+                {
+                    message: MESSAGES.INVALID_NEXT,
+                    start: [18, 26],
+                    end: [18, 40]
+                },
+                {
+                    message: MESSAGES.INVALID_NEXT,
+                    start: [24, 26],
+                    end: [24, 44]
+                },
+            ],
+            filterMessages: [MESSAGES.UNREACHABLE_STATE]
+        })
+      })
+
+      test('Shows diagnostics on invalid next property within Catch block o Parallel', async () => {
+        await testValidations({
+            json: documentParallelCatchTemplateInvalidNext,
+            diagnostics: [
+                {
+                    message: MESSAGES.INVALID_NEXT,
+                    start: [11, 18],
+                    end: [11, 28]
+                }
+            ],
+            filterMessages: [MESSAGES.UNREACHABLE_STATE]
+        })
+      })
     })
 })
