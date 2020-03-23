@@ -42,13 +42,14 @@ interface ValidateCatchResult {
     reachedStates: { [ix: string]: boolean }
 }
 
-function validateCatch(oneStateValueNode: ObjectASTNode, stateNames: string[], document: TextDocument): ValidateCatchResult {
-    const catchPropNode = findPropChildByName(oneStateValueNode, 'Catch')
+// Validates next property within array of objects
+function validateArrayNext(arrayPropName: string, oneStateValueNode: ObjectASTNode, stateNames: string[], document: TextDocument): ValidateCatchResult {
+    const arrayPropNode = findPropChildByName(oneStateValueNode, arrayPropName)
     const diagnostics: Diagnostic[] = []
     const reachedStates: { [ix: string]: boolean } = {}
 
-    if (catchPropNode?.valueNode && isArrayNode(catchPropNode.valueNode)) {
-        catchPropNode.valueNode.items.forEach(item => {
+    if (arrayPropNode?.valueNode && isArrayNode(arrayPropNode.valueNode)) {
+        arrayPropNode.valueNode.items.forEach(item => {
             if (isObjectNode(item)) {
                 const nextProp = findPropChildByName(item, 'Next')
                 const nextPropValue = nextProp?.valueNode?.value
@@ -146,7 +147,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         // it the type of state is "Parallel" recursively run validateStates for each child of value node (an array)
                         case 'Parallel': {
                             const branchesPropNode = findPropChildByName(oneStateValueNode, 'Branches')
-                            const validateCatchResult = validateCatch(oneStateValueNode, stateNames, document)
+                            const validateCatchResult = validateArrayNext('Catch', oneStateValueNode, stateNames, document)
                             diagnostics = diagnostics.concat(validateCatchResult.diagnostics)
                             reachedStates = { ...reachedStates, ...validateCatchResult.reachedStates }
 
@@ -163,9 +164,17 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         }
 
                         case 'Task': {
-                            const validateCatchResult = validateCatch(oneStateValueNode, stateNames, document)
+                            const validateCatchResult = validateArrayNext('Catch', oneStateValueNode, stateNames, document)
                             diagnostics = diagnostics.concat(validateCatchResult.diagnostics)
                             reachedStates = { ...reachedStates, ...validateCatchResult.reachedStates }
+
+                            break
+                        }
+
+                        case 'Choice': {
+                            const validateChoiceResult = validateArrayNext('Choices', oneStateValueNode, stateNames, document)
+                            diagnostics = diagnostics.concat(validateChoiceResult.diagnostics)
+                            reachedStates = { ...reachedStates, ...validateChoiceResult.reachedStates }
 
                             break
                         }
