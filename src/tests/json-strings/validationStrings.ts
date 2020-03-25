@@ -603,3 +603,75 @@ export const documentChoiceInvalidNext = `{
     }
   }
 }`
+
+export const documentChoiceValidDefault = `{
+  "StartAt": "FirstState",
+  "States": {
+      "FirstState": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:FUNCTION_NAME",
+          "Next": "ChoiceState"
+      },
+      "ChoiceState": {
+          "Type": "Choice",
+          "Choices": [
+              {
+                  "Variable": "$.foo",
+                  "NumericEquals": 1,
+                  "Next": "FirstMatchState"
+              }
+          ],
+          "Default": "DefaultState"
+      },
+      "FirstMatchState": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:OnFirstMatch",
+          "Next": "NextState"
+      },
+      "DefaultState": {
+          "Type": "Fail",
+          "Error": "DefaultStateError",
+          "Cause": "No Matches!"
+      },
+      "NextState": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}`
+
+export const documentChoiceInvalidDefault = `{
+  "StartAt": "FirstState",
+  "States": {
+      "FirstState": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:FUNCTION_NAME",
+          "Next": "ChoiceState"
+      },
+      "ChoiceState": {
+          "Type": "Choice",
+          "Choices": [
+              {
+                  "Variable": "$.foo",
+                  "NumericEquals": 1,
+                  "Next": "FirstMatchState"
+              }
+          ],
+          "Default": "DefaultStatexxxxxx"
+      },
+      "FirstMatchState": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:OnFirstMatch",
+          "Next": "NextState"
+      },
+      "DefaultState": {
+          "Type": "Fail",
+          "Error": "DefaultStateError",
+          "Cause": "No Matches!"
+      },
+      "NextState": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}`

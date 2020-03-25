@@ -21,19 +21,25 @@ import {
 
 export const MESSAGES = {
     INVALID_NEXT: 'The property "Next" has to refer to an existing state name',
+    INVALID_DEFAULT: 'The property "Default" has to refer to an existing state name',
     INVALID_START_AT: 'The property "StartAt" has to refer to an existing state name',
     UNREACHABLE_STATE: 'Unreachable state',
     NO_TERMINAL_STATE: 'No terminal state'
 }
 
-function stateNameExistsInNextPropNode(nextPropNode: PropertyASTNode, stateNames: string[], document: TextDocument): Diagnostic | void {
+function stateNameExistsInPropNode(
+    nextPropNode: PropertyASTNode,
+    stateNames: string[],
+    document: TextDocument,
+    message: string
+): Diagnostic | void {
     const stateNameExists = (stateNames as unknown[]).includes(nextPropNode?.valueNode?.value)
 
     if (nextPropNode && nextPropNode.valueNode && !stateNameExists) {
         const { length, offset } = nextPropNode.valueNode
         const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
 
-        return Diagnostic.create(range, MESSAGES.INVALID_NEXT, DiagnosticSeverity.Error)
+        return Diagnostic.create(range, message, DiagnosticSeverity.Error)
     }
 }
 
@@ -54,7 +60,7 @@ function validateArrayNext(arrayPropName: string, oneStateValueNode: ObjectASTNo
                 const nextProp = findPropChildByName(item, 'Next')
                 const nextPropValue = nextProp?.valueNode?.value
 
-                const diagnostic = stateNameExistsInNextPropNode(nextProp, stateNames, document)
+                const diagnostic = stateNameExistsInPropNode(nextProp, stateNames, document, MESSAGES.INVALID_NEXT)
                 if (diagnostic) {
                     diagnostics.push(diagnostic)
                 } else if (typeof nextPropValue === 'string') {
@@ -70,6 +76,7 @@ function validateArrayNext(arrayPropName: string, oneStateValueNode: ObjectASTNo
 export default function validateStates(rootNode: ObjectASTNode, document: TextDocument): Diagnostic[] {
     const statesNode = findPropChildByName(rootNode, 'States')
     const startAtNode = findPropChildByName(rootNode, 'StartAt')
+
     let diagnostics: Diagnostic[] = []
 
     if (statesNode) {
@@ -172,6 +179,17 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         }
 
                         case 'Choice': {
+                            const defaultNode = findPropChildByName(oneStateValueNode, 'Default')
+                            const defaultStateDiagnostic = stateNameExistsInPropNode(defaultNode, stateNames, document, MESSAGES.INVALID_DEFAULT)
+
+                            if (defaultStateDiagnostic) {
+                                diagnostics.push(defaultStateDiagnostic)
+                            } else {
+                                const name = defaultNode.valueNode.value as string
+
+                                reachedStates[name] = true
+                            }
+
                             const validateChoiceResult = validateArrayNext('Choices', oneStateValueNode, stateNames, document)
                             diagnostics = diagnostics.concat(validateChoiceResult.diagnostics)
                             reachedStates = { ...reachedStates, ...validateChoiceResult.reachedStates }
@@ -186,7 +204,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         }
                     }
 
-                    const nextStateDiagnostic = stateNameExistsInNextPropNode(nextPropNode, stateNames, document)
+                    const nextStateDiagnostic = stateNameExistsInPropNode(nextPropNode, stateNames, document, MESSAGES.INVALID_NEXT)
 
                     if (nextStateDiagnostic) {
                         diagnostics.push(nextStateDiagnostic)
