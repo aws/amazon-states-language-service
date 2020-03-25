@@ -9,7 +9,9 @@ import { getLanguageService, Position, Range } from '../service'
 import { MESSAGES } from '../validation/validateStates'
 
 import {
+  documentChoiceInvalidDefault,
   documentChoiceInvalidNext,
+  documentChoiceValidDefault,
   documentChoiceValidNext,
   documentInvalidNext,
   documentInvalidNextNested,
@@ -26,7 +28,7 @@ import {
   documentTaskCatchTemplateInvalidNext,
   documentUnreachableState,
   documentValidNext,
-} from './json-strings/validation-strings'
+} from './json-strings/validationStrings'
 
 import { toDocument } from './utils/testUtilities'
 
@@ -89,6 +91,34 @@ suite('ASL context-aware validation', () => {
           TypeError
         )
       })
+    })
+
+    suite('Default of Choice state', () => {
+        test('Shows diagnostic for invalid state name', async () => {
+            await testValidations({
+                json: documentChoiceInvalidDefault,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_DEFAULT,
+                        start: [17, 21],
+                        end: [17, 41]
+                    },
+                    {
+                        message: MESSAGES.UNREACHABLE_STATE,
+                        start: [24, 6],
+                        end: [24, 20]
+                    },
+                ],
+            })
+
+        })
+
+        test('Doesn\'t show Diagnostic for valid state name', async () => {
+            await testValidations({
+                json: documentChoiceValidDefault,
+                diagnostics: []
+            })
+        })
     })
 
     suite('StartAt', () => {
