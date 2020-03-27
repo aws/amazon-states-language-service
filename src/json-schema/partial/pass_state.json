@@ -21,7 +21,7 @@
                         },
                         "Parameters": {
                             "$ref": "common.json#/definitions/parameters",
-                            "description": "A collection of key-value pairs that will be passed as input. Values can be static, or selected from the input with a path."
+                            "description": "A collection of key-value pairs that will be passed as input to the next state. Values can be static, or selected from the input to the current state using JsonPath."
                         }
                     }
                 }

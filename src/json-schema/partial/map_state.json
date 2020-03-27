@@ -51,11 +51,11 @@
                         },
                         "Retry": {
                             "$ref": "common.json#/definitions/retry",
-                            "description": "An array of objects, called Retriers, that define a retry policy if the state encounters runtime errors."
+                            "description": "Contains an array of objects, called Retriers, that define a retry policy if the state encounters runtime errors."
                         },
                         "Catch": {
                             "$ref": "common.json#/definitions/catch",
-                            "description": "An array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
+                            "description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
                         }
                     },
                     "required": [

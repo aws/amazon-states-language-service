@@ -10,16 +10,16 @@
 		},
 		"Comment": {
 			"type": "string",
-			"description": "A human-readable description of the state machine.",
+			"description": "A human-readable comment or description.",
 			"minLength": 1
 		},
 		"TimeoutSeconds": {
 			"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/Retry/items/properties/IntervalSeconds",
-			"description": "The maximum number of seconds an execution of the state machine can run. If it runs longer than the specified time, the execution fails with a States.Timeout Error Name."
+			"description": "The maximum number of seconds an execution of the state machine can run. If it runs longer than the specified time, the execution fails with a States.Timeout error."
 		},
 		"StartAt": {
 			"type": "string",
-			"description": "A string that must exactly match (is case sensitive) the name of one of the state objects.",
+			"description": "A string that must exactly match (is case sensitive) the name of a state.",
 			"minLength": 1
 		},
 		"States": {
@@ -124,7 +124,7 @@
 										]
 									},
 									"Parameters": {
-										"description": "A collection of key-value pairs that will be passed as input. Values can be static, or selected from the input with a path.",
+										"description": "A collection of key-value pairs that will be passed as input to the next state. Values can be static, or selected from the input to the current state using JsonPath.",
 										"type": "object"
 									}
 								}
@@ -205,7 +205,7 @@
 						]
 					},
 					{
-						"description": "A Task state represents a single unit of work performed by a state machine.\nAll work in your state machine is done by tasks. A task performs work by using an activity or an AWS Lambda function, or by passing parameters to the API actions of other services.",
+						"description": "A Task state represents a single unit of work performed by a state machine.\nAll work in your state machine is done by tasks. A task performs work identified by the state’s Resource field, which is often an AWS Lambda function or other Step Functions service integrations.",
 						"allOf": [
 							{
 								"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/0"
@@ -1028,7 +1028,7 @@
 									},
 									"Default": {
 										"type": "string",
-										"description": "The name of the state to transition to if none of the transitions in Choices is taken."
+										"description": "The name of the state to transition to if none of the Choice Rules match."
 									}
 								},
 								"required": [
@@ -1148,11 +1148,11 @@
 									},
 									"Retry": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/Retry",
-										"description": "An array of objects, called Retriers, that define a retry policy if the state encounters runtime errors."
+										"description": "Contains an array of objects, called Retriers, that define a retry policy if the state encounters runtime errors."
 									},
 									"Catch": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/Catch",
-										"description": "An array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
+										"description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
 									}
 								},
 								"required": [
@@ -1212,11 +1212,11 @@
 									},
 									"Retry": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/Retry",
-										"description": "An array of objects, called Retriers, that define a retry policy if the state encounters runtime errors."
+										"description": "Contains an array of objects, called Retriers, that define a retry policy if the state encounters runtime errors."
 									},
 									"Catch": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/Catch",
-										"description": "An array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
+										"description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
 									}
 								},
 								"required": [

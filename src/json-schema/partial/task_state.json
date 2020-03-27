@@ -1,7 +1,7 @@
 {
     "definitions": {
         "taskState": {
-            "description": "A Task state represents a single unit of work performed by a state machine.\nAll work in your state machine is done by tasks. A task performs work by using an activity or an AWS Lambda function, or by passing parameters to the API actions of other services.",
+            "description": "A Task state represents a single unit of work performed by a state machine.\nAll work in your state machine is done by tasks. A task performs work identified by the state’s Resource field, which is often an AWS Lambda function or other Step Functions service integrations.",
             "allOf": [
                 {
                     "$ref": "common.json#/definitions/basics"
