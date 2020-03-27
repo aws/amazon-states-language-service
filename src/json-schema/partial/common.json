@@ -79,7 +79,7 @@
         },
         "comment": {
             "type": "string",
-            "description": "A human-readable description of the state machine.",
+            "description": "A human-readable comment or description.",
             "minLength": 1
         },
         "endOrTransition": {
