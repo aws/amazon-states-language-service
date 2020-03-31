@@ -25,7 +25,7 @@
                         },
                         "Branches": {
                             "type": "array",
-                            "description": "An array of objects that specify state machines to execute in parallel.",
+                            "description": "An array of objects that specifies state machines to execute in parallel.",
                             "minItems": 1,
                             "items": {
                                 "type": "object",
