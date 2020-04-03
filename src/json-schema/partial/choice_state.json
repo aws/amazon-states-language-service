@@ -94,6 +94,16 @@
                 }
             ]
         },
+        "variable": {
+            "type": "string",
+            "description": "A reference path specifying the input value to apply the comparison operator to.",
+            "minLength": 1
+        },
+        "next": {
+            "type": "string",
+            "description": "The state to transition to if there is an exact match between the input value and the comparison operator for this Choice Rule.",
+            "minLength": 1
+        },
         "topStringEquals": {
             "type": "object",
             "properties": {
@@ -101,11 +111,10 @@
                     "type": "string"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -121,11 +130,10 @@
                     "type": "string"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -141,11 +149,10 @@
                     "type": "string"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -161,11 +168,10 @@
                     "type": "string"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -181,11 +187,10 @@
                     "type": "string"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -201,11 +206,10 @@
                     "type": "number"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -221,11 +225,10 @@
                     "type": "number"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -241,11 +244,10 @@
                     "type": "number"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -261,11 +263,10 @@
                     "type": "number"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -281,11 +282,10 @@
                     "type": "number"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -301,11 +301,10 @@
                     "type": "boolean"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -321,11 +320,10 @@
                     "$ref": "common.json#/definitions/timestamp"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -341,11 +339,10 @@
                     "$ref": "common.json#/definitions/timestamp"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -361,11 +358,10 @@
                     "$ref": "common.json#/definitions/timestamp"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -381,11 +377,10 @@
                     "$ref": "common.json#/definitions/timestamp"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -401,11 +396,10 @@
                     "$ref": "common.json#/definitions/timestamp"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -421,8 +415,7 @@
                     "$ref": "#/definitions/lowerConditions"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -437,8 +430,7 @@
                     "$ref": "#/definitions/lowerConditions"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -453,8 +445,7 @@
                     "$ref": "#/definitions/lowerCondition"
                 },
                 "Next": {
-                    "type": "string",
-                    "minLength": 1
+                    "$ref": "#/definitions/next"
                 }
             },
             "required": [
@@ -537,7 +528,7 @@
                     "type": "string"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 }
             },
             "required": [
@@ -552,7 +543,7 @@
                     "type": "string"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 }
             },
             "required": [
@@ -567,7 +558,7 @@
                     "type": "string"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 }
             },
             "required": [
@@ -582,7 +573,7 @@
                     "type": "string"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 }
             },
             "required": [
@@ -597,7 +588,7 @@
                     "type": "string"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 }
             },
             "required": [
@@ -612,7 +603,7 @@
                     "type": "number"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 }
             },
             "required": [
@@ -627,7 +618,7 @@
                     "type": "number"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 }
             },
             "required": [
@@ -642,7 +633,7 @@
                     "type": "number"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 }
             },
             "required": [
@@ -657,7 +648,7 @@
                     "type": "number"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 }
             },
             "required": [
@@ -672,7 +663,7 @@
                     "type": "number"
                 },
                 "Variable": {
-                    "$ref": "common.json#/definitions/referencePath"
+                    "$ref": "#/definitions/variable"
                 }
             },
             "required": [
