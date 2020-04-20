@@ -8,6 +8,11 @@
                     "description": "The state's type.",
                     "minLength": 1,
                     "enum": ["Pass", "Succeed", "Fail", "Task", "Choice", "Wait", "Parallel", "Map"]
+                },
+                "Comment": {
+                    "type": "string",
+                    "description": "A human-readable comment or description of the state.",
+                    "minLength": 1
                 }
             },
             "required": [
@@ -137,17 +142,21 @@
                 "type": "object",
                 "properties": {
                     "ErrorEquals": {
-                        "$ref": "#/definitions/errors"
+                        "$ref": "#/definitions/errors",
+                        "description": "A non-empty array of Error Names. The retry policy for this Retrier is implemented if the reported error matches one of the Error Names."
                     },
                     "IntervalSeconds": {
-                        "$ref": "#/definitions/seconds"
+                        "$ref": "#/definitions/seconds",
+                        "description": "A positive integer representing the number of seconds before the first retry attempt. (Default: 1)"
                     },
                     "MaxAttempts": {
                         "type": "integer",
+                        "description": "A non-negative integer representing the maximum number of retry attempts. (Default: 3)",
                         "minimum": 0
                     },
                     "BackoffRate": {
                         "type": "number",
+                        "description": "A number (>= 1) which is the multiplier that increases the retry interval on each attempt. (Default: 2.0)",
                         "minimum": 1.0
                     }
                 },
@@ -163,16 +172,19 @@
                 "type": "object",
                 "properties": {
                     "ErrorEquals": {
-                        "$ref": "#/definitions/errors"
+                        "$ref": "#/definitions/errors",
+                        "description": "A non-empty array of Error Names. The state machine transitions to this Catcher's fallback state if the reported error matches one of the Error Names."
                     },
                     "Next": {
                         "type": "string",
+                        "description": "The state to transition to on Error Name match.",
                         "minLength": 1
                     },
                     "ResultPath": {
                         "oneOf": [
                             {
-                                "$ref": "#/definitions/referencePath"
+                                "$ref": "#/definitions/referencePath",
+                                "description": "A path that specifies where to place the Result, relative to the raw input. If the raw input has a field at the location addressed by the ResultPath value then in the output that field is discarded and overwritten by the state's result. Otherwise, a new field is created in the state output, with intervening fields constructed as necessary."
                             },
                             {
                                 "type": "null"
