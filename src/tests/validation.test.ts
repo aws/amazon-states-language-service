@@ -11,6 +11,7 @@ import { MESSAGES } from '../validation/validateStates'
 import {
   documentChoiceInvalidDefault,
   documentChoiceInvalidNext,
+  documentChoiceNoDefault,
   documentChoiceValidDefault,
   documentChoiceValidNext,
   documentInvalidNext,
@@ -116,6 +117,13 @@ suite('ASL context-aware validation', () => {
         test('Doesn\'t show Diagnostic for valid state name', async () => {
             await testValidations({
                 json: documentChoiceValidDefault,
+                diagnostics: []
+            })
+        })
+
+        test('Doesn\'t show Diagnostic when default property is absent', async () => {
+            await testValidations({
+                json: documentChoiceNoDefault,
                 diagnostics: []
             })
         })

@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+/* tslint:disable:cyclomatic-complexity */
+
 import {
     Diagnostic,
     DiagnosticSeverity,
@@ -180,13 +182,12 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
 
                         case 'Choice': {
                             const defaultNode = findPropChildByName(oneStateValueNode, 'Default')
+                            const name = defaultNode?.valueNode?.value
                             const defaultStateDiagnostic = stateNameExistsInPropNode(defaultNode, stateNames, document, MESSAGES.INVALID_DEFAULT)
 
                             if (defaultStateDiagnostic) {
                                 diagnostics.push(defaultStateDiagnostic)
-                            } else {
-                                const name = defaultNode.valueNode.value as string
-
+                            } else if (typeof name === 'string') {
                                 reachedStates[name] = true
                             }
 
