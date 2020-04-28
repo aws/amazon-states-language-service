@@ -675,3 +675,23 @@ export const documentChoiceInvalidDefault = `{
       }
   }
 }`
+
+export const documentChoiceNoDefault = `{
+    "StartAt": "ChoiceState",
+    "States": {
+        "ChoiceState": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.foo",
+                    "NumericEquals": 1,
+                    "Next": "FirstMatchState"
+                }
+            ]
+        },
+        "FirstMatchState": {
+            "Type": "Pass",
+            "End": true
+        }
+    }
+}`
