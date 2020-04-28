@@ -9,6 +9,7 @@ import { getLanguageService, Position, Range } from '../service'
 import { MESSAGES } from '../validation/validateStates'
 
 import {
+  documentChoiceDefaultBeforeChoice,
   documentChoiceInvalidDefault,
   documentChoiceInvalidNext,
   documentChoiceNoDefault,
@@ -124,6 +125,13 @@ suite('ASL context-aware validation', () => {
         test('Doesn\'t show Diagnostic when default property is absent', async () => {
             await testValidations({
                 json: documentChoiceNoDefault,
+                diagnostics: []
+            })
+        })
+
+        test('Doesn\'t show Diagnostic for valid state name when default state is declared before Choice state', async () => {
+            await testValidations({
+                json: documentChoiceDefaultBeforeChoice,
                 diagnostics: []
             })
         })

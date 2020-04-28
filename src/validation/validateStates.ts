@@ -189,6 +189,9 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                                 diagnostics.push(defaultStateDiagnostic)
                             } else if (typeof name === 'string') {
                                 reachedStates[name] = true
+
+                                // tslint:disable-next-line no-dynamic-delete
+                                delete unreachedStates[name]
                             }
 
                             const validateChoiceResult = validateArrayNext('Choices', oneStateValueNode, stateNames, document)

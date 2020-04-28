@@ -677,21 +677,48 @@ export const documentChoiceInvalidDefault = `{
 }`
 
 export const documentChoiceNoDefault = `{
-    "StartAt": "ChoiceState",
-    "States": {
-        "ChoiceState": {
-            "Type": "Choice",
-            "Choices": [
-                {
-                    "Variable": "$.foo",
-                    "NumericEquals": 1,
-                    "Next": "FirstMatchState"
-                }
-            ]
-        },
-        "FirstMatchState": {
-            "Type": "Pass",
-            "End": true
-        }
-    }
+  "StartAt": "ChoiceState",
+  "States": {
+      "ChoiceState": {
+          "Type": "Choice",
+          "Choices": [
+              {
+                  "Variable": "$.foo",
+                  "NumericEquals": 1,
+                  "Next": "FirstMatchState"
+              }
+          ]
+      },
+      "FirstMatchState": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}`
+
+export const documentChoiceDefaultBeforeChoice = `{
+  "StartAt": "ChoiceState",
+  "States": {
+      "DefaultState": {
+          "Type": "Fail",
+          "Error": "DefaultStateError",
+          "Cause": "No Matches!"
+      },
+      "ChoiceState": {
+          "Type": "Choice",
+          "Choices": [
+              {
+                  "Variable": "$.foo",
+                  "NumericEquals": 1,
+                  "Next": "FirstMatchState"
+              }
+          ],
+          "Default": "DefaultState"
+      },
+      "FirstMatchState": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:OnFirstMatch",
+          "End": true
+      }
+  }
 }`
