@@ -21,13 +21,8 @@ import {
     isObjectNode,
 } from '../utils/astUtilityFunctions'
 
-export const MESSAGES = {
-    INVALID_NEXT: 'The value of "Next" property must be the name of an existing state.',
-    INVALID_DEFAULT: 'The value of "Default" property must be the name of an existing state.',
-    INVALID_START_AT: 'The value of "StartAt" property must be the name of an existing state.',
-    UNREACHABLE_STATE: 'The state cannot be reached. It must be referenced by at least one other state.',
-    NO_TERMINAL_STATE: 'No terminal state. The state machine must have at least one terminal state (a state in which the "End" property is set to true).'
-}
+import { MESSAGES } from '../constants/diagnosticStrings'
+import validateProperties from './validateProperties'
 
 function stateNameExistsInPropNode(
     nextPropNode: PropertyASTNode,
@@ -113,6 +108,8 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                 const oneStateValueNode = prop.valueNode
 
                 if (oneStateValueNode && isObjectNode(oneStateValueNode)) {
+                    diagnostics = diagnostics.concat(validateProperties(oneStateValueNode, document))
+
                     const nextPropNode = findPropChildByName(oneStateValueNode, 'Next')
                     const endPropNode = findPropChildByName(oneStateValueNode, 'End')
 
