@@ -883,3 +883,43 @@ export const documentInvalidPropertiesChoices = `{
       }
   }
 }`
+
+export const documentInvalidPropertiesRoot = `{
+  "StartAt": "Succeed",
+  "TimeoutSeconds": 3,
+  "Version": "1.0",
+  "Comment": "It's a test",
+  "NewTopLevelField": "This field is not supported",
+  "States": {
+      "Succeed": {
+          "Type": "Succeed"
+      }
+  }
+}`
+
+export const documentInvalidPropertiesRootNested = `{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "Next": "Final State",
+          "Iterator": {
+              "StartAt": "Pass",
+              "Comment": "Nested comment",
+              "InvalidProp": "This is invalid",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "Result": "Done!",
+                      "End": true
+                  }
+              }
+          }
+      },
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}`

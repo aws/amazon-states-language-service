@@ -19,6 +19,8 @@ import {
   documentInvalidNextNested,
   documentInvalidPropertiesCatch,
   documentInvalidPropertiesChoices,
+  documentInvalidPropertiesRoot,
+  documentInvalidPropertiesRootNested,
   documentInvalidPropertiesState,
   documentNestedNoTerminalState,
   documentNestedUnreachableState,
@@ -36,6 +38,8 @@ import {
 } from './json-strings/validationStrings'
 
 import { toDocument } from './utils/testUtilities'
+
+const JSON_SCHEMA_MULTIPLE_SCHEMAS_MSG = 'Matches multiple schemas when only one must validate.'
 
 export interface TestValidationOptions {
     json: string,
@@ -429,12 +433,12 @@ suite('ASL context-aware validation', () => {
                         end: [17, 40]
                     },
                     {
-                        message: MESSAGES.MUTUALLY_EXCLUSIVE_PROPERTIES + 'StringEquals, NumericGreaterThanEquals',
+                        message: MESSAGES.MUTUALLY_EXCLUSIVE_PROPERTIES,
                         start: [15, 22],
                         end: [15, 36]
                     },
                     {
-                        message: MESSAGES.MUTUALLY_EXCLUSIVE_PROPERTIES + 'StringEquals, NumericGreaterThanEquals',
+                        message: MESSAGES.MUTUALLY_EXCLUSIVE_PROPERTIES,
                         start: [16, 22],
                         end: [16, 48]
                     },
@@ -454,7 +458,35 @@ suite('ASL context-aware validation', () => {
                         end: [37, 53]
                     },
                 ],
-                filterMessages: [MESSAGES.UNREACHABLE_STATE, 'Matches multiple schemas when only one must validate.']
+                filterMessages: [MESSAGES.UNREACHABLE_STATE, JSON_SCHEMA_MULTIPLE_SCHEMAS_MSG]
+
+            })
+
+        })
+
+        test('Shows diagnostics for additional invalid properties within root of state machine', async () => {
+            await testValidations({
+                json: documentInvalidPropertiesRoot,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [5, 2],
+                        end: [5, 20]
+                    }
+                ]
+            })
+        })
+
+        test('Shows diagnostics for additional invalid properties within root of nested state machine', async () => {
+            await testValidations({
+                json: documentInvalidPropertiesRootNested,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [10, 14],
+                        end: [10, 27]
+                    }
+                ]
             })
         })
     })

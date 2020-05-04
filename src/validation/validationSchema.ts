@@ -37,10 +37,15 @@ export default {
         },
         Choice: {
             Properties: {
+                Comment: true,
+                InputPath: true,
+                OutputPath: true,
+                Type: true,
                 Choices: {
                     'Fn:ArrayOf': 'Choices'
                 },
-                Default: true
+                Default: true,
+                hasCommonFields: false
             }
         },
         Wait: {
@@ -53,7 +58,10 @@ export default {
         },
         Succeed: {
             Properties: {
-                Type: true
+                Type: true,
+                Comment: true,
+                InputPath: true,
+                OutputPath: true,
             },
             hasCommonFields: false
         },
@@ -70,6 +78,7 @@ export default {
             Properties: {
                 Branches: true,
                 ResultPath: true,
+                Parameters: true,
                 Retry: {
                     'Fn:ArrayOf': 'Retry'
                 },
@@ -84,6 +93,7 @@ export default {
                 ItemsPath: true,
                 MaxConcurrency: true,
                 ResultPath: true,
+                Parameters: true,
                 Retry: {
                     'Fn:ArrayOf': 'Retry'
                 },
@@ -121,19 +131,16 @@ export default {
             TimestampLessThan: true,
             TimestampLessThanEquals: true
         },
-
         Choices: {
             'Fn:OneOf': 'ChoiceRules',
             Variable: true,
             Next: true
         },
-
         Catch: {
             ErrorEquals: true,
             ResultPath: true,
             Next: true
         },
-
         Retry: {
             ErrorEquals: true,
             IntervalSeconds: true,
@@ -147,6 +154,11 @@ export default {
         TimeoutSeconds: true,
         Version: true,
         States: true
+    },
+    // State machines nested within Map and Parallel states
+    NestedRoot: {
+        Comment: true,
+        StartAt: true,
+        States: true
     }
-
 }
