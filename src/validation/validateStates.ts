@@ -22,7 +22,8 @@ import {
 } from '../utils/astUtilityFunctions'
 
 import { MESSAGES } from '../constants/diagnosticStrings'
-import validateProperties, { getPropertyNodeDiagnostic } from './validateProperties'
+import { getPropertyNodeDiagnostic } from './utils/validatePropertiesUtils'
+import validateProperties from './validateProperties'
 import schema from './validationSchema'
 
 function stateNameExistsInPropNode(

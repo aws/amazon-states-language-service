@@ -12,13 +12,14 @@ export default {
         OutputPath: true,
         Type: true
     },
-    Specific: {
+    StateTypes: {
         Pass: {
             Properties: {
                 Result: true,
                 ResultPath: true,
                 Parameters: true
-            }
+            },
+            hasCommonProperties: true
         },
         Task: {
             Properties: {
@@ -28,12 +29,13 @@ export default {
                 TimeoutSeconds: true,
                 HeartbeatSeconds: true,
                 Retry: {
-                    'Fn:ArrayOf': 'Retry'
+                    'Fn:ArrayOf': 'Retrier'
                 },
                 Catch: {
-                    'Fn:ArrayOf': 'Catch'
+                    'Fn:ArrayOf': 'Catcher'
                 }
-            }
+            },
+            hasCommonProperties: true
         },
         Choice: {
             Properties: {
@@ -42,10 +44,9 @@ export default {
                 OutputPath: true,
                 Type: true,
                 Choices: {
-                    'Fn:ArrayOf': 'Choices'
+                    'Fn:ArrayOf': 'ChoiceRule'
                 },
                 Default: true,
-                hasCommonFields: false
             }
         },
         Wait: {
@@ -54,7 +55,8 @@ export default {
                 Timestamp: true,
                 SecondsPath: true,
                 TimestampPath: true
-            }
+            },
+            hasCommonProperties: true
         },
         Succeed: {
             Properties: {
@@ -62,8 +64,7 @@ export default {
                 Comment: true,
                 InputPath: true,
                 OutputPath: true,
-            },
-            hasCommonFields: false
+            }
         },
         Fail: {
             Properties: {
@@ -71,8 +72,7 @@ export default {
                 Error: true,
                 Comment: true,
                 Type:  true
-            },
-            hasCommonFields: false
+            }
         },
         Parallel: {
             Properties: {
@@ -80,12 +80,13 @@ export default {
                 ResultPath: true,
                 Parameters: true,
                 Retry: {
-                    'Fn:ArrayOf': 'Retry'
+                    'Fn:ArrayOf': 'Retrier'
                 },
                 Catch: {
-                    'Fn:ArrayOf': 'Catch'
+                    'Fn:ArrayOf': 'Catcher'
                 }
-            }
+            },
+            hasCommonProperties: true
         },
         Map: {
             Properties: {
@@ -95,22 +96,23 @@ export default {
                 ResultPath: true,
                 Parameters: true,
                 Retry: {
-                    'Fn:ArrayOf': 'Retry'
+                    'Fn:ArrayOf': 'Retrier'
                 },
                 Catch: {
-                    'Fn:ArrayOf': 'Catch'
+                    'Fn:ArrayOf': 'Catcher'
                 }
-            }
+            },
+            hasCommonProperties: true
         }
     },
-    Sets: {
-        ChoiceRules: {
+    ReferenceTypes: {
+        ComparisonOperators: {
             And: {
-                'Fn:ArrayOf': 'Choices'
+                'Fn:ArrayOf': 'NestedChoiceRule'
             },
             BooleanEquals: true,
             Not: {
-                'Fn:ValueOf': 'Choices'
+                'Fn:ValueOf': 'ChoiceRule'
             },
             NumericEquals: true,
             NumericGreaterThan: true,
@@ -118,7 +120,7 @@ export default {
             NumericLessThan: true,
             NumericLessThanEquals: true,
             Or: {
-                'Fn:ArrayOf': 'Choices'
+                'Fn:ArrayOf': 'NestedChoiceRule'
             },
             StringEquals: true,
             StringGreaterThan: true,
@@ -131,17 +133,21 @@ export default {
             TimestampLessThan: true,
             TimestampLessThanEquals: true
         },
-        Choices: {
-            'Fn:OneOf': 'ChoiceRules',
+        ChoiceRule: {
+            'Fn:OneOf': 'ComparisonOperators',
             Variable: true,
             Next: true
         },
-        Catch: {
+        NestedChoiceRule: {
+            'Fn:OneOf': 'ComparisonOperators',
+             Variable: true,
+        },
+        Catcher: {
             ErrorEquals: true,
             ResultPath: true,
             Next: true
         },
-        Retry: {
+        Retrier: {
             ErrorEquals: true,
             IntervalSeconds: true,
             MaxAttempts: true,

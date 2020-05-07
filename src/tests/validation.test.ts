@@ -433,12 +433,12 @@ suite('ASL context-aware validation', () => {
                         end: [17, 40]
                     },
                     {
-                        message: MESSAGES.MUTUALLY_EXCLUSIVE_PROPERTIES,
+                        message: MESSAGES.MUTUALLY_EXCLUSIVE_CHOICE_PROPERTIES,
                         start: [15, 22],
                         end: [15, 36]
                     },
                     {
-                        message: MESSAGES.MUTUALLY_EXCLUSIVE_PROPERTIES,
+                        message: MESSAGES.MUTUALLY_EXCLUSIVE_CHOICE_PROPERTIES,
                         start: [16, 22],
                         end: [16, 48]
                     },
