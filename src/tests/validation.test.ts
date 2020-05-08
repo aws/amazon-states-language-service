@@ -5,8 +5,8 @@
 
 import * as assert from 'assert';
 import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver'
+import { MESSAGES } from '../constants/diagnosticStrings'
 import { getLanguageService, Position, Range } from '../service'
-import { MESSAGES } from '../validation/validateStates'
 
 import {
   documentChoiceDefaultBeforeChoice,
@@ -17,6 +17,11 @@ import {
   documentChoiceValidNext,
   documentInvalidNext,
   documentInvalidNextNested,
+  documentInvalidPropertiesCatch,
+  documentInvalidPropertiesChoices,
+  documentInvalidPropertiesRoot,
+  documentInvalidPropertiesRootNested,
+  documentInvalidPropertiesState,
   documentNestedNoTerminalState,
   documentNestedUnreachableState,
   documentNoTerminalState,
@@ -33,6 +38,8 @@ import {
 } from './json-strings/validationStrings'
 
 import { toDocument } from './utils/testUtilities'
+
+const JSON_SCHEMA_MULTIPLE_SCHEMAS_MSG = 'Matches multiple schemas when only one must validate.'
 
 export interface TestValidationOptions {
     json: string,
@@ -370,5 +377,132 @@ suite('ASL context-aware validation', () => {
             filterMessages: [MESSAGES.UNREACHABLE_STATE]
         })
       })
+    })
+
+    suite('Additional properties that are not valid', async () => {
+        test('Shows diagnostics for additional invalid properties of a given state', async () => {
+            await testValidations({
+                json: documentInvalidPropertiesState,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [7, 10],
+                        end: [7, 29]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [8, 10],
+                        end: [8, 29]
+                    }
+                ],
+                filterMessages: [MESSAGES.UNREACHABLE_STATE]
+            })
+        })
+
+        test('Shows diagnostics for additional invalid properties within Catch block', async () => {
+            await testValidations({
+                json: documentInvalidPropertiesCatch,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [12, 20],
+                        end: [12, 32]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [19, 20],
+                        end: [19, 32]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [20, 20],
+                        end: [20, 34]
+                    }
+                ],
+                filterMessages: [MESSAGES.UNREACHABLE_STATE]
+            })
+        })
+
+        test('Shows diagnostics for additional invalid properties within Choice state', async () => {
+            await testValidations({
+                json: documentInvalidPropertiesChoices,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [17, 22],
+                        end: [17, 40]
+                    },
+                    {
+                        message: MESSAGES.MUTUALLY_EXCLUSIVE_CHOICE_PROPERTIES,
+                        start: [15, 22],
+                        end: [15, 36]
+                    },
+                    {
+                        message: MESSAGES.MUTUALLY_EXCLUSIVE_CHOICE_PROPERTIES,
+                        start: [16, 22],
+                        end: [16, 48]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [23, 18],
+                        end: [23, 37]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [29, 30],
+                        end: [29, 48]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [30, 30],
+                        end: [30, 36]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [38, 34],
+                        end: [38, 53]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [39, 34],
+                        end: [39, 40]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [50, 24],
+                        end: [50, 30]
+                    },
+                ],
+                filterMessages: [MESSAGES.UNREACHABLE_STATE, JSON_SCHEMA_MULTIPLE_SCHEMAS_MSG]
+
+            })
+
+        })
+
+        test('Shows diagnostics for additional invalid properties within root of state machine', async () => {
+            await testValidations({
+                json: documentInvalidPropertiesRoot,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [5, 2],
+                        end: [5, 20]
+                    }
+                ]
+            })
+        })
+
+        test('Shows diagnostics for additional invalid properties within root of nested state machine', async () => {
+            await testValidations({
+                json: documentInvalidPropertiesRootNested,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [10, 14],
+                        end: [10, 27]
+                    }
+                ]
+            })
+        })
     })
 })

@@ -12,7 +12,7 @@ import {
     PropertyASTNode,
     Range,
     TextDocument,
-} from 'vscode-json-languageservice';
+} from 'vscode-json-languageservice'
 
 import {
     findPropChildByName,
@@ -21,13 +21,10 @@ import {
     isObjectNode,
 } from '../utils/astUtilityFunctions'
 
-export const MESSAGES = {
-    INVALID_NEXT: 'The value of "Next" property must be the name of an existing state.',
-    INVALID_DEFAULT: 'The value of "Default" property must be the name of an existing state.',
-    INVALID_START_AT: 'The value of "StartAt" property must be the name of an existing state.',
-    UNREACHABLE_STATE: 'The state cannot be reached. It must be referenced by at least one other state.',
-    NO_TERMINAL_STATE: 'No terminal state. The state machine must have at least one terminal state (a state in which the "End" property is set to true).'
-}
+import { MESSAGES } from '../constants/diagnosticStrings'
+import getPropertyNodeDiagnostic from './utils/getPropertyNodeDiagnostic'
+import validateProperties from './validateProperties'
+import schema from './validationSchema'
 
 function stateNameExistsInPropNode(
     nextPropNode: PropertyASTNode,
@@ -75,11 +72,25 @@ function validateArrayNext(arrayPropName: string, oneStateValueNode: ObjectASTNo
     return { diagnostics, reachedStates }
 }
 
-export default function validateStates(rootNode: ObjectASTNode, document: TextDocument): Diagnostic[] {
+export default function validateStates(rootNode: ObjectASTNode, document: TextDocument, isRoot?: Boolean): Diagnostic[] {
     const statesNode = findPropChildByName(rootNode, 'States')
     const startAtNode = findPropChildByName(rootNode, 'StartAt')
 
+    // Different schemas for root and root of nested state machine
+    const rootSchema = isRoot ? schema.Root : schema.NestedRoot
+
     let diagnostics: Diagnostic[] = []
+
+    // Check root property names against the schema
+    rootNode.properties.forEach(prop => {
+        const key = prop.keyNode.value
+
+        if (!rootSchema[key]) {
+            diagnostics.push(
+                getPropertyNodeDiagnostic(prop, document, MESSAGES.INVALID_PROPERTY_NAME)
+            )
+        }
+    })
 
     if (statesNode) {
         const stateNames = getListOfStateNamesFromStateNode(statesNode)
@@ -104,7 +115,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
 
             const startAtValue = startAtNode?.valueNode?.value
 
-            // mark state refered to in StartAt as reached
+            // mark state referred to in StartAt as reached
             if (typeof startAtValue === 'string') {
                 reachedStates[startAtValue] = true
             }
@@ -113,6 +124,8 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                 const oneStateValueNode = prop.valueNode
 
                 if (oneStateValueNode && isObjectNode(oneStateValueNode)) {
+                    diagnostics = diagnostics.concat(validateProperties(oneStateValueNode, document))
+
                     const nextPropNode = findPropChildByName(oneStateValueNode, 'Next')
                     const endPropNode = findPropChildByName(oneStateValueNode, 'End')
 
@@ -225,7 +238,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                 diagnostics.push(Diagnostic.create(range, MESSAGES.NO_TERMINAL_STATE, DiagnosticSeverity.Error))
             }
 
-            // loop thorugh the hash map of unreached states and create diagnostics
+            // loop through the hash map of unreached states and create diagnostics
             Object.values(unreachedStates).forEach(statePropNode => {
                 const { length, offset } =  statePropNode.keyNode
                 const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))

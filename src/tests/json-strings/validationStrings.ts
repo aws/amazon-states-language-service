@@ -722,3 +722,211 @@ export const documentChoiceDefaultBeforeChoice = `{
       }
   }
 }`
+
+export const documentInvalidPropertiesState = `{
+  "StartAt": "FirstState",
+  "States": {
+      "FirstState": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:FUNCTION_NAME",
+          "Next": "ChoiceState",
+          "SomethingInvalid1": "dddd",
+          "SomethingInvalid2": "eeee"
+      },
+      "ChoiceState": {
+          "Type": "Choice",
+          "Choices": [
+              {
+                  "Variable": "$.foo",
+                  "NumericEquals": 1,
+                  "Next": "FirstMatchState"
+              }
+          ],
+          "Default": "DefaultState"
+      },
+      "FirstMatchState": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:OnFirstMatch",
+          "Next": "NextState"
+      },
+      "DefaultState": {
+          "Type": "Fail",
+          "Error": "DefaultStateError",
+          "Cause": "No Matches!"
+      },
+      "NextState": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}`
+
+export const documentInvalidPropertiesCatch = `{
+    "StartAt": "HelloWorld",
+    "States": {
+        "HelloWorld": {
+            "Type": "Task",
+            "Resource": "arn:aws:lambda:us-east-1:111111111111:function:FUNCTION_NAME",
+            "Catch": [
+                {
+                    "ErrorEquals": [
+                        "CustomError"
+                    ],
+                    "Next": "CustomErrorFallback",
+                    "OneInvalid": "something"
+                },
+                {
+                    "ErrorEquals": [
+                        "States.TaskFailed"
+                    ],
+                    "Next": "ReservedTypeFallback",
+                    "TwoInvalid": "something",
+                    "ThreeInvalid": "something"
+                },
+                {
+                    "ErrorEquals": [
+                        "States.ALL"
+                    ],
+                    "Next": "CatchAllFallback"
+                }
+            ],
+            "End": true
+        },
+        "CustomErrorFallback": {
+            "Type": "Pass",
+            "Result": "This is a fallback from a custom lambda function exception",
+            "End": true
+        },
+        "ReservedTypeFallback": {
+            "Type": "Pass",
+            "Result": "This is a fallback from a reserved error code",
+            "End": true
+        },
+        "CatchAllFallback": {
+            "Type": "Pass",
+            "Result": "This is a fallback from a reserved error code",
+            "End": true
+        }
+    }
+}`
+
+export const documentInvalidPropertiesChoices = `{
+  "Comment": "An example of the Amazon States Language using a choice state.",
+  "StartAt": "FirstState",
+  "States": {
+      "FirstState": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:FUNCTION_NAME",
+          "Next": "ChoiceState"
+      },
+      "ChoiceState": {
+          "Type": "Choice",
+          "Choices": [
+              {
+                  "Not": {
+                      "Variable": "$.foo",
+                      "StringEquals": "blabla",
+                      "NumericGreaterThanEquals": 20,
+                      "FirstInvalidProp": {}
+                  },
+                  "Next": "FirstMatchState"
+              },
+              {
+
+                  "SecondInvalidProp": {},
+                  "And": [
+                      {
+                          "Not": {
+                              "Variable": "$.foo",
+                              "StringEquals": "blabla",
+                              "ThirdInvalidProp": {},
+                              "Next": "FirstMatchState"
+                          }
+                      },
+                      {
+                          "Or": [
+                              {
+                                  "Variable": "$.value",
+                                  "NumericGreaterThanEquals": 20,
+                                  "FourthInvalidProp": {},
+                                  "Next": "FirstMatchState"
+                              },
+                              {
+                                  "Variable": "$.value",
+                                  "NumericLessThan": 30
+                              }
+                          ]
+                      },
+                      {
+                        "Variable": "$.foo",
+                        "NumericGreaterThanEquals": 20,
+                        "Next": "SecondMatchState"
+                      }
+                  ],
+                  "Next": "SecondMatchState"
+              }
+          ],
+          "Default": "DefaultState"
+      },
+      "FirstMatchState": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:OnFirstMatch",
+          "Next": "NextState"
+      },
+      "SecondMatchState": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:OnSecondMatch",
+          "Next": "NextState"
+      },
+      "DefaultState": {
+          "Type": "Fail",
+          "Error": "DefaultStateError",
+          "Cause": "No Matches!"
+      },
+      "NextState": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:FUNCTION_NAME",
+          "End": true
+      }
+  }
+}`
+
+export const documentInvalidPropertiesRoot = `{
+  "StartAt": "Succeed",
+  "TimeoutSeconds": 3,
+  "Version": "1.0",
+  "Comment": "It's a test",
+  "NewTopLevelField": "This field is not supported",
+  "States": {
+      "Succeed": {
+          "Type": "Succeed"
+      }
+  }
+}`
+
+export const documentInvalidPropertiesRootNested = `{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "Next": "Final State",
+          "Iterator": {
+              "StartAt": "Pass",
+              "Comment": "Nested comment",
+              "InvalidProp": "This is invalid",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "Result": "Done!",
+                      "End": true
+                  }
+              }
+          }
+      },
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}`

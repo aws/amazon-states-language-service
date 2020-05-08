@@ -44,7 +44,7 @@ export const getLanguageService: GetLanguageServiceFunc = function(params) {
 
     languageService.doValidation = async function(document, jsonDocument, documentSettings) {
         // vscode-json-languageservice will always set severity as warning for JSONSchema validation
-        // there is no option to configure this behaviour so severity needs to be overwritten as error
+        // there is no option to configure this behavior so severity needs to be overwritten as error
         const diagnostics = (await doValidation(document, jsonDocument, documentSettings)).map(diagnostic => {
             // Non JSON Schema validation will have source: 'asl'
             if (diagnostic.source !== 'asl') {
@@ -57,7 +57,7 @@ export const getLanguageService: GetLanguageServiceFunc = function(params) {
         const rootNode = (jsonDocument as ASTTree).root
 
         if (rootNode && isObjectNode(rootNode)) {
-            const aslDiagnostics = validateStates(rootNode, document)
+            const aslDiagnostics = validateStates(rootNode, document, true)
 
             return diagnostics.concat(aslDiagnostics)
         }
