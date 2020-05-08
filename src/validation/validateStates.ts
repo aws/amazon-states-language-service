@@ -12,7 +12,7 @@ import {
     PropertyASTNode,
     Range,
     TextDocument,
-} from 'vscode-json-languageservice';
+} from 'vscode-json-languageservice'
 
 import {
     findPropChildByName,
@@ -22,7 +22,7 @@ import {
 } from '../utils/astUtilityFunctions'
 
 import { MESSAGES } from '../constants/diagnosticStrings'
-import { getPropertyNodeDiagnostic } from './utils/validatePropertiesUtils'
+import getPropertyNodeDiagnostic from './utils/getPropertyNodeDiagnostic'
 import validateProperties from './validateProperties'
 import schema from './validationSchema'
 

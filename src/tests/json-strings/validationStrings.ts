@@ -839,7 +839,8 @@ export const documentInvalidPropertiesChoices = `{
                           "Not": {
                               "Variable": "$.foo",
                               "StringEquals": "blabla",
-                              "ThirdInvalidProp": {}
+                              "ThirdInvalidProp": {},
+                              "Next": "FirstMatchState"
                           }
                       },
                       {
@@ -847,13 +848,19 @@ export const documentInvalidPropertiesChoices = `{
                               {
                                   "Variable": "$.value",
                                   "NumericGreaterThanEquals": 20,
-                                  "FourthInvalidProp": {}
+                                  "FourthInvalidProp": {},
+                                  "Next": "FirstMatchState"
                               },
                               {
                                   "Variable": "$.value",
                                   "NumericLessThan": 30
                               }
                           ]
+                      },
+                      {
+                        "Variable": "$.foo",
+                        "NumericGreaterThanEquals": 20,
+                        "Next": "SecondMatchState"
                       }
                   ],
                   "Next": "SecondMatchState"

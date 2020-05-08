@@ -112,7 +112,7 @@ export default {
             },
             BooleanEquals: true,
             Not: {
-                'Fn:ValueOf': 'ChoiceRule'
+                'Fn:ValueOf': 'NestedChoiceRule'
             },
             NumericEquals: true,
             NumericGreaterThan: true,

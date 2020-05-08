@@ -15,40 +15,27 @@ import {
 } from 'vscode-json-languageservice';
 
 import {
+    isArrayNode,
     isObjectNode,
 } from '../../utils/astUtilityFunctions'
+
+import getPropertyNodeDiagnostic from './getPropertyNodeDiagnostic'
 
 import { MESSAGES } from '../../constants/diagnosticStrings'
 import schema from '../validationSchema'
 
 const referenceTypes = schema.ReferenceTypes
 
-export interface SchemaObject { [property: string]: SchemaObject | boolean | string }
+interface SchemaObject { [property: string]: SchemaObject | boolean | string }
 
-export interface DiagnosticsForNodeFunc {
-    (
-        rootNode: ASTNode,
-        document: TextDocument,
-        schemaPart: SchemaObject,
-    ): Diagnostic[]
-}
-
-export function isObject(obj: any): obj is Object {
+function isObject(obj: any): obj is Object {
     return obj === Object(obj);
 }
 
-export function getPropertyNodeDiagnostic(propNode: PropertyASTNode, document: TextDocument, message: string): Diagnostic {
-    const { length, offset } = propNode.keyNode
-    const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
-
-    return Diagnostic.create(range, message, DiagnosticSeverity.Error)
-}
-
-export function getDiagnosticsForArrayOfSchema(
+function getDiagnosticsForArrayOfSchema(
     rootNode: ArrayASTNode,
     document: TextDocument,
     arraySchema: string,
-    getDiagnosticsForNode: DiagnosticsForNodeFunc
 ) {
     const newSchemaPart = referenceTypes[arraySchema] as SchemaObject
     let diagnostics: Diagnostic[] = []
@@ -66,12 +53,11 @@ export function getDiagnosticsForArrayOfSchema(
     return diagnostics
 }
 
-export function getDiagnosticsForOneOfSchema(
+function getDiagnosticsForOneOfSchema(
     rootNode: ObjectASTNode,
     document: TextDocument,
     schemaPart: SchemaObject,
     oneOfSchema: string,
-    getDiagnosticsForNode: DiagnosticsForNodeFunc
 ) {
     const mutuallyExclusiveProperties: unknown = referenceTypes[oneOfSchema]
     const mutuallyExclusivePropertiesPresent: { propNode: PropertyASTNode, schemaValue: unknown }[] = []
@@ -114,11 +100,10 @@ export function getDiagnosticsForOneOfSchema(
     return diagnostics
 }
 
-export function getDiagnosticsForRegularProperties(
+function getDiagnosticsForRegularProperties(
     rootNode: ObjectASTNode,
     document: TextDocument,
     schemaPart: SchemaObject,
-    getDiagnosticsForNode: DiagnosticsForNodeFunc
 ) {
     const diagnostics: Diagnostic[] = []
 
@@ -141,4 +126,29 @@ export function getDiagnosticsForRegularProperties(
     })
 
     return diagnostics
+}
+
+export default function getDiagnosticsForNode(rootNode: ASTNode, document: TextDocument, schemaPart: SchemaObject): Diagnostic[] {
+    const arrayOfType = schemaPart['Fn:ArrayOf']
+    const oneOfType = schemaPart['Fn:OneOf']
+    const valueOfType = schemaPart['Fn:ValueOf']
+
+    // Fn:ArrayOf
+    // if it contains Fn:ArrayOf property all the other values will be ignored
+    if (typeof arrayOfType === 'string' && isArrayNode(rootNode)) {
+        return getDiagnosticsForArrayOfSchema(rootNode, document, arrayOfType)
+    // Fn:OneOf
+    } else if (typeof oneOfType === 'string' && isObjectNode(rootNode)) {
+        return getDiagnosticsForOneOfSchema(rootNode, document, schemaPart, oneOfType)
+    // Fn:ValueOf
+    } else if (typeof valueOfType === 'string' && isObjectNode(rootNode)) {
+        const newSchemaPart = referenceTypes[valueOfType] as SchemaObject
+
+        return getDiagnosticsForNode(rootNode, document, newSchemaPart)
+    // Regular properties
+    } else if (isObjectNode(rootNode)) {
+        return getDiagnosticsForRegularProperties(rootNode, document, schemaPart)
+    }
+
+    return []
 }

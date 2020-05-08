@@ -454,8 +454,23 @@ suite('ASL context-aware validation', () => {
                     },
                     {
                         message: MESSAGES.INVALID_PROPERTY_NAME,
-                        start: [37, 34],
-                        end: [37, 53]
+                        start: [30, 30],
+                        end: [30, 36]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [38, 34],
+                        end: [38, 53]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [39, 34],
+                        end: [39, 40]
+                    },
+                    {
+                        message: MESSAGES.INVALID_PROPERTY_NAME,
+                        start: [50, 24],
+                        end: [50, 30]
                     },
                 ],
                 filterMessages: [MESSAGES.UNREACHABLE_STATE, JSON_SCHEMA_MULTIPLE_SCHEMAS_MSG]
