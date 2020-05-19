@@ -9,32 +9,34 @@ import { MESSAGES } from '../constants/diagnosticStrings'
 import { getLanguageService, Position, Range } from '../service'
 
 import {
-  documentChoiceDefaultBeforeChoice,
-  documentChoiceInvalidDefault,
-  documentChoiceInvalidNext,
-  documentChoiceNoDefault,
-  documentChoiceValidDefault,
-  documentChoiceValidNext,
-  documentInvalidNext,
-  documentInvalidNextNested,
-  documentInvalidPropertiesCatch,
-  documentInvalidPropertiesChoices,
-  documentInvalidPropertiesRoot,
-  documentInvalidPropertiesRootNested,
-  documentInvalidPropertiesState,
-  documentNestedNoTerminalState,
-  documentNestedUnreachableState,
-  documentNoTerminalState,
-  documentParallelCatchTemplate,
-  documentParallelCatchTemplateInvalidNext,
-  documentStartAtInvalid,
-  documentStartAtNestedInvalid,
-  documentStartAtValid,
-  documentSucceedFailTerminalState,
-  documentTaskCatchTemplate,
-  documentTaskCatchTemplateInvalidNext,
-  documentUnreachableState,
-  documentValidNext,
+    documentChoiceDefaultBeforeChoice,
+    documentChoiceInvalidDefault,
+    documentChoiceInvalidNext,
+    documentChoiceNoDefault,
+    documentChoiceValidDefault,
+    documentChoiceValidNext,
+    documentInvalidNext,
+    documentInvalidNextNested,
+    documentInvalidPropertiesCatch,
+    documentInvalidPropertiesChoices,
+    documentInvalidPropertiesRoot,
+    documentInvalidPropertiesRootNested,
+    documentInvalidPropertiesState,
+    documentNestedNoTerminalState,
+    documentNestedUnreachableState,
+    documentNoTerminalState,
+    documentParallelCatchTemplate,
+    documentParallelCatchTemplateInvalidNext,
+    documentStartAtInvalid,
+    documentStartAtNestedInvalid,
+    documentStartAtValid,
+    documentSucceedFailTerminalState,
+    documentTaskCatchTemplate,
+    documentTaskCatchTemplateInvalidNext,
+    documentTaskInvalidArn,
+    documentTaskValidVariableSubstitution,
+    documentUnreachableState,
+    documentValidNext,
 } from './json-strings/validationStrings'
 
 import { toDocument } from './utils/testUtilities'
@@ -64,7 +66,7 @@ async function testValidations(options: TestValidationOptions) {
     let res = await getValidations(json)
 
     res = res.filter(diagnostic => {
-        if (filterMessages && filterMessages.find(message => message === diagnostic.message) ) {
+        if (filterMessages && filterMessages.find(message => message === diagnostic.message)) {
             return false
         }
 
@@ -90,16 +92,16 @@ async function testValidations(options: TestValidationOptions) {
 
 suite('ASL context-aware validation', () => {
     suite('Invalid JSON Input', () => {
-      test("Empty string doesn't throw errors", async () => {
-        await getValidations('')
-      })
+        test("Empty string doesn't throw errors", async () => {
+            await getValidations('')
+        })
 
-      test("[] string doesn't throw type errors", async () => {
-        await assert.doesNotReject(
-          getValidations('[]'),
-          TypeError
-        )
-      })
+        test("[] string doesn't throw type errors", async () => {
+            await assert.doesNotReject(
+                getValidations('[]'),
+                TypeError
+            )
+        })
     })
 
     suite('Default of Choice state', () => {
@@ -301,17 +303,17 @@ suite('ASL context-aware validation', () => {
                 json: documentNestedNoTerminalState,
                 diagnostics: [
                     {
-                      message: MESSAGES.NO_TERMINAL_STATE,
-                      start: [22, 10],
-                      end: [22, 18]
+                        message: MESSAGES.NO_TERMINAL_STATE,
+                        start: [22, 10],
+                        end: [22, 18]
                     },
                     {
-                      message: MESSAGES.NO_TERMINAL_STATE,
-                      start: [40, 8],
-                      end: [40, 16]
+                        message: MESSAGES.NO_TERMINAL_STATE,
+                        start: [40, 8],
+                        end: [40, 16]
                     },
-               ],
-               filterMessages: [MESSAGES.UNREACHABLE_STATE]
+                ],
+                filterMessages: [MESSAGES.UNREACHABLE_STATE]
             })
         })
 
@@ -331,52 +333,52 @@ suite('ASL context-aware validation', () => {
     })
 
     suite('Catch property of "Parallel" and "Task" state', async () => {
-      test('Does not show diagnostic on valid next property within Catch block of Task state', async () => {
-        await testValidations({
-            json: documentTaskCatchTemplate,
-            diagnostics: []
+        test('Does not show diagnostic on valid next property within Catch block of Task state', async () => {
+            await testValidations({
+                json: documentTaskCatchTemplate,
+                diagnostics: []
+            })
         })
-      })
 
-      test('Does not show diagnostic on valid next property within Catch block of Parallel state', async () => {
-        await testValidations({
-            json: documentParallelCatchTemplate,
-            diagnostics: []
+        test('Does not show diagnostic on valid next property within Catch block of Parallel state', async () => {
+            await testValidations({
+                json: documentParallelCatchTemplate,
+                diagnostics: []
+            })
         })
-      })
 
-      test('Shows diagnostics on invalid next property within Catch block of Task state', async () => {
-        await testValidations({
-            json: documentTaskCatchTemplateInvalidNext,
-            diagnostics: [
-                {
-                    message: MESSAGES.INVALID_NEXT,
-                    start: [18, 26],
-                    end: [18, 40]
-                },
-                {
-                    message: MESSAGES.INVALID_NEXT,
-                    start: [24, 26],
-                    end: [24, 44]
-                },
-            ],
-            filterMessages: [MESSAGES.UNREACHABLE_STATE]
+        test('Shows diagnostics on invalid next property within Catch block of Task state', async () => {
+            await testValidations({
+                json: documentTaskCatchTemplateInvalidNext,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_NEXT,
+                        start: [18, 26],
+                        end: [18, 40]
+                    },
+                    {
+                        message: MESSAGES.INVALID_NEXT,
+                        start: [24, 26],
+                        end: [24, 44]
+                    },
+                ],
+                filterMessages: [MESSAGES.UNREACHABLE_STATE]
+            })
         })
-      })
 
-      test('Shows diagnostics on invalid next property within Catch block o Parallel', async () => {
-        await testValidations({
-            json: documentParallelCatchTemplateInvalidNext,
-            diagnostics: [
-                {
-                    message: MESSAGES.INVALID_NEXT,
-                    start: [11, 18],
-                    end: [11, 28]
-                }
-            ],
-            filterMessages: [MESSAGES.UNREACHABLE_STATE]
+        test('Shows diagnostics on invalid next property within Catch block o Parallel', async () => {
+            await testValidations({
+                json: documentParallelCatchTemplateInvalidNext,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_NEXT,
+                        start: [11, 18],
+                        end: [11, 28]
+                    }
+                ],
+                filterMessages: [MESSAGES.UNREACHABLE_STATE]
+            })
         })
-      })
     })
 
     suite('Additional properties that are not valid', async () => {
@@ -502,6 +504,22 @@ suite('ASL context-aware validation', () => {
                         end: [10, 27]
                     }
                 ]
+            })
+        })
+    })
+
+    suite('Test validation of Resource arn for Task State', async () => {
+        test('Does not show diagnostic on invalid arn', async () => {
+            await testValidations({
+                json: documentTaskInvalidArn,
+                diagnostics: []
+            })
+        })
+
+        test('Does not show diagnostic on valid variable substitution', async () => {
+            await testValidations({
+                json: documentTaskValidVariableSubstitution,
+                diagnostics: []
             })
         })
     })

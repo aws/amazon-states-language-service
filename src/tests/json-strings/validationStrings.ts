@@ -368,6 +368,30 @@ export const documentSucceedFailTerminalState = `{
   }
 }`
 
+export const documentTaskValidVariableSubstitution = `{
+  "Comment": "A Catch example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "HelloWorld",
+  "States": {
+      "HelloWorld": {
+          "Type": "Task",
+          "Resource": "\${variableName}",
+          "End": true
+      }
+  }
+}`
+
+export const documentTaskInvalidArn = `{
+  "Comment": "A Catch example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "HelloWorld",
+  "States": {
+      "HelloWorld": {
+          "Type": "Task",
+          "Resource": "InvalidArn",
+          "End": true
+      }
+  }
+}`
+
 export const documentTaskCatchTemplate = `{
   "Comment": "A Catch example of the Amazon States Language using an AWS Lambda Function",
   "StartAt": "HelloWorld",
