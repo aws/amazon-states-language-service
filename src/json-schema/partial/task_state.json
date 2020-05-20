@@ -22,7 +22,6 @@
                         "Resource": {
                             "type": "string",
                             "description": "A URI, especially an ARN that uniquely identifies the specific task to execute.",
-                            "pattern": "^arn:aws([a-z]|\\-)*:(states|lambda):([a-z]|\\d|\\-)*:([0-9]{12})?:.+:.+$",
                             "examples": [
                                 "arn:aws:states:::batch:submitJob",
                                 "arn:aws:states:::batch:submitJob.sync",
