@@ -157,6 +157,10 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         // if the type of the state is "Map" recursively run validateStates for its value node
                         case 'Map': {
                             const iteratorPropNode = findPropChildByName(oneStateValueNode, 'Iterator')
+                            const validateCatchResult = validateArrayNext('Catch', oneStateValueNode, stateNames, document)
+
+                            diagnostics = diagnostics.concat(validateCatchResult.diagnostics)
+                            reachedStates = { ...reachedStates, ...validateCatchResult.reachedStates }
 
                             if (iteratorPropNode && iteratorPropNode.valueNode && isObjectNode(iteratorPropNode.valueNode)) {
                                 // append the result of recursive validation to the list of diagnostics

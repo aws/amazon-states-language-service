@@ -22,6 +22,8 @@ import {
     documentInvalidPropertiesRoot,
     documentInvalidPropertiesRootNested,
     documentInvalidPropertiesState,
+    documentMapCatchTemplate,
+    documentMapCatchTemplateInvalidNext,
     documentNestedNoTerminalState,
     documentNestedUnreachableState,
     documentNoTerminalState,
@@ -347,6 +349,13 @@ suite('ASL context-aware validation', () => {
             })
         })
 
+        test('Does not show diagnostic on valid next property within Catch block of Map state', async () => {
+            await testValidations({
+                json: documentMapCatchTemplate,
+                diagnostics: []
+            })
+        })
+
         test('Shows diagnostics on invalid next property within Catch block of Task state', async () => {
             await testValidations({
                 json: documentTaskCatchTemplateInvalidNext,
@@ -366,7 +375,7 @@ suite('ASL context-aware validation', () => {
             })
         })
 
-        test('Shows diagnostics on invalid next property within Catch block o Parallel', async () => {
+        test('Shows diagnostics on invalid next property within Catch block of Parallel', async () => {
             await testValidations({
                 json: documentParallelCatchTemplateInvalidNext,
                 diagnostics: [
@@ -375,6 +384,25 @@ suite('ASL context-aware validation', () => {
                         start: [11, 18],
                         end: [11, 28]
                     }
+                ],
+                filterMessages: [MESSAGES.UNREACHABLE_STATE]
+            })
+        })
+
+        test('Shows diagnostics on invalid next property within Catch block of Map', async () => {
+            await testValidations({
+                json: documentMapCatchTemplateInvalidNext,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_NEXT,
+                        start: [25, 26],
+                        end: [25, 35]
+                    },
+                    {
+                        message: MESSAGES.INVALID_NEXT,
+                        start: [37, 26],
+                        end: [37, 36],
+                    },
                 ],
                 filterMessages: [MESSAGES.UNREACHABLE_STATE]
             })
