@@ -477,6 +477,136 @@ export const documentParallelCatchTemplate = `{
   }
 }`
 
+export const documentMapCatchTemplate = `
+{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "ResultPath": "$.array",
+          "MaxConcurrency": 2,
+          "Next": "Final State",
+          "Iterator": {
+              "StartAt": "Pass",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "Result": "Done!",
+                      "End": true
+                  }
+              }
+          },
+          "Catch": [
+              {
+                  "ErrorEquals": [
+                      "CustomError"
+                  ],
+                  "Next": "CustomErrorFallback"
+              },
+              {
+                  "ErrorEquals": [
+                      "States.TaskFailed"
+                  ],
+                  "Next": "ReservedTypeFallback"
+              },
+              {
+                  "ErrorEquals": [
+                      "States.ALL"
+                  ],
+                  "Next": "CatchAllFallback"
+              }
+          ]
+      },
+
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      },
+      "CustomErrorFallback": {
+          "Type": "Pass",
+          "Result": "This is a fallback from a custom lambda function exception",
+          "End": true
+      },
+      "ReservedTypeFallback": {
+          "Type": "Pass",
+          "Result": "This is a fallback from a reserved error code",
+          "End": true
+      },
+      "CatchAllFallback": {
+          "Type": "Pass",
+          "Result": "This is a fallback from a reserved error code",
+          "End": true
+      }
+  }
+}
+`
+
+export const documentMapCatchTemplateInvalidNext = `
+{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "ResultPath": "$.array",
+          "MaxConcurrency": 2,
+          "Next": "Final State",
+          "Iterator": {
+              "StartAt": "Pass",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "Result": "Done!",
+                      "End": true
+                  }
+              }
+          },
+          "Catch": [
+              {
+                  "ErrorEquals": [
+                      "CustomError"
+                  ],
+                  "Next": "invalid"
+              },
+              {
+                  "ErrorEquals": [
+                      "States.TaskFailed"
+                  ],
+                  "Next": "ReservedTypeFallback"
+              },
+              {
+                  "ErrorEquals": [
+                      "States.ALL"
+                  ],
+                  "Next": "invalid2"
+              }
+          ]
+      },
+
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      },
+      "CustomErrorFallback": {
+          "Type": "Pass",
+          "Result": "This is a fallback from a custom lambda function exception",
+          "End": true
+      },
+      "ReservedTypeFallback": {
+          "Type": "Pass",
+          "Result": "This is a fallback from a reserved error code",
+          "End": true
+      },
+      "CatchAllFallback": {
+          "Type": "Pass",
+          "Result": "This is a fallback from a reserved error code",
+          "End": true
+      }
+  }
+}
+`
+
 export const documentTaskCatchTemplateInvalidNext = `{
   "Comment": "A Catch example of the Amazon States Language using an AWS Lambda Function",
   "StartAt": "HelloWorld",
