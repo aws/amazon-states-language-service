@@ -47,6 +47,30 @@ interface ValidateCatchResult {
     reachedStates: { [ix: string]: boolean }
 }
 
+function validateParameters(parametersPropNode: PropertyASTNode, document: TextDocument): Diagnostic[] {
+    let diagnostics: Diagnostic[] = []
+    const valueNode = parametersPropNode.valueNode
+
+    if (isObjectNode(valueNode)) {
+        valueNode.properties.forEach(prop => {
+            if (prop.keyNode.value.endsWith('.$')) {
+                const propValue = prop.valueNode.value
+
+                if (typeof propValue !== 'string' || !propValue.startsWith('$')) {
+                    const { length, offset } = prop.valueNode
+                    const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
+
+                    diagnostics.push(Diagnostic.create(range, MESSAGES.INVALID_JSON_PATH, DiagnosticSeverity.Error))
+                }
+            } else if (isObjectNode(prop.valueNode)) {
+                diagnostics = diagnostics.concat(validateParameters(prop, document))
+            }
+        });
+    }
+
+    return diagnostics
+}
+
 // Validates next property within array of objects
 function validateArrayNext(arrayPropName: string, oneStateValueNode: ObjectASTNode, stateNames: string[], document: TextDocument): ValidateCatchResult {
     const arrayPropNode = findPropChildByName(oneStateValueNode, arrayPropName)
@@ -153,14 +177,28 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                        delete unreachedStates[nextNodeValue]
                     }
 
+                    // Validate Parameters for given state types
+                    if (['Pass', 'Task', 'Parallel', 'Map'].includes(stateType as string)) {
+                        const parametersPropNode = findPropChildByName(oneStateValueNode, 'Parameters')
+
+                        if (parametersPropNode) {
+                            const validateParametersDiagnostics = validateParameters(parametersPropNode, document)
+                            diagnostics = diagnostics.concat(validateParametersDiagnostics)
+                        }
+                    }
+
+                    // Validate Catch for given state types
+                    if (['Task', 'Parallel', 'Map'].includes(stateType as string)) {
+                        const validateCatchResult = validateArrayNext('Catch', oneStateValueNode, stateNames, document)
+
+                        diagnostics = diagnostics.concat(validateCatchResult.diagnostics)
+                        reachedStates = { ...reachedStates, ...validateCatchResult.reachedStates }
+                    }
+
                     switch(stateType) {
                         // if the type of the state is "Map" recursively run validateStates for its value node
                         case 'Map': {
                             const iteratorPropNode = findPropChildByName(oneStateValueNode, 'Iterator')
-                            const validateCatchResult = validateArrayNext('Catch', oneStateValueNode, stateNames, document)
-
-                            diagnostics = diagnostics.concat(validateCatchResult.diagnostics)
-                            reachedStates = { ...reachedStates, ...validateCatchResult.reachedStates }
 
                             if (iteratorPropNode && iteratorPropNode.valueNode && isObjectNode(iteratorPropNode.valueNode)) {
                                 // append the result of recursive validation to the list of diagnostics
@@ -173,9 +211,6 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         // it the type of state is "Parallel" recursively run validateStates for each child of value node (an array)
                         case 'Parallel': {
                             const branchesPropNode = findPropChildByName(oneStateValueNode, 'Branches')
-                            const validateCatchResult = validateArrayNext('Catch', oneStateValueNode, stateNames, document)
-                            diagnostics = diagnostics.concat(validateCatchResult.diagnostics)
-                            reachedStates = { ...reachedStates, ...validateCatchResult.reachedStates }
 
                             if (branchesPropNode && branchesPropNode.valueNode && isArrayNode(branchesPropNode.valueNode)) {
                                 branchesPropNode.valueNode.children.forEach(branchItem => {
@@ -185,14 +220,6 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                                     }
                                 })
                             }
-
-                            break
-                        }
-
-                        case 'Task': {
-                            const validateCatchResult = validateArrayNext('Catch', oneStateValueNode, stateNames, document)
-                            diagnostics = diagnostics.concat(validateCatchResult.diagnostics)
-                            reachedStates = { ...reachedStates, ...validateCatchResult.reachedStates }
 
                             break
                         }

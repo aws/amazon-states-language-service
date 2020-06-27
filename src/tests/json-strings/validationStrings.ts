@@ -1084,3 +1084,53 @@ export const documentInvalidPropertiesRootNested = `{
       }
   }
 }`
+
+export const documentValidParametersJsonPath = `
+{
+  "StartAt": "GetManualReview",
+  "States": {
+      "GetManualReview": {
+          "Type": "Task",
+          "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+          "Parameters": {
+              "FunctionName": "get-model-review-decision",
+              "Payload": {
+                  "model.$": "$.new_model",
+                  "token.$": "$$.Task.Token",
+                  "someProp": {
+                      "nested_model.$": "$.new_model",
+                      "nested_token.$": "$$.Task.Token"
+                  }
+              },
+              "Qualifier": "prod-v1"
+          },
+          "End": true
+      }
+  }
+}
+`
+
+export const documentInvalidParametersJsonPath = `
+{
+  "StartAt": "GetManualReview",
+  "States": {
+      "GetManualReview": {
+          "Type": "Task",
+          "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+          "Parameters": {
+              "FunctionName": "get-model-review-decision",
+              "Payload": {
+                  "model.$": "",
+                  "token.$": "$$.Task.Token",
+                  "someProp": {
+                      "nested_model.$": 22,
+                      "nested_token.$": true
+                  }
+              },
+              "Qualifier.$": "prod-v1"
+          },
+          "End": true
+      }
+  }
+}
+`

@@ -17,6 +17,7 @@ import {
     documentChoiceValidNext,
     documentInvalidNext,
     documentInvalidNextNested,
+    documentInvalidParametersJsonPath,
     documentInvalidPropertiesCatch,
     documentInvalidPropertiesChoices,
     documentInvalidPropertiesRoot,
@@ -39,6 +40,7 @@ import {
     documentTaskValidVariableSubstitution,
     documentUnreachableState,
     documentValidNext,
+    documentValidParametersJsonPath,
 } from './json-strings/validationStrings'
 
 import { toDocument } from './utils/testUtilities'
@@ -548,6 +550,43 @@ suite('ASL context-aware validation', () => {
             await testValidations({
                 json: documentTaskValidVariableSubstitution,
                 diagnostics: []
+            })
+        })
+    })
+
+    suite('Test validation of Properties field', async () => {
+        test('Does not show diagnostics for valid JSON paths', async () => {
+            await testValidations({
+                json: documentValidParametersJsonPath,
+                diagnostics: []
+            })
+        })
+
+        test('Shows diagnostics for invalid JSON paths', async () => {
+            await testValidations({
+                json: documentInvalidParametersJsonPath,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_JSON_PATH,
+                        start: [10, 29],
+                        end: [10, 31]
+                    },
+                    {
+                        message: MESSAGES.INVALID_JSON_PATH,
+                        start: [13, 40],
+                        end: [13, 42]
+                    },
+                    {
+                        message: MESSAGES.INVALID_JSON_PATH,
+                        start: [14, 40],
+                        end: [14, 44]
+                    },
+                    {
+                        message: MESSAGES.INVALID_JSON_PATH,
+                        start: [17, 29],
+                        end: [17, 38]
+                    },
+                ]
             })
         })
     })
