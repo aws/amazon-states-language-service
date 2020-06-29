@@ -51,9 +51,7 @@
 										]
 									},
 									"Comment": {
-										"type": "string",
-										"description": "A human-readable comment or description of the state.",
-										"minLength": 1
+										"$ref": "#/properties/Comment"
 									}
 								},
 								"required": [
@@ -319,9 +317,7 @@
 													"minimum": 1
 												},
 												"Comment": {
-													"type": "string",
-													"description": "A human-readable comment or description of the state.",
-													"minLength": 1
+													"$ref": "#/properties/Comment"
 												}
 											},
 											"required": [
@@ -356,9 +352,7 @@
 													]
 												},
 												"Comment": {
-													"type": "string",
-													"description": "A human-readable comment or description of the state.",
-													"minLength": 1
+													"$ref": "#/properties/Comment"
 												}
 											},
 											"required": [
