@@ -317,6 +317,11 @@
 													"type": "number",
 													"description": "A number (>= 1) which is the multiplier that increases the retry interval on each attempt. (Default: 2.0)",
 													"minimum": 1
+												},
+												"Comment": {
+													"type": "string",
+													"description": "A human-readable comment or description of the state.",
+													"minLength": 1
 												}
 											},
 											"required": [
@@ -349,6 +354,11 @@
 															"type": "null"
 														}
 													]
+												},
+												"Comment": {
+													"type": "string",
+													"description": "A human-readable comment or description of the state.",
+													"minLength": 1
 												}
 											},
 											"required": [
@@ -401,6 +411,9 @@
 															"type": "string",
 															"description": "The state to transition to if there is an exact match between the input value and the comparison operator for this Choice Rule.",
 															"minLength": 1
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -420,6 +433,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -439,6 +455,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -458,6 +477,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -477,6 +499,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -496,6 +521,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -515,6 +543,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -534,6 +565,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -553,6 +587,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -572,6 +609,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -591,6 +631,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -611,6 +654,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -630,6 +676,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -649,6 +698,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -668,6 +720,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -687,6 +742,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -703,6 +761,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -722,6 +783,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
@@ -742,6 +806,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -757,6 +824,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -772,6 +842,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -787,6 +860,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -802,6 +878,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -817,6 +896,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -832,6 +914,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -847,6 +932,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -862,6 +950,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -877,6 +968,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -892,6 +986,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -907,6 +1004,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -922,6 +1022,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -937,6 +1040,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -952,6 +1058,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -967,6 +1076,9 @@
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -979,6 +1091,9 @@
 																	"properties": {
 																		"And": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/17/properties/Or"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -990,6 +1105,9 @@
 																	"properties": {
 																		"Or": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/17/properties/Or"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -1001,6 +1119,9 @@
 																	"properties": {
 																		"Not": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/18/properties/Not"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
 																		}
 																	},
 																	"required": [
@@ -1011,6 +1132,9 @@
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
 														}
 													},
 													"required": [
