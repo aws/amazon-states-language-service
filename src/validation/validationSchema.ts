@@ -136,22 +136,26 @@ export default {
         ChoiceRule: {
             'Fn:OneOf': 'ComparisonOperators',
             Variable: true,
-            Next: true
+            Next: true,
+            Comment: true
         },
         NestedChoiceRule: {
             'Fn:OneOf': 'ComparisonOperators',
-             Variable: true,
+            Variable: true,
+            Comment: true
         },
         Catcher: {
             ErrorEquals: true,
             ResultPath: true,
-            Next: true
+            Next: true,
+            Comment: true
         },
         Retrier: {
             ErrorEquals: true,
             IntervalSeconds: true,
             MaxAttempts: true,
-            BackoffRate: true
+            BackoffRate: true,
+            Comment: true
         }
     },
     Root: {

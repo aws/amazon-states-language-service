@@ -115,6 +115,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -134,6 +137,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -153,6 +159,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -172,6 +181,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -191,6 +203,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -210,6 +225,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -229,6 +247,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -248,6 +269,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -267,6 +291,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -286,6 +313,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -305,6 +335,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -324,6 +357,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -343,6 +379,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -362,6 +401,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -381,6 +423,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -400,6 +445,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -416,6 +464,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -431,6 +482,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -446,6 +500,9 @@
                 },
                 "Next": {
                     "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -529,6 +586,9 @@
                 },
                 "Variable": {
                     "$ref": "#/definitions/variable"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -544,6 +604,9 @@
                 },
                 "Variable": {
                     "$ref": "#/definitions/variable"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -559,6 +622,9 @@
                 },
                 "Variable": {
                     "$ref": "#/definitions/variable"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -574,6 +640,9 @@
                 },
                 "Variable": {
                     "$ref": "#/definitions/variable"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -589,6 +658,9 @@
                 },
                 "Variable": {
                     "$ref": "#/definitions/variable"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -604,6 +676,9 @@
                 },
                 "Variable": {
                     "$ref": "#/definitions/variable"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -619,6 +694,9 @@
                 },
                 "Variable": {
                     "$ref": "#/definitions/variable"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -634,6 +712,9 @@
                 },
                 "Variable": {
                     "$ref": "#/definitions/variable"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -649,6 +730,9 @@
                 },
                 "Variable": {
                     "$ref": "#/definitions/variable"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -664,6 +748,9 @@
                 },
                 "Variable": {
                     "$ref": "#/definitions/variable"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -679,6 +766,9 @@
                 },
                 "Variable": {
                     "$ref": "common.json#/definitions/referencePath"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -694,6 +784,9 @@
                 },
                 "Variable": {
                     "$ref": "common.json#/definitions/referencePath"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -709,6 +802,9 @@
                 },
                 "Variable": {
                     "$ref": "common.json#/definitions/referencePath"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -724,6 +820,9 @@
                 },
                 "Variable": {
                     "$ref": "common.json#/definitions/referencePath"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -739,6 +838,9 @@
                 },
                 "Variable": {
                     "$ref": "common.json#/definitions/referencePath"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -754,6 +856,9 @@
                 },
                 "Variable": {
                     "$ref": "common.json#/definitions/referencePath"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -766,6 +871,9 @@
             "properties": {
                 "And": {
                     "$ref": "#/definitions/lowerConditions"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -777,6 +885,9 @@
             "properties": {
                 "Or": {
                     "$ref": "#/definitions/lowerConditions"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [
@@ -788,6 +899,9 @@
             "properties": {
                 "Not": {
                     "$ref": "#/definitions/lowerCondition"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
                 }
             },
             "required": [

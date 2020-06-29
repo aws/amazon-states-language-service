@@ -10,9 +10,7 @@
                     "enum": ["Pass", "Succeed", "Fail", "Task", "Choice", "Wait", "Parallel", "Map"]
                 },
                 "Comment": {
-                    "type": "string",
-                    "description": "A human-readable comment or description of the state.",
-                    "minLength": 1
+                    "$ref": "#/definitions/comment"
                 }
             },
             "required": [
@@ -158,6 +156,9 @@
                         "type": "number",
                         "description": "A number (>= 1) which is the multiplier that increases the retry interval on each attempt. (Default: 2.0)",
                         "minimum": 1.0
+                    },
+                    "Comment": {
+                        "$ref": "#/definitions/comment"
                     }
                 },
                 "required": [
@@ -190,6 +191,9 @@
                                 "type": "null"
                             }
                         ]
+                    },
+                    "Comment": {
+                        "$ref": "#/definitions/comment"
                     }
                 },
                 "required": [
