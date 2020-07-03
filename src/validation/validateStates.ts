@@ -269,7 +269,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                 diagnostics.push(Diagnostic.create(range, MESSAGES.NO_TERMINAL_STATE, DiagnosticSeverity.Error))
             }
 
-            // loop through the hash map of unreached states and create diagnostics.
+            // loop through the hash map of unreached states and create diagnostics
             Object.values(unreachedStates).forEach(statePropNode => {
                 const { length, offset } =  statePropNode.keyNode
                 const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
