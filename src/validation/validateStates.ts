@@ -278,6 +278,6 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
             })
         }
     }
-    
+
     return diagnostics
 }
