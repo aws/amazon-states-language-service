@@ -27,7 +27,9 @@ export default {
                 Parameters: true,
                 ResultPath: true,
                 TimeoutSeconds: true,
+                TimeoutSecondsPath: true,
                 HeartbeatSeconds: true,
+                HeartbeatSecondsPath: true,
                 Retry: {
                     'Fn:ArrayOf': 'Retrier'
                 },
