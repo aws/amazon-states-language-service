@@ -284,9 +284,18 @@
 										"$ref": "#/properties/TimeoutSeconds",
 										"description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error name. Must be a positive, non-zero integer. If not provided, the default value is 99999999. The count begins after the task has been started, for example, when ActivityStarted or LambdaFunctionStarted are logged in the Execution event history."
 									},
+									"TimeoutSecondsPath": {
+										"description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error name. Specified using a path from the state's input data which must reference a positive, non-zero integer. If not provided, the default value is 99999999. The count begins after the task has been started, for example, when ActivityStarted or LambdaFunctionStarted are logged in the Execution event history.",
+										"type": "string",
+										"pattern": "\\$.*"
+									},
 									"HeartbeatSeconds": {
 										"$ref": "#/properties/TimeoutSeconds",
 										"description": "If more time than the specified seconds elapses between heartbeats from the task, this state fails with a States.Timeout error name. Must be a positive, non-zero integer less than the number of seconds specified in the TimeoutSeconds field. If not provided, the default value is 99999999. For Activities, the count begins when GetActivityTask receives a token and ActivityStarted is logged in the Execution event history."
+									},
+									"HeartbeatSecondsPath": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/TimeoutSecondsPath",
+										"description": "If more time than the specified seconds elapses between heartbeats from the task, this state fails with a States.Timeout error name. Specified using a path from the state's input data which must reference a positive, non-zero integer less than the number of seconds specified in the TimeoutSeconds field. If not provided, the default value is 99999999. For Activities, the count begins when GetActivityTask receives a token and ActivityStarted is logged in the Execution event history."
 									},
 									"Retry": {
 										"description": "An array of objects, called Retriers, that define a retry policy if the state encounters runtime errors.",

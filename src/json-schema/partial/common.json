@@ -130,6 +130,10 @@
             "minimum": 0,
             "maximum": 99999999
         },
+        "path": {
+            "type": "string",
+            "pattern": "\\$.*"
+        },
         "parameters": {
             "type": "object"
         },
