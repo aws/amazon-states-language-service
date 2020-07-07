@@ -51,9 +51,9 @@ function validateParameters(parametersPropNode: PropertyASTNode, document: TextD
     let diagnostics: Diagnostic[] = []
     const valueNode = parametersPropNode.valueNode
 
-    if (isObjectNode(valueNode)) {
+    if (valueNode && isObjectNode(valueNode)) {
         valueNode.properties.forEach(prop => {
-            if (prop.keyNode.value.endsWith('.$')) {
+            if (prop.valueNode && prop.keyNode.value.endsWith('.$')) {
                 const propValue = prop.valueNode.value
 
                 if (typeof propValue !== 'string' || !propValue.startsWith('$')) {
@@ -62,7 +62,7 @@ function validateParameters(parametersPropNode: PropertyASTNode, document: TextD
 
                     diagnostics.push(Diagnostic.create(range, MESSAGES.INVALID_JSON_PATH, DiagnosticSeverity.Error))
                 }
-            } else if (isObjectNode(prop.valueNode)) {
+            } else if (prop.valueNode && isObjectNode(prop.valueNode)) {
                 diagnostics = diagnostics.concat(validateParameters(prop, document))
             }
         });
