@@ -23,6 +23,10 @@
                             "$ref": "common.json#/definitions/parameters",
                             "description": "A collection of key-value pairs that will be passed as input. Values can be static, or selected from the input with a path."
                         },
+                        "ResultSelector": {
+                            "$ref": "common.json#/definitions/resultSelector",
+                            "description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
+                        },
                         "Branches": {
                             "type": "array",
                             "description": "An array of objects that specifies state machines to execute in parallel.",

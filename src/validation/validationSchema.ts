@@ -25,6 +25,7 @@ export default {
             Properties: {
                 Resource: true,
                 Parameters: true,
+                ResultSelector: true,
                 ResultPath: true,
                 TimeoutSeconds: true,
                 TimeoutSecondsPath: true,
@@ -81,6 +82,7 @@ export default {
                 Branches: true,
                 ResultPath: true,
                 Parameters: true,
+                ResultSelector: true,
                 Retry: {
                     'Fn:ArrayOf': 'Retrier'
                 },
@@ -97,6 +99,7 @@ export default {
                 MaxConcurrency: true,
                 ResultPath: true,
                 Parameters: true,
+                ResultSelector: true,
                 Retry: {
                     'Fn:ArrayOf': 'Retrier'
                 },
