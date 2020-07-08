@@ -280,6 +280,10 @@
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Parameters",
 										"description": "Used to pass information to the API actions of connected resources. The parameters can use a mix of static JSON and JsonPath."
 									},
+									"ResultSelector": {
+										"description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions.",
+										"type": "object"
+									},
 									"TimeoutSeconds": {
 										"$ref": "#/properties/TimeoutSeconds",
 										"description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error name. Must be a positive, non-zero integer. If not provided, the default value is 99999999. The count begins after the task has been started, for example, when ActivityStarted or LambdaFunctionStarted are logged in the Execution event history."
@@ -1248,6 +1252,10 @@
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Parameters",
 										"description": "A collection of key-value pairs that will be passed as input. Values can be static, or selected from the input with a path."
 									},
+									"ResultSelector": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/ResultSelector",
+										"description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
+									},
 									"Branches": {
 										"type": "array",
 										"description": "An array of objects that specifies state machines to execute in parallel.",
@@ -1306,6 +1314,10 @@
 									"Parameters": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Parameters",
 										"description": "A collection of key-value pairs that will be passed as input. Values can be static, or selected from the input with a path."
+									},
+									"ResultSelector": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/ResultSelector",
+										"description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
 									},
 									"ItemsPath": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0",

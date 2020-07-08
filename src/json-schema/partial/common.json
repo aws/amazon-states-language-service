@@ -137,6 +137,9 @@
         "parameters": {
             "type": "object"
         },
+        "resultSelector": {
+            "type": "object"
+        },
         "retry": {
             "type": "array",
             "description": "An array of objects, called Retriers, that define a retry policy if the state encounters runtime errors.",

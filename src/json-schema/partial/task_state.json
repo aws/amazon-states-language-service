@@ -71,6 +71,10 @@
                             "$ref": "common.json#/definitions/parameters",
                             "description": "Used to pass information to the API actions of connected resources. The parameters can use a mix of static JSON and JsonPath."
                         },
+                        "ResultSelector": {
+                            "$ref": "common.json#/definitions/resultSelector",
+                            "description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
+                        },
                         "TimeoutSeconds": {
                             "$ref": "common.json#/definitions/seconds",
                             "description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error name. Must be a positive, non-zero integer. If not provided, the default value is 99999999. The count begins after the task has been started, for example, when ActivityStarted or LambdaFunctionStarted are logged in the Execution event history."
