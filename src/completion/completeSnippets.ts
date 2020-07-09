@@ -8,8 +8,8 @@ import {
     CompletionItem,
     CompletionItemKind,
     InsertTextFormat,
-    ObjectASTNode,
-    PropertyASTNode} from 'vscode-json-languageservice'
+    PropertyASTNode
+} from 'vscode-json-languageservice'
 
 import {
     findPropChildByName,
@@ -44,7 +44,7 @@ function parseSnippetsFromJson(json: Snippet[]): CompletionItem[] {
 }
 
 function doesStateSupportErrorHandling(node: ASTNode): boolean {
-    let typeNode: PropertyASTNode
+    let typeNode: PropertyASTNode | undefined
 
     if(isObjectNode(node)) {
         typeNode = findPropChildByName(node, 'Type')

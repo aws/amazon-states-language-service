@@ -7,10 +7,8 @@ import {
     ArrayASTNode,
     ASTNode,
     Diagnostic,
-    DiagnosticSeverity,
     ObjectASTNode,
     PropertyASTNode,
-    Range,
     TextDocument,
 } from 'vscode-json-languageservice';
 
@@ -64,6 +62,10 @@ function getDiagnosticsForOneOfSchema(
     let diagnostics: Diagnostic[] = []
 
     rootNode.properties.forEach(prop => {
+        if (!isObject(mutuallyExclusiveProperties)) {
+            return
+        }
+
         const propName = prop.keyNode.value
         const propertySchema = mutuallyExclusiveProperties[propName]
 
@@ -90,7 +92,7 @@ function getDiagnosticsForOneOfSchema(
     } else if (mutuallyExclusivePropertiesPresent.length) {
         const { schemaValue, propNode } = mutuallyExclusivePropertiesPresent[0]
         const { valueNode } = propNode
-        if (isObject(schemaValue)) {
+        if (valueNode && isObject(schemaValue)) {
             diagnostics = diagnostics.concat(
                 getDiagnosticsForNode(valueNode, document, schemaValue as SchemaObject)
             )
@@ -119,7 +121,7 @@ function getDiagnosticsForRegularProperties(
             diagnostics.push(
                 getPropertyNodeDiagnostic(prop, document, MESSAGES.INVALID_PROPERTY_NAME)
             )
-        } else if (isObject(propertySchema)) {
+        } else if (prop.valueNode && isObject(propertySchema)) {
             // evaluate nested schema
             diagnostics.push(...getDiagnosticsForNode(prop.valueNode, document, propertySchema as SchemaObject))
         }

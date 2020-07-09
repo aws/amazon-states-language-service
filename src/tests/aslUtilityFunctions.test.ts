@@ -72,7 +72,8 @@ function toDocument(text: string): { textDoc: TextDocument, jsonDoc: ASTTree } {
 suite('Utility functions for extracting data from AST Tree', () => {
     test('getListOfStateNamesFromStateNode - retrieves list of states from state node', async () => {
         const { jsonDoc } = toDocument(document)
-        const stateNames = getListOfStateNamesFromStateNode(jsonDoc.root!.children[1] as PropertyASTNode)
+        const stateNode = jsonDoc.root!.children![1] as PropertyASTNode
+        const stateNames = getListOfStateNamesFromStateNode(stateNode)
 
         const expectedStateNames = [
             'FirstState',
@@ -90,16 +91,18 @@ suite('Utility functions for extracting data from AST Tree', () => {
 
     test('getListOfStateNamesFromStateNode - throws an error when property named "States" is not provided', async () => {
         const { jsonDoc } = toDocument(document)
+        const stateNode = jsonDoc.root!.children![0] as PropertyASTNode
 
         assert.throws(
-            () => getListOfStateNamesFromStateNode(jsonDoc.root!.children[0] as PropertyASTNode),
+            () => getListOfStateNamesFromStateNode(stateNode),
             { message: 'Not a state name property node' }
         )
     })
 
     test('getListOfStateNamesFromStateNode - retrieves only valid states', () => {
         const { jsonDoc } = toDocument(documentInvalid)
-        const stateNames = getListOfStateNamesFromStateNode(jsonDoc.root!.children[0] as PropertyASTNode)
+        const stateNode = jsonDoc.root!.children![0] as PropertyASTNode
+        const stateNames = getListOfStateNamesFromStateNode(stateNode)
 
         const expectedStateNames = [
             'FirstState',
