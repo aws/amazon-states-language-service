@@ -193,9 +193,15 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                     // Validate Catch for given state types
                     if (['Task', 'Parallel', 'Map'].includes(stateType as string)) {
                         const validateCatchResult = validateArrayNext('Catch', oneStateValueNode, stateNames, document)
+                        const resultSelectorPropNode = findPropChildByName(oneStateValueNode, 'ResultSelector')
 
                         diagnostics = diagnostics.concat(validateCatchResult.diagnostics)
                         reachedStates = { ...reachedStates, ...validateCatchResult.reachedStates }
+
+                        if (resultSelectorPropNode) {
+                            const resultSelectorDiagnostics = validateParameters(resultSelectorPropNode, document)
+                            diagnostics = diagnostics.concat(resultSelectorDiagnostics)
+                        }
                     }
 
                     switch(stateType) {

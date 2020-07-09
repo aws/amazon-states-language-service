@@ -115,18 +115,18 @@ export default {
             And: {
                 'Fn:ArrayOf': 'NestedChoiceRule'
             },
-            BooleanEquals: true,
             Not: {
                 'Fn:ValueOf': 'NestedChoiceRule'
             },
+            Or: {
+                'Fn:ArrayOf': 'NestedChoiceRule'
+            },
+            BooleanEquals: true,
             NumericEquals: true,
             NumericGreaterThan: true,
             NumericGreaterThanEquals: true,
             NumericLessThan: true,
             NumericLessThanEquals: true,
-            Or: {
-                'Fn:ArrayOf': 'NestedChoiceRule'
-            },
             StringEquals: true,
             StringGreaterThan: true,
             StringGreaterThanEquals: true,
@@ -136,7 +136,30 @@ export default {
             TimestampGreaterThan: true,
             TimestampGreaterThanEquals: true,
             TimestampLessThan: true,
-            TimestampLessThanEquals: true
+            TimestampLessThanEquals: true,
+            BooleanEqualsPath: true,
+            NumericEqualsPath: true,
+            NumericGreaterThanPath: true,
+            NumericGreaterThanEqualsPath: true,
+            NumericLessThanPath: true,
+            NumericLessThanEqualsPath: true,
+            StringEqualsPath: true,
+            StringGreaterThanPath: true,
+            StringGreaterThanEqualsPath: true,
+            StringLessThanPath: true,
+            StringLessThanEqualsPath: true,
+            TimestampEqualsPath: true,
+            TimestampGreaterThanPath: true,
+            TimestampGreaterThanEqualsPath: true,
+            TimestampLessThanPath: true,
+            TimestampLessThanEqualsPath: true,
+            StringMatches: true,
+            IsNull: true,
+            IsPresent: true,
+            IsNumeric: true,
+            IsString: true,
+            IsBoolean: true,
+            IsTimestamp: true
         },
         ChoiceRule: {
             'Fn:OneOf': 'ComparisonOperators',
