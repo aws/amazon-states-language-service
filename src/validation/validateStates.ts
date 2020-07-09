@@ -81,13 +81,16 @@ function validateArrayNext(arrayPropName: string, oneStateValueNode: ObjectASTNo
         arrayPropNode.valueNode.items.forEach(item => {
             if (isObjectNode(item)) {
                 const nextProp = findPropChildByName(item, 'Next')
-                const nextPropValue = nextProp?.valueNode?.value
 
-                const diagnostic = stateNameExistsInPropNode(nextProp, stateNames, document, MESSAGES.INVALID_NEXT)
-                if (diagnostic) {
-                    diagnostics.push(diagnostic)
-                } else if (typeof nextPropValue === 'string') {
-                    reachedStates[nextPropValue] = true
+                if (nextProp) {
+                    const nextPropValue = nextProp.valueNode?.value
+                    const diagnostic = stateNameExistsInPropNode(nextProp, stateNames, document, MESSAGES.INVALID_NEXT)
+
+                    if (diagnostic) {
+                        diagnostics.push(diagnostic)
+                    } else if (typeof nextPropValue === 'string') {
+                        reachedStates[nextPropValue] = true
+                    }
                 }
             }
         })
@@ -226,16 +229,19 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
 
                         case 'Choice': {
                             const defaultNode = findPropChildByName(oneStateValueNode, 'Default')
-                            const name = defaultNode?.valueNode?.value
-                            const defaultStateDiagnostic = stateNameExistsInPropNode(defaultNode, stateNames, document, MESSAGES.INVALID_DEFAULT)
 
-                            if (defaultStateDiagnostic) {
-                                diagnostics.push(defaultStateDiagnostic)
-                            } else if (typeof name === 'string') {
-                                reachedStates[name] = true
+                            if (defaultNode) {
+                                const name = defaultNode?.valueNode?.value
+                                const defaultStateDiagnostic = stateNameExistsInPropNode(defaultNode, stateNames, document, MESSAGES.INVALID_DEFAULT)
 
-                                // tslint:disable-next-line no-dynamic-delete
-                                delete unreachedStates[name]
+                                if (defaultStateDiagnostic) {
+                                    diagnostics.push(defaultStateDiagnostic)
+                                } else if (typeof name === 'string') {
+                                    reachedStates[name] = true
+
+                                    // tslint:disable-next-line no-dynamic-delete
+                                    delete unreachedStates[name]
+                                }
                             }
 
                             const validateChoiceResult = validateArrayNext('Choices', oneStateValueNode, stateNames, document)
@@ -252,10 +258,12 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         }
                     }
 
-                    const nextStateDiagnostic = stateNameExistsInPropNode(nextPropNode, stateNames, document, MESSAGES.INVALID_NEXT)
+                    if (nextPropNode) {
+                        const nextStateDiagnostic = stateNameExistsInPropNode(nextPropNode, stateNames, document, MESSAGES.INVALID_NEXT)
 
-                    if (nextStateDiagnostic) {
-                        diagnostics.push(nextStateDiagnostic)
+                        if (nextStateDiagnostic) {
+                            diagnostics.push(nextStateDiagnostic)
+                        }
                     }
                 }
             })

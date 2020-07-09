@@ -29,7 +29,7 @@ export default function(oneStateValueNode: ObjectASTNode, document: TextDocument
         const stateProperties = schema.StateTypes[stateType]?.Properties
 
         if (!stateProperties) {
-            return
+            return []
         }
 
         const allowedProperties = hasCommonProperties

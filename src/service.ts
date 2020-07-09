@@ -7,6 +7,7 @@ import {
     Diagnostic,
     DiagnosticSeverity,
     getLanguageService as getLanguageServiceVscode,
+    JSONSchema
 } from 'vscode-json-languageservice';
 
 import aslSchema from './json-schema/bundled.json';
@@ -37,7 +38,7 @@ export const getLanguageService: GetLanguageServiceFunc = function(params) {
             {
                 uri: 'asl',
                 fileMatch: ['*'],
-                schema: aslSchema
+                schema: aslSchema as JSONSchema
             }
         ]
     })
