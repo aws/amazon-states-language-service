@@ -17,6 +17,7 @@ import {
     documentChoiceValidNext,
     documentInvalidNext,
     documentInvalidNextNested,
+    documentInvalidParametersIntrinsicFunction,
     documentInvalidParametersJsonPath,
     documentInvalidPropertiesCatch,
     documentInvalidPropertiesChoices,
@@ -40,6 +41,7 @@ import {
     documentTaskValidVariableSubstitution,
     documentUnreachableState,
     documentValidNext,
+    documentValidParametersIntrinsicFunction,
     documentValidParametersJsonPath,
 } from './json-strings/validationStrings'
 
@@ -562,29 +564,74 @@ suite('ASL context-aware validation', () => {
             })
         })
 
+        test('Does not show diagnostics for valid Intrinsic Functions', async () => {
+            await testValidations({
+                json: documentValidParametersIntrinsicFunction,
+                diagnostics: []
+            })
+        })
+
         test('Shows diagnostics for invalid JSON paths', async () => {
             await testValidations({
                 json: documentInvalidParametersJsonPath,
                 diagnostics: [
                     {
-                        message: MESSAGES.INVALID_JSON_PATH,
+                        message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC,
                         start: [10, 29],
                         end: [10, 31]
                     },
                     {
-                        message: MESSAGES.INVALID_JSON_PATH,
+                        message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC,
                         start: [13, 40],
                         end: [13, 42]
                     },
                     {
-                        message: MESSAGES.INVALID_JSON_PATH,
+                        message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC,
                         start: [14, 40],
                         end: [14, 44]
                     },
                     {
-                        message: MESSAGES.INVALID_JSON_PATH,
+                        message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC,
                         start: [17, 29],
                         end: [17, 38]
+                    },
+                ]
+            })
+        })
+
+        test('Shows diagnostics for invalid Intrinsic Functions', async () => {
+            await testValidations({
+                json: documentInvalidParametersIntrinsicFunction,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC,
+                        start: [10, 22],
+                        end: [10, 76]
+                    },
+                    {
+                        message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC,
+                        start: [11, 22],
+                        end: [11, 45]
+                    },
+                    {
+                        message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC,
+                        start: [12, 22],
+                        end: [12, 54]
+                    },
+                    {
+                        message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC,
+                        start: [13, 22],
+                        end: [13, 32]
+                    },
+                    {
+                        message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC,
+                        start: [14, 22],
+                        end: [14, 39]
+                    },
+                    {
+                        message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC,
+                        start: [15, 22],
+                        end: [15, 42]
                     },
                 ]
             })

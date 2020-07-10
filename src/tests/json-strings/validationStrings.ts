@@ -1134,3 +1134,57 @@ export const documentInvalidParametersJsonPath = `
   }
 }
 `
+
+export const documentValidParametersIntrinsicFunction = `
+{
+  "StartAt": "Invoke Lambda function",
+  "States": {
+    "Invoke Lambda function": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME",
+        "Payload": {
+          "Input1.$": "States.Format($.template, $.firstName, $.lastName)",
+          "Input2.$": "States.JsonToString($)",
+          "Input3.$": "States.StringToJson($.escaped)",
+          "Input4.$": "States.Format($.template, $.firstName, $.lastName)    ",
+          "Input5.$": "States.JsonToString($)    ",
+          "Input6.$": "States.StringToJson($.escaped)    "
+        }
+      },
+      "Next": "Succeed state"
+    },
+    "Succeed state": {
+      "Type": "Succeed"
+    }
+  }
+}
+`
+
+export const documentInvalidParametersIntrinsicFunction = `
+{
+  "StartAt": "Invoke Lambda function",
+  "States": {
+    "Invoke Lambda function": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME",
+        "Payload": {
+          "Input1.$": "  States.Format($.template, $.firstName, $.lastName)",
+          "Input2.$": "States.JsonToString($",
+          "Input3.$": "States.StringToJson $.escaped)",
+          "Input4.$": "States. ",
+          "Input5.$": "JsonToString($)",
+          "Input6.$": "something else    "
+        }
+      },
+      "Next": "Succeed state"
+    },
+    "Succeed state": {
+      "Type": "Succeed"
+    }
+  }
+}
+`
