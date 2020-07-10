@@ -61,7 +61,7 @@ export const getLanguageService: GetLanguageServiceFunc = function(params) {
 
             return diagnostics.concat(aslDiagnostics)
         }
-
+        // testing
         return diagnostics
     }
 
