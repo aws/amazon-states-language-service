@@ -1188,3 +1188,425 @@ export const documentInvalidParametersIntrinsicFunction = `
   }
 }
 `
+
+export const documentValidAslImprovements = `
+{
+  "StartAt": "Invoke Lambda function",
+  "States": {
+      "Invoke Lambda function": {
+          "Type": "Task",
+          "TimeoutSecondsPath": "$.path",
+          "HeartbeatSecondsPath": "$.path",
+          "InputPath": "$$.Execution.Id",
+          "OutputPath": "$$.Execution.Id",
+          "Resource": "arn:aws:states:::lambda:invoke",
+          "Parameters": {
+              "FunctionName": "arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME",
+              "Payload": {
+                  "Input.$": "$"
+              }
+          },
+          "ResultSelector": {
+              "example.$": "$",
+              "example2": {
+                  "nested.$": "$.path"
+              }
+          },
+          "Next": "MapState"
+      },
+      "MapState": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "MaxConcurrency": 0,
+          "Iterator": {
+              "StartAt": "Pass",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "Result": "Done!",
+                      "End": true
+                  }
+              }
+          },
+          "ResultSelector": {
+              "example.$": "$",
+              "example2": {
+                  "nested.$": "$.path"
+              }
+          },
+          "ResultPath": "$.output",
+          "Next": "ParallelState"
+      },
+      "ParallelState": {
+          "Type": "Parallel",
+          "Branches": [
+              {
+                  "StartAt": "State1",
+                  "States": {
+                      "State1": {
+                          "Type": "Pass",
+                          "End": true
+                      }
+                  }
+              },
+              {
+                  "StartAt": "State2",
+                  "States": {
+                      "State2": {
+                          "Type": "Pass",
+                          "End": true
+                      }
+                  }
+              }
+          ],
+          "ResultSelector": {
+              "example.$": "$",
+              "example2": {
+                  "nested.$": "$.path"
+              }
+          },
+          "Next": "Compare 2 variables"
+      },
+      "Compare 2 variables": {
+          "Type": "Choice",
+          "Choices": [
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "IsNull": true
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "IsPresent": true
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "IsNumeric": true
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "IsString": true
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "IsBoolean": true
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "IsTimestamp": true
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "StringMatches": "uuu*"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "StringEqualsPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "StringLessThanPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "StringGreaterThanPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "StringLessThanEqualsPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "StringGreaterThanEqualsPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "NumericEqualsPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "NumericLessThanPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "NumericGreaterThanPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "NumericLessThanEqualsPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "NumericGreaterThanEqualsPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "BooleanEqualsPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "TimestampEqualsPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "TimestampLessThanPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "TimestampGreaterThanPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "TimestampLessThanEqualsPath": "$.some.path"
+              },
+              {
+                  "Variable": "$.var1",
+                  "Next": "Succeed state",
+                  "TimestampGreaterThanEqualsPath": "$.some.path"
+              },
+              {
+                  "And": [
+                      {
+                          "Variable": "$.var1",
+                          "IsNull": true
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "IsPresent": true
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "IsNumeric": true
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "IsString": true
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "IsBoolean": true
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "IsTimestamp": true
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "StringMatches": "uuu*"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "StringEqualsPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "StringLessThanPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "StringGreaterThanPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "StringLessThanEqualsPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "StringGreaterThanEqualsPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "NumericEqualsPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "NumericLessThanPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "NumericGreaterThanPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "NumericLessThanEqualsPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "NumericGreaterThanEqualsPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "BooleanEqualsPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "TimestampEqualsPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "TimestampLessThanPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "TimestampGreaterThanPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "TimestampLessThanEqualsPath": "$.some.path"
+                      },
+                      {
+                          "Variable": "$.var1",
+                          "TimestampGreaterThanEqualsPath": "$.some.path"
+                      }
+                  ],
+                  "Next": "Succeed state"
+              }
+          ],
+          "Default": "Fail state"
+      },
+      "Fail state": {
+          "Type": "Fail"
+      },
+      "Succeed state": {
+          "Type": "Succeed"
+      }
+  }
+}
+`
+
+export const documentValidResultSelectorJsonPath = `
+{
+  "StartAt": "GetManualReview",
+  "States": {
+      "GetManualReview": {
+          "Type": "Task",
+          "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+          "ResultSelector": {
+              "prop1": "get-model-review-decision",
+              "prop2": {
+                  "model.$": "$.new_model",
+                  "token.$": "$$.Task.Token",
+                  "someProp": {
+                      "nested_model.$": "$.new_model",
+                      "nested_token.$": "$$.Task.Token"
+                  }
+              },
+              "Qualifier": "prod-v1"
+          },
+          "Parameters": {
+            "FunctionName": "arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME"
+          },
+          "End": true
+      }
+  }
+}
+`
+
+export const documentInvalidResultSelectorJsonPath = `
+{
+  "StartAt": "GetManualReview",
+  "States": {
+      "GetManualReview": {
+          "Type": "Task",
+          "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+          "ResultSelector": {
+              "prop1": "get-model-review-decision",
+              "prop2": {
+                  "model.$": "",
+                  "token.$": "$$.Task.Token",
+                  "someProp": {
+                      "nested_model.$": 22,
+                      "nested_token.$": true
+                  }
+              },
+              "Qualifier.$": "prod-v1"
+          },
+          "Parameters": {
+            "FunctionName": "arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME"
+          },
+          "End": true
+      }
+  }
+}
+`
+
+export const documentValidResultSelectorIntrinsicFunction = `
+{
+  "StartAt": "Invoke Lambda function",
+  "States": {
+    "Invoke Lambda function": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultSelector": {
+        "prop1": "arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME",
+        "prop2": {
+          "Input1.$": "States.Format($.template, $.firstName, $.lastName)",
+          "Input2.$": "States.JsonToString($)",
+          "Input3.$": "States.StringToJson($.escaped)",
+          "Input4.$": "States.Format($.template, $.firstName, $.lastName)    ",
+          "Input5.$": "States.JsonToString($)    ",
+          "Input6.$": "States.StringToJson($.escaped)    "
+        }
+      },
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME"
+      },
+      "Next": "Succeed state"
+    },
+    "Succeed state": {
+      "Type": "Succeed"
+    }
+  }
+}
+`
+
+export const documentInvalidResultSelectorIntrinsicFunction = `
+{
+  "StartAt": "Invoke Lambda function",
+  "States": {
+    "Invoke Lambda function": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "ResultSelector": {
+        "prop1": "arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME",
+        "prop2": {
+          "Input1.$": "  States.Format($.template, $.firstName, $.lastName)",
+          "Input2.$": "States.JsonToString($",
+          "Input3.$": "States.StringToJson $.escaped)",
+          "Input4.$": "States. ",
+          "Input5.$": "JsonToString($)",
+          "Input6.$": "something else    "
+        }
+      },
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME"
+      },
+      "Next": "Succeed state"
+    },
+    "Succeed state": {
+      "Type": "Succeed"
+    }
+  }
+}
+`
