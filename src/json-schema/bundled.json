@@ -129,7 +129,7 @@
 										]
 									},
 									"Parameters": {
-										"description": "A collection of key-value pairs that will be passed as input to the next state. Values can be static, or selected from the input to the current state using JsonPath.",
+										"description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions.",
 										"type": "object"
 									}
 								}
@@ -278,7 +278,7 @@
 									},
 									"Parameters": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Parameters",
-										"description": "Used to pass information to the API actions of connected resources. The parameters can use a mix of static JSON and JsonPath."
+										"description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions."
 									},
 									"ResultSelector": {
 										"description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions.",
@@ -290,7 +290,7 @@
 									},
 									"TimeoutSecondsPath": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath",
-										"description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error name. Specified using a path from the state's input data which must reference a positive, non-zero integer. If not provided, the default value is 99999999. The count begins after the task has been started, for example, when ActivityStarted or LambdaFunctionStarted are logged in the Execution event history."
+										"description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error. Specified using JsonPath syntax, to select the value from the state's input data."
 									},
 									"HeartbeatSeconds": {
 										"$ref": "#/properties/TimeoutSeconds",
@@ -298,7 +298,7 @@
 									},
 									"HeartbeatSecondsPath": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath",
-										"description": "If more time than the specified seconds elapses between heartbeats from the task, this state fails with a States.Timeout error name. Specified using a path from the state's input data which must reference a positive, non-zero integer less than the number of seconds specified in the TimeoutSeconds field. If not provided, the default value is 99999999. For Activities, the count begins when GetActivityTask receives a token and ActivityStarted is logged in the Execution event history."
+										"description": "If more time than the specified seconds elapses between heartbeats from the task, this state fails with a States.Timeout error. Specified using JsonPath syntax, to select the value from the state's input data."
 									},
 									"Retry": {
 										"description": "An array of objects, called Retriers, that define a retry policy if the state encounters runtime errors.",
@@ -2170,7 +2170,7 @@
 									},
 									"Parameters": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Parameters",
-										"description": "A collection of key-value pairs that will be passed as input. Values can be static, or selected from the input with a path."
+										"description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions."
 									},
 									"ResultSelector": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/ResultSelector",
@@ -2233,7 +2233,7 @@
 									},
 									"Parameters": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Parameters",
-										"description": "A collection of key-value pairs that will be passed as input. Values can be static, or selected from the input with a path."
+										"description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions."
 									},
 									"ResultSelector": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/ResultSelector",
