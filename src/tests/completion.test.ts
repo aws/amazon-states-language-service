@@ -242,14 +242,10 @@ async function testCompletions(options: TestCompletionOptions) {
     const itemInsertTexts = labels.map(labelToInsertText)
 
     assert.deepEqual(res?.items.map(item => item.label), labels)
-    assert.deepEqual(res?.items.map(item => item.textEdit?.newText), itemInsertTexts)
+    assert.deepEqual(res?.items.map(item => item.insertText), itemInsertTexts)
 
     const leftPos = Position.create(...start)
     const rightPos = Position.create(...end)
-
-    res?.items.forEach(item => {
-      assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
-    })
 
 }
 

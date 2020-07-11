@@ -72,7 +72,9 @@ function getListOfItems(node: PropertyASTNode): string[] {
 
 function getCompletionList(
     items: string[],
-    shouldAddLeftSpace?: boolean
+    shouldAddLeftQuote?: boolean,
+    shouldAddLeftSpace?: boolean,
+    shoudlAddTrailingComma?: boolean
 ) {
     const list: CompletionList = {
         isIncomplete: false,
@@ -81,7 +83,7 @@ function getCompletionList(
             item.commitCharacters = [',']
 
             item.kind = CompletionItemKind.Value
-            item.insertText =  `${shouldAddLeftSpace ? ' ' : ''}"${name}"`
+            item.insertText = `${shouldAddLeftSpace ? ' ' : ''}${shouldAddLeftQuote ? '"' : ''}${name}"${shoudlAddTrailingComma ? ',' : ''}`
             item.filterText = name
 
             return item
@@ -106,7 +108,7 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
                 endPosition = colonPosition
             }
 
-            return getCompletionList(states, true)
+            return getCompletionList(states, true, true, true)
         }
     }
 
@@ -118,7 +120,11 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
             const states = getListOfItems(propNode)
 
             if (states.length) {
-                return getCompletionList(states)
+                // Text edit will only work when start position is higher than the node offset
+
+                const isCursorAtTheBeginning = offset === node.offset
+
+                return getCompletionList(states, isCursorAtTheBeginning)
             }
         }
     }
