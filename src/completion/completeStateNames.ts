@@ -9,7 +9,9 @@ import {
     CompletionItemKind,
     CompletionList,
     PropertyASTNode,
-    TextDocument
+    Range,
+    TextDocument,
+    TextEdit,
 } from 'vscode-json-languageservice';
 
 import {
@@ -72,6 +74,7 @@ function getListOfItems(node: PropertyASTNode): string[] {
 
 function getCompletionList(
     items: string[],
+    replaceRange: Range,
     shouldAddLeftQuote?: boolean,
     shouldAddLeftSpace?: boolean,
     shoudlAddTrailingComma?: boolean
@@ -83,7 +86,10 @@ function getCompletionList(
             item.commitCharacters = [',']
 
             item.kind = CompletionItemKind.Value
-            item.insertText = `${shouldAddLeftSpace ? ' ' : ''}${shouldAddLeftQuote ? '"' : ''}${name}"${shoudlAddTrailingComma ? ',' : ''}`
+            item.textEdit = TextEdit.replace(
+                replaceRange,
+                `${shouldAddLeftSpace ? ' ' : ''}${shouldAddLeftQuote ? '"' : ''}${name}"${shoudlAddTrailingComma ? ',' : ''}`
+            )
             item.filterText = name
 
             return item
@@ -108,7 +114,9 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
                 endPosition = colonPosition
             }
 
-            return getCompletionList(states, true, true, true)
+            const range = Range.create(colonPosition, endPosition)
+
+            return getCompletionList(states, range, true, true, true)
         }
     }
 
@@ -121,10 +129,13 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
 
             if (states.length) {
                 // Text edit will only work when start position is higher than the node offset
+                const startPosition = document.positionAt(node.offset + 1)
+                const endPosition = document.positionAt(node.offset + node.length)
 
+                const range = Range.create(startPosition, endPosition)
                 const isCursorAtTheBeginning = offset === node.offset
 
-                return getCompletionList(states, isCursorAtTheBeginning)
+                return getCompletionList(states, range, isCursorAtTheBeginning)
             }
         }
     }
