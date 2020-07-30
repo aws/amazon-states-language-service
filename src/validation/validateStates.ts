@@ -99,7 +99,7 @@ function validateArrayNext(arrayPropName: string, oneStateValueNode: ObjectASTNo
     return { diagnostics, reachedStates }
 }
 
-export default function validateStates(rootNode: ObjectASTNode, document: TextDocument, isRoot?: Boolean): Diagnostic[] {
+export default function validateStates(rootNode: ObjectASTNode, document: TextDocument, isRoot?: Boolean, ignoreColonOffset?: boolean): Diagnostic[] {
     const statesNode = findPropChildByName(rootNode, 'States')
     const startAtNode = findPropChildByName(rootNode, 'StartAt')
 
@@ -120,7 +120,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
     })
 
     if (statesNode) {
-        const stateNames = getListOfStateNamesFromStateNode(statesNode)
+        const stateNames = getListOfStateNamesFromStateNode(statesNode, ignoreColonOffset)
         const statesValueNode = statesNode.valueNode
 
         if (startAtNode) {
@@ -205,7 +205,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
 
                             if (iteratorPropNode && iteratorPropNode.valueNode && isObjectNode(iteratorPropNode.valueNode)) {
                                 // append the result of recursive validation to the list of diagnostics
-                                diagnostics = [...diagnostics, ...validateStates(iteratorPropNode.valueNode, document)]
+                                diagnostics = [...diagnostics, ...validateStates(iteratorPropNode.valueNode, document, undefined, ignoreColonOffset)]
                             }
 
                             break
@@ -219,7 +219,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                                 branchesPropNode.valueNode.children.forEach(branchItem => {
                                     if (isObjectNode(branchItem)) {
                                         // append the result of recursive validation to the list of diagnostics
-                                        diagnostics = [...diagnostics, ...validateStates(branchItem, document)]
+                                        diagnostics = [...diagnostics, ...validateStates(branchItem, document, undefined, ignoreColonOffset)]
                                     }
                                 })
                             }

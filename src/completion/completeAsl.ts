@@ -18,7 +18,7 @@ import {
 import completeSnippets from './completeSnippets'
 import completeStateNames from './completeStateNames'
 
-export default function completeAsl(document: TextDocument, position: Position, doc: JSONDocument, jsonCompletions: CompletionList | null): CompletionList {
+export default function completeAsl(document: TextDocument, position: Position, doc: JSONDocument, jsonCompletions: CompletionList | null, ignoreColonOffset?: boolean): CompletionList {
 
     const offset = document.offsetAt(position)
     const rootNode = (doc as ASTTree).root
@@ -33,7 +33,7 @@ export default function completeAsl(document: TextDocument, position: Position, 
     const node = findNodeAtLocation(rootNode, offset)
 
     const snippetsList = completeSnippets(node)
-    let completionList = completeStateNames(node, offset, document) ?? jsonCompletions
+    let completionList = completeStateNames(node, offset, document, ignoreColonOffset) ?? jsonCompletions
 
     if (completionList?.items) {
         completionList.items = completionList.items.concat(snippetsList)

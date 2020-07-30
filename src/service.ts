@@ -20,11 +20,9 @@ import {
 import completeAsl from './completion/completeAsl'
 import validateStates from './validation/validateStates'
 
-type GetLanguageServiceFunc = typeof getLanguageServiceVscode;
-
 export * from 'vscode-json-languageservice'
 
-export const getLanguageService: GetLanguageServiceFunc = function(params) {
+export const getLanguageService = function(params: any, ignoreColonOffset?: boolean) {
     const builtInParams = {}
 
     const languageService = getLanguageServiceVscode({ ...params, ...builtInParams })
@@ -58,7 +56,7 @@ export const getLanguageService: GetLanguageServiceFunc = function(params) {
         const rootNode = (jsonDocument as ASTTree).root
 
         if (rootNode && isObjectNode(rootNode)) {
-            const aslDiagnostics = validateStates(rootNode, document, true)
+            const aslDiagnostics = validateStates(rootNode, document, true, ignoreColonOffset)
 
             return diagnostics.concat(aslDiagnostics)
         }
@@ -69,7 +67,7 @@ export const getLanguageService: GetLanguageServiceFunc = function(params) {
     languageService.doComplete = async function(document, position, doc) {
         const jsonCompletions = await doComplete(document, position, doc);
 
-        return completeAsl(document, position, doc, jsonCompletions);
+        return completeAsl(document, position, doc, jsonCompletions, ignoreColonOffset);
     }
 
     return languageService
