@@ -1335,7 +1335,6 @@
 									}
 								},
 								"required": [
-									"ItemsPath",
 									"Iterator"
 								]
 							}
