@@ -99,7 +99,7 @@ function validateArrayNext(arrayPropName: string, oneStateValueNode: ObjectASTNo
     return { diagnostics, reachedStates }
 }
 
-export default function validateStates(rootNode: ObjectASTNode, document: TextDocument, isRoot?: Boolean, ignoreColonOffset?: boolean): Diagnostic[] {
+export default function validateStates(rootNode: ObjectASTNode, document: TextDocument, isRoot?: Boolean, ignoreColonOffset: boolean = false): Diagnostic[] {
     const statesNode = findPropChildByName(rootNode, 'States')
     const startAtNode = findPropChildByName(rootNode, 'StartAt')
 

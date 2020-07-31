@@ -18,7 +18,7 @@ import {
 import completeSnippets from './completeSnippets'
 import completeStateNames from './completeStateNames'
 
-export default function completeAsl(document: TextDocument, position: Position, doc: JSONDocument, jsonCompletions: CompletionList | null, ignoreColonOffset?: boolean): CompletionList {
+export default function completeAsl(document: TextDocument, position: Position, doc: JSONDocument, jsonCompletions: CompletionList | null, ignoreColonOffset: boolean = false): CompletionList {
 
     const offset = document.offsetAt(position)
     const rootNode = (doc as ASTTree).root
