@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { ArrayASTNode, ASTNode, JSONDocument, ObjectASTNode, PropertyASTNode, StringASTNode } from 'vscode-json-languageservice'
+import { ArrayASTNode, ASTNode, JSONDocument, LanguageServiceParams, ObjectASTNode, PropertyASTNode, StringASTNode } from 'vscode-json-languageservice'
 
 export interface ASTTree extends JSONDocument {
     root?: ASTNode
+}
+
+export interface ASLOptions {
+    ignoreColonOffset?: boolean
 }
 
 export function isStringNode(node: ASTNode): node is StringASTNode {

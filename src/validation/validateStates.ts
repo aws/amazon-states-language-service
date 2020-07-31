@@ -15,6 +15,7 @@ import {
 } from 'vscode-json-languageservice'
 
 import {
+    ASLOptions,
     findPropChildByName,
     getListOfStateNamesFromStateNode,
     isArrayNode,
@@ -99,7 +100,7 @@ function validateArrayNext(arrayPropName: string, oneStateValueNode: ObjectASTNo
     return { diagnostics, reachedStates }
 }
 
-export default function validateStates(rootNode: ObjectASTNode, document: TextDocument, isRoot?: Boolean, ignoreColonOffset: boolean = false): Diagnostic[] {
+export default function validateStates(rootNode: ObjectASTNode, document: TextDocument, isRoot?: Boolean, options?: ASLOptions): Diagnostic[] {
     const statesNode = findPropChildByName(rootNode, 'States')
     const startAtNode = findPropChildByName(rootNode, 'StartAt')
 
@@ -120,7 +121,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
     })
 
     if (statesNode) {
-        const stateNames = getListOfStateNamesFromStateNode(statesNode, ignoreColonOffset)
+        const stateNames = getListOfStateNamesFromStateNode(statesNode, options?.ignoreColonOffset)
         const statesValueNode = statesNode.valueNode
 
         if (startAtNode) {
@@ -205,7 +206,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
 
                             if (iteratorPropNode && iteratorPropNode.valueNode && isObjectNode(iteratorPropNode.valueNode)) {
                                 // append the result of recursive validation to the list of diagnostics
-                                diagnostics = [...diagnostics, ...validateStates(iteratorPropNode.valueNode, document, undefined, ignoreColonOffset)]
+                                diagnostics = [...diagnostics, ...validateStates(iteratorPropNode.valueNode, document, undefined, options)]
                             }
 
                             break
@@ -219,7 +220,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                                 branchesPropNode.valueNode.children.forEach(branchItem => {
                                     if (isObjectNode(branchItem)) {
                                         // append the result of recursive validation to the list of diagnostics
-                                        diagnostics = [...diagnostics, ...validateStates(branchItem, document, undefined, ignoreColonOffset)]
+                                        diagnostics = [...diagnostics, ...validateStates(branchItem, document, undefined, options)]
                                     }
                                 })
                             }

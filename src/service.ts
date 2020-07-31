@@ -15,6 +15,7 @@ import {
 import aslSchema from './json-schema/bundled.json';
 
 import {
+    ASLOptions,
     ASTTree,
     isObjectNode
 } from './utils/astUtilityFunctions'
@@ -24,11 +25,7 @@ import validateStates from './validation/validateStates'
 
 export * from 'vscode-json-languageservice'
 
-interface ASLLanguageServiceParams extends LanguageServiceParams {
-    aslOptions?: {
-        ignoreColonOffset?: boolean
-    }
-}
+interface ASLLanguageServiceParams extends LanguageServiceParams { aslOptions?: ASLOptions }
 
 export const getLanguageService = function( params: ASLLanguageServiceParams): LanguageService {
     const builtInParams = {}
@@ -64,7 +61,7 @@ export const getLanguageService = function( params: ASLLanguageServiceParams): L
         const rootNode = (jsonDocument as ASTTree).root
 
         if (rootNode && isObjectNode(rootNode)) {
-            const aslDiagnostics = validateStates(rootNode, document, true, params.aslOptions?.ignoreColonOffset)
+            const aslDiagnostics = validateStates(rootNode, document, true, params.aslOptions)
 
             return diagnostics.concat(aslDiagnostics)
         }
@@ -75,7 +72,7 @@ export const getLanguageService = function( params: ASLLanguageServiceParams): L
     languageService.doComplete = async function(document, position, doc) {
         const jsonCompletions = await doComplete(document, position, doc);
 
-        return completeAsl(document, position, doc, jsonCompletions, params.aslOptions?.ignoreColonOffset);
+        return completeAsl(document, position, doc, jsonCompletions, params.aslOptions);
     }
 
     return languageService

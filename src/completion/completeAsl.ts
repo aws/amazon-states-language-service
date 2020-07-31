@@ -11,6 +11,7 @@ import {
 } from 'vscode-json-languageservice'
 
 import {
+    ASLOptions,
     ASTTree,
     findNodeAtLocation,
 } from '../utils/astUtilityFunctions'
@@ -18,7 +19,7 @@ import {
 import completeSnippets from './completeSnippets'
 import completeStateNames from './completeStateNames'
 
-export default function completeAsl(document: TextDocument, position: Position, doc: JSONDocument, jsonCompletions: CompletionList | null, ignoreColonOffset: boolean = false): CompletionList {
+export default function completeAsl(document: TextDocument, position: Position, doc: JSONDocument, jsonCompletions: CompletionList | null, aslOptions?: ASLOptions): CompletionList {
 
     const offset = document.offsetAt(position)
     const rootNode = (doc as ASTTree).root
@@ -33,7 +34,7 @@ export default function completeAsl(document: TextDocument, position: Position, 
     const node = findNodeAtLocation(rootNode, offset)
 
     const snippetsList = completeSnippets(node)
-    let completionList = completeStateNames(node, offset, document, ignoreColonOffset) ?? jsonCompletions
+    let completionList = completeStateNames(node, offset, document, aslOptions) ?? jsonCompletions
 
     if (completionList?.items) {
         completionList.items = completionList.items.concat(snippetsList)
