@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { ArrayASTNode, ASTNode, JSONDocument, ObjectASTNode, PropertyASTNode, StringASTNode } from 'vscode-json-languageservice'
+import { ArrayASTNode, ASTNode, JSONDocument, LanguageServiceParams, ObjectASTNode, PropertyASTNode, StringASTNode } from 'vscode-json-languageservice'
 
 export interface ASTTree extends JSONDocument {
     root?: ASTNode
+}
+
+export interface ASLOptions {
+    ignoreColonOffset?: boolean
 }
 
 export function isStringNode(node: ASTNode): node is StringASTNode {
@@ -81,7 +85,7 @@ export function findClosestAncestorStateNode(node: ASTNode): PropertyASTNode | u
 }
 
 /** Extracts the list of state names from given property node named "States" */
-export function getListOfStateNamesFromStateNode(node: PropertyASTNode): string[] {
+export function getListOfStateNamesFromStateNode(node: PropertyASTNode, ignoreColonOffset: boolean = false): string[] {
     const nodeName = node.keyNode.value
 
     if (nodeName === 'States') {
@@ -89,9 +93,9 @@ export function getListOfStateNamesFromStateNode(node: PropertyASTNode): string[
         const objNode = node.children.find(isObjectNode)
 
         return objNode?.children
-            // Filter out property nodes that do not have colonOffset. They are invalid.
-            .filter(childNode => isPropertyNode(childNode) && childNode.colonOffset && childNode.colonOffset >= 0)
-            .map(propNode => (propNode as PropertyASTNode).keyNode.value) ?? []
+        // Filter out property nodes that do not have colonOffset. They are invalid.
+        .filter(childNode => isPropertyNode(childNode) && childNode.colonOffset && (ignoreColonOffset || (!ignoreColonOffset && childNode.colonOffset >= 0)))
+        .map(propNode => (propNode as PropertyASTNode).keyNode.value) ?? []
     } else {
         throw new Error('Not a state name property node')
     }

@@ -15,6 +15,7 @@ import {
 } from 'vscode-json-languageservice';
 
 import {
+    ASLOptions,
     findClosestAncestorStateNode,
     getListOfStateNamesFromStateNode,
     isObjectNode,
@@ -22,13 +23,13 @@ import {
     isStringNode
 } from '../utils/astUtilityFunctions'
 
-function getStatesFromStartAtNode(node: PropertyASTNode): string[] {
+function getStatesFromStartAtNode(node: PropertyASTNode, options?: ASLOptions): string[] {
     if (node.keyNode.value === 'StartAt') {
         if (node.parent && isObjectNode(node.parent)) {
             const statesNode = node.parent.properties.find(propNode => propNode.keyNode.value === 'States')
 
             if (statesNode) {
-                return getListOfStateNamesFromStateNode(statesNode)
+                return getListOfStateNamesFromStateNode(statesNode, options?.ignoreColonOffset)
             }
         }
     }
@@ -36,12 +37,12 @@ function getStatesFromStartAtNode(node: PropertyASTNode): string[] {
     return []
 }
 
-function getListOfItems(node: PropertyASTNode): string[] {
+function getListOfItems(node: PropertyASTNode, options?: ASLOptions): string[] {
     const keyVal = node.keyNode.value
 
     switch (keyVal) {
         case 'StartAt': {
-            return getStatesFromStartAtNode(node)
+            return getStatesFromStartAtNode(node, options)
         }
         case 'Next':
         case 'Default': {
@@ -60,7 +61,7 @@ function getListOfItems(node: PropertyASTNode): string[] {
             }
 
             if (statesNode) {
-                return getListOfStateNamesFromStateNode(statesNode).filter(name => name !== stateItemName)
+                return getListOfStateNamesFromStateNode(statesNode, options?.ignoreColonOffset).filter(name => name !== stateItemName)
             }
 
             return []
@@ -99,10 +100,10 @@ function getCompletionList(
     return list
 }
 
-export default function completeStateNames(node: ASTNode | undefined, offset: number, document: TextDocument): CompletionList | undefined {
+export default function completeStateNames(node: ASTNode | undefined, offset: number, document: TextDocument, options?: ASLOptions): CompletionList | undefined {
     // For property nodes
     if (node && isPropertyNode(node) && node.colonOffset) {
-        const states = getListOfItems(node)
+        const states = getListOfItems(node, options)
 
         if (states.length) {
             const colonPosition = document.positionAt(node.colonOffset + 1)
@@ -125,7 +126,7 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
         const propNode = node.parent
 
         if (isStringNode(node)) {
-            const states = getListOfItems(propNode)
+            const states = getListOfItems(propNode, options)
 
             if (states.length) {
                 // Text edit will only work when start position is higher than the node offset

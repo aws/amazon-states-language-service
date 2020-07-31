@@ -7,12 +7,15 @@ import {
     Diagnostic,
     DiagnosticSeverity,
     getLanguageService as getLanguageServiceVscode,
-    JSONSchema
+    JSONSchema,
+    LanguageService,
+    LanguageServiceParams
 } from 'vscode-json-languageservice';
 
 import aslSchema from './json-schema/bundled.json';
 
 import {
+    ASLOptions,
     ASTTree,
     isObjectNode
 } from './utils/astUtilityFunctions'
@@ -20,11 +23,11 @@ import {
 import completeAsl from './completion/completeAsl'
 import validateStates from './validation/validateStates'
 
-type GetLanguageServiceFunc = typeof getLanguageServiceVscode;
-
 export * from 'vscode-json-languageservice'
 
-export const getLanguageService: GetLanguageServiceFunc = function(params) {
+interface ASLLanguageServiceParams extends LanguageServiceParams { aslOptions?: ASLOptions }
+
+export const getLanguageService = function( params: ASLLanguageServiceParams): LanguageService {
     const builtInParams = {}
 
     const languageService = getLanguageServiceVscode({ ...params, ...builtInParams })
@@ -58,7 +61,7 @@ export const getLanguageService: GetLanguageServiceFunc = function(params) {
         const rootNode = (jsonDocument as ASTTree).root
 
         if (rootNode && isObjectNode(rootNode)) {
-            const aslDiagnostics = validateStates(rootNode, document, true)
+            const aslDiagnostics = validateStates(rootNode, document, true, params.aslOptions)
 
             return diagnostics.concat(aslDiagnostics)
         }
@@ -69,7 +72,7 @@ export const getLanguageService: GetLanguageServiceFunc = function(params) {
     languageService.doComplete = async function(document, position, doc) {
         const jsonCompletions = await doComplete(document, position, doc);
 
-        return completeAsl(document, position, doc, jsonCompletions);
+        return completeAsl(document, position, doc, jsonCompletions, params.aslOptions);
     }
 
     return languageService
