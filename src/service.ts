@@ -27,7 +27,8 @@ export * from 'vscode-json-languageservice'
 
 interface ASLLanguageServiceParams extends LanguageServiceParams { aslOptions?: ASLOptions }
 
-export const ASLSCHEMA = aslSchema as JSONSchema
+export const ASL_SCHEMA = aslSchema as JSONSchema
+export const doCompleteAsl = completeAsl
 
 export const getLanguageService = function( params: ASLLanguageServiceParams): LanguageService {
     const builtInParams = {}
