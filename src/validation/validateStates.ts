@@ -27,7 +27,7 @@ import getPropertyNodeDiagnostic from './utils/getPropertyNodeDiagnostic'
 import validateProperties from './validateProperties'
 import schema from './validationSchema'
 
-const INTRINSIC_FUNC_REGEX = /^States\.(JsonToString|Format|StringToJson)\(.+\)$/
+const INTRINSIC_FUNC_REGEX = /^States\.(JsonToString|Format|StringToJson|Array)\(.+\)$/
 
 function stateNameExistsInPropNode(
     nextPropNode: PropertyASTNode,
