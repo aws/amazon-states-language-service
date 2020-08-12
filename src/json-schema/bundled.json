@@ -129,7 +129,7 @@
 										]
 									},
 									"Parameters": {
-										"description": "A collection of key-value pairs that will be passed as input to the next state. Values can be static, or selected from the input to the current state using JsonPath.",
+										"description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions.",
 										"type": "object"
 									}
 								}
@@ -278,15 +278,27 @@
 									},
 									"Parameters": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Parameters",
-										"description": "Used to pass information to the API actions of connected resources. The parameters can use a mix of static JSON and JsonPath."
+										"description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions."
+									},
+									"ResultSelector": {
+										"description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions.",
+										"type": "object"
 									},
 									"TimeoutSeconds": {
 										"$ref": "#/properties/TimeoutSeconds",
 										"description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error name. Must be a positive, non-zero integer. If not provided, the default value is 99999999. The count begins after the task has been started, for example, when ActivityStarted or LambdaFunctionStarted are logged in the Execution event history."
 									},
+									"TimeoutSecondsPath": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath",
+										"description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error. Specified using JsonPath syntax, to select the value from the state's input data."
+									},
 									"HeartbeatSeconds": {
 										"$ref": "#/properties/TimeoutSeconds",
 										"description": "If more time than the specified seconds elapses between heartbeats from the task, this state fails with a States.Timeout error name. Must be a positive, non-zero integer less than the number of seconds specified in the TimeoutSeconds field. If not provided, the default value is 99999999. For Activities, the count begins when GetActivityTask receives a token and ActivityStarted is logged in the Execution event history."
+									},
+									"HeartbeatSecondsPath": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath",
+										"description": "If more time than the specified seconds elapses between heartbeats from the task, this state fails with a States.Timeout error. Specified using JsonPath syntax, to select the value from the state's input data."
 									},
 									"Retry": {
 										"description": "An array of objects, called Retriers, that define a retry policy if the state encounters runtime errors.",
@@ -1121,6 +1133,420 @@
 																	"required": [
 																		"Not"
 																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"StringEqualsPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"StringEqualsPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"StringLessThanPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"StringLessThanPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"StringGreaterThanPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"StringGreaterThanPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"StringLessThanEqualsPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"StringLessThanEqualsPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"StringGreaterThanEqualsPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"StringGreaterThanEqualsPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"NumericEqualsPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"NumericEqualsPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"NumericLessThanPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"NumericLessThanPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"NumericGreaterThanPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"NumericGreaterThanPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"NumericLessThanEqualsPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"NumericLessThanEqualsPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"NumericGreaterThanEqualsPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"NumericGreaterThanEqualsPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"BooleanEqualsPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"BooleanEqualsPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"TimestampEqualsPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"TimestampEqualsPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"TimestampLessThanPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"TimestampLessThanPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"TimestampGreaterThanPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"TimestampGreaterThanPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"TimestampLessThanEqualsPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"TimestampLessThanEqualsPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"TimestampGreaterThanEqualsPath": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"TimestampGreaterThanEqualsPath",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"IsNull": {
+																			"type": "boolean"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"IsNull",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"IsPresent": {
+																			"type": "boolean"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"IsPresent",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"IsNumeric": {
+																			"type": "boolean"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"IsNumeric",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"IsString": {
+																			"type": "boolean"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"IsString",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"IsBoolean": {
+																			"type": "boolean"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"IsBoolean",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"IsTimestamp": {
+																			"type": "boolean"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"IsTimestamp",
+																		"Variable"
+																	]
+																},
+																{
+																	"type": "object",
+																	"properties": {
+																		"StringMatches": {
+																			"type": "string"
+																		},
+																		"Variable": {
+																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+																		},
+																		"Comment": {
+																			"$ref": "#/properties/Comment"
+																		}
+																	},
+																	"required": [
+																		"StringMatches",
+																		"Variable"
+																	]
 																}
 															]
 														},
@@ -1133,6 +1559,513 @@
 													},
 													"required": [
 														"Not",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"StringEqualsPath": {
+															"type": "string",
+															"pattern": "\\$.*"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"StringEqualsPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"StringGreaterThanPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"StringGreaterThanPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"StringGreaterThanEqualsPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"StringGreaterThanEqualsPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"StringLessThanPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"StringLessThanPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"StringLessThanEqualsPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"StringLessThanEqualsPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"NumericEqualsPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"NumericEqualsPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"NumericGreaterThanPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"NumericGreaterThanPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"NumericGreaterThanEqualsPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"NumericGreaterThanEqualsPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"NumericLessThanPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"NumericLessThanPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"NumericLessThanEqualsPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"NumericLessThanEqualsPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"BooleanEqualsPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"BooleanEqualsPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"TimestampEqualsPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"TimestampEqualsPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"TimestampGreaterThanPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"TimestampGreaterThanPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"TimestampGreaterThanEqualsPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"TimestampGreaterThanEqualsPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"TimestampLessThanPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"TimestampLessThanPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"TimestampLessThanEqualsPath": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"TimestampLessThanEqualsPath",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"IsNull": {
+															"type": "boolean"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"IsNull",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"IsPresent": {
+															"type": "boolean"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"IsPresent",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"IsNumeric": {
+															"type": "boolean"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"IsNumeric",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"IsString": {
+															"type": "boolean"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"IsString",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"IsBoolean": {
+															"type": "boolean"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"IsBoolean",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"IsTimestamp": {
+															"type": "boolean"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"IsTimestamp",
+														"Variable",
+														"Next"
+													]
+												},
+												{
+													"type": "object",
+													"properties": {
+														"StringMatches": {
+															"type": "string"
+														},
+														"Variable": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
+														},
+														"Next": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"StringMatches",
+														"Variable",
 														"Next"
 													]
 												}
@@ -1237,7 +2170,11 @@
 									},
 									"Parameters": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Parameters",
-										"description": "A collection of key-value pairs that will be passed as input. Values can be static, or selected from the input with a path."
+										"description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions."
+									},
+									"ResultSelector": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/ResultSelector",
+										"description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
 									},
 									"Branches": {
 										"type": "array",
@@ -1296,7 +2233,11 @@
 									},
 									"Parameters": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Parameters",
-										"description": "A collection of key-value pairs that will be passed as input. Values can be static, or selected from the input with a path."
+										"description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions."
+									},
+									"ResultSelector": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/ResultSelector",
+										"description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
 									},
 									"ItemsPath": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0",

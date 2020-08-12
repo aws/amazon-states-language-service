@@ -21,7 +21,11 @@
                         },
                         "Parameters": {
                             "$ref": "common.json#/definitions/parameters",
-                            "description": "A collection of key-value pairs that will be passed as input. Values can be static, or selected from the input with a path."
+                            "description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions."
+                        },
+                        "ResultSelector": {
+                            "$ref": "common.json#/definitions/resultSelector",
+                            "description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
                         },
                         "ItemsPath": {
                             "$ref": "common.json#/definitions/referencePath",

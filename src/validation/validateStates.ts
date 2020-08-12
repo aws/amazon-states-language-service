@@ -27,6 +27,8 @@ import getPropertyNodeDiagnostic from './utils/getPropertyNodeDiagnostic'
 import validateProperties from './validateProperties'
 import schema from './validationSchema'
 
+const INTRINSIC_FUNC_REGEX = /^States\.(JsonToString|Format|StringToJson|Array)\(.+\)$/
+
 function stateNameExistsInPropNode(
     nextPropNode: PropertyASTNode,
     stateNames: string[],
@@ -48,6 +50,16 @@ interface ValidateCatchResult {
     reachedStates: { [ix: string]: boolean }
 }
 
+function isIntrinsicFunction(text: string): boolean {
+    const intrinsicText = text.trimRight()
+
+    return INTRINSIC_FUNC_REGEX.test(intrinsicText)
+}
+
+function isJsonPath(text: string) {
+    return text.startsWith('$')
+}
+
 function validateParameters(parametersPropNode: PropertyASTNode, document: TextDocument): Diagnostic[] {
     let diagnostics: Diagnostic[] = []
     const valueNode = parametersPropNode.valueNode
@@ -57,11 +69,11 @@ function validateParameters(parametersPropNode: PropertyASTNode, document: TextD
             if (prop.valueNode && prop.keyNode.value.endsWith('.$')) {
                 const propValue = prop.valueNode.value
 
-                if (typeof propValue !== 'string' || !propValue.startsWith('$')) {
+                if (typeof propValue !== 'string' || !(isJsonPath(propValue) || isIntrinsicFunction(propValue))) {
                     const { length, offset } = prop.valueNode
                     const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
 
-                    diagnostics.push(Diagnostic.create(range, MESSAGES.INVALID_JSON_PATH, DiagnosticSeverity.Error))
+                    diagnostics.push(Diagnostic.create(range, MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC, DiagnosticSeverity.Error))
                 }
             } else if (prop.valueNode && isObjectNode(prop.valueNode)) {
                 diagnostics = diagnostics.concat(validateParameters(prop, document))
@@ -194,9 +206,15 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                     // Validate Catch for given state types
                     if (['Task', 'Parallel', 'Map'].includes(stateType as string)) {
                         const validateCatchResult = validateArrayNext('Catch', oneStateValueNode, stateNames, document)
+                        const resultSelectorPropNode = findPropChildByName(oneStateValueNode, 'ResultSelector')
 
                         diagnostics = diagnostics.concat(validateCatchResult.diagnostics)
                         reachedStates = { ...reachedStates, ...validateCatchResult.reachedStates }
+
+                        if (resultSelectorPropNode) {
+                            const resultSelectorDiagnostics = validateParameters(resultSelectorPropNode, document)
+                            diagnostics = diagnostics.concat(resultSelectorDiagnostics)
+                        }
                     }
 
                     switch(stateType) {
