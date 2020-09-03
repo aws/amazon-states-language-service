@@ -149,7 +149,6 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
 
         if (statesValueNode && isObjectNode(statesValueNode)) {
             // keep track of reached states and unreached states to avoid multiple loops
-            const unreachedStates: { [ix: string]: PropertyASTNode } = {}
             let reachedStates: { [ix: string]: boolean } = {}
             let hasTerminalState = false
 
@@ -179,18 +178,9 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         hasTerminalState = true
                     }
 
-                    // if the state hasn't been reached in any of the previous iterations
-                    // mark it as unreached
-                    if (!reachedStates[stateName]) {
-                        unreachedStates[stateName] = prop
-                    }
-
                     // mark the value of Next property as reached state
-                    // and delete it from the list of unreached states
                     if (typeof nextNodeValue === 'string') {
                        reachedStates[nextNodeValue] = true
-                        // tslint:disable-next-line no-dynamic-delete
-                       delete unreachedStates[nextNodeValue]
                     }
 
                     // Validate Parameters for given state types
@@ -257,9 +247,6 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                                     diagnostics.push(defaultStateDiagnostic)
                                 } else if (typeof name === 'string') {
                                     reachedStates[name] = true
-
-                                    // tslint:disable-next-line no-dynamic-delete
-                                    delete unreachedStates[name]
                                 }
                             }
 
@@ -296,13 +283,19 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                 diagnostics.push(Diagnostic.create(range, MESSAGES.NO_TERMINAL_STATE, DiagnosticSeverity.Error))
             }
 
-            // loop through the hash map of unreached states and create diagnostics
-            Object.values(unreachedStates).forEach(statePropNode => {
-                const { length, offset } =  statePropNode.keyNode
-                const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
+            // Create diagnostics for states that weren't referenced by a State, Choice Rule, or Catcher's "Next" field
+            statesValueNode.properties
+                .filter(statePropNode => {
+                    const stateName = statePropNode.keyNode.value
 
-                diagnostics.push(Diagnostic.create(range, MESSAGES.UNREACHABLE_STATE, DiagnosticSeverity.Error))
-            })
+                    return !reachedStates[stateName]
+                })
+                .forEach(unreachableStatePropNode => {
+                    const { length, offset } =  unreachableStatePropNode.keyNode
+                    const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
+
+                    diagnostics.push(Diagnostic.create(range, MESSAGES.UNREACHABLE_STATE, DiagnosticSeverity.Error))
+                })
         }
     }
 

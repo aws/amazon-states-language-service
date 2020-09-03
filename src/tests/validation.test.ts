@@ -12,6 +12,7 @@ import {
     documentChoiceDefaultBeforeChoice,
     documentChoiceInvalidDefault,
     documentChoiceInvalidNext,
+    documentChoiceNextBeforeChoice,
     documentChoiceNoDefault,
     documentChoiceValidDefault,
     documentChoiceValidNext,
@@ -248,6 +249,13 @@ suite('ASL context-aware validation', () => {
                     },
                 ],
                 filterMessages: [MESSAGES.UNREACHABLE_STATE, MESSAGES.NO_TERMINAL_STATE]
+            })
+        })
+
+        test('Doesn\'t show Diagnostic for valid state name when Next state is declared before Choice state', async () => {
+            await testValidations({
+                json: documentChoiceNextBeforeChoice,
+                diagnostics: []
             })
         })
     })

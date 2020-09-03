@@ -877,6 +877,25 @@ export const documentChoiceDefaultBeforeChoice = `{
   }
 }`
 
+export const documentChoiceNextBeforeChoice = `{
+  "StartAt": "ChoiceState",
+  "States": {
+    "FailState": {
+      "Type": "Fail"
+    },
+    "ChoiceState": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.myVariable",
+          "StringEquals": "bug",
+          "Next": "FailState"
+        }
+      ]
+    }
+  }
+}`
+
 export const documentInvalidPropertiesState = `{
   "StartAt": "FirstState",
   "States": {
