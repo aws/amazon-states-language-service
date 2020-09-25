@@ -36,12 +36,21 @@
 		"typescript": "^3.7.5"
 	},
 	"dependencies": {
-		"@types/prettier": "^2.1.1",
 		"prettier": "^1.19.1",
 		"vscode-json-languageservice": "3.4.9",
 		"vscode-languageserver": "^6.1.1",
 		"vscode-languageserver-textdocument": "^1.0.0",
 		"vscode-languageserver-types": "^3.15.1",
 		"yaml-language-server": "0.10.0"
-	}
+	},
+    "prettier": {
+        "printWidth": 120,
+        "trailingComma": "es5",
+        "tabWidth": 4,
+        "singleQuote": true,
+        "semi": false,
+        "bracketSpacing": true,
+        "arrowParens": "avoid",
+        "endOfLine": "lf"
+    }
 }
