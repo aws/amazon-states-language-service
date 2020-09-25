@@ -36,6 +36,7 @@
 		"typescript": "^3.7.5"
 	},
 	"dependencies": {
+		"@types/prettier": "^2.1.1",
 		"prettier": "^1.19.1",
 		"vscode-json-languageservice": "3.4.9",
 		"vscode-languageserver": "^6.1.1",
