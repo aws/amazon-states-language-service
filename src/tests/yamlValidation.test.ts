@@ -86,7 +86,6 @@ async function testValidations(options: TestValidationOptions) {
     const { json, diagnostics, filterMessages } = options
 
     let res = await getValidations(json)
-    console.log(res)
     res = res.filter(diagnostic => {
         if (filterMessages && filterMessages.find(message => message === diagnostic.message)) {
             return false
@@ -114,7 +113,7 @@ async function testValidations(options: TestValidationOptions) {
 suite('ASL YAML context-aware validation', () => {
     suite('Invalid JSON Input', () => {
         test("Empty string doesn't throw errors", async () => {
-            await getValidations('')
+            await assert.doesNotReject(getValidations(''))
         })
 
         test("[] string doesn't throw type errors", async () => {

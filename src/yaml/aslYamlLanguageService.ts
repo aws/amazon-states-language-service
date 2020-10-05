@@ -63,7 +63,7 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
 
         for (const currentYAMLDoc of yamlDocument.documents) {
             const validation = await aslLanguageService.doValidation(textDocument, currentYAMLDoc)
-            const syd = ((currentYAMLDoc as unknown) as any) as SingleYAMLDocument
+            const syd = (currentYAMLDoc as unknown) as SingleYAMLDocument
             if (syd.errors.length > 0) {
                 validationResult.push(...syd.errors)
             }
@@ -137,7 +137,6 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
                 if (completion.textEdit) {
                     // textEdit can't be done on white-space so insert text is used instead
                     if (atSpace) {
-                        completion.insertText = completion.textEdit.newText
                         // remove any commas from json-completions
                         completion.insertText = completion.textEdit.newText.replace(/[\,]/g, '')
                         completion.textEdit = undefined
@@ -172,7 +171,11 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
         return aslLanguageService.doHover(document, position, currentDoc)
     }
 
-    languageService.format = function(document: TextDocument, range: Range, options: FormattingOptions): TextEdit[] {
+    languageService.format = function(
+        document: TextDocument,
+        range: Range,
+        options: FormattingOptions
+    ): TextEdit[] {
         try {
             const text = document.getText()
 

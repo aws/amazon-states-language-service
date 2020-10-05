@@ -243,7 +243,6 @@ suite('ASL YAML context-aware completion', () => {
         })
 
         test('Suggests nested completions when Next is nested within Map state', async () => {
-            console.log(nestedItemLabels)
             await testCompletions({
                 // remove last label as it is the name of the current state
                 labels: nestedItemLabels.filter(label => label !== 'Nested4'),
