@@ -22,6 +22,7 @@ import {
 
 import completeAsl from './completion/completeAsl'
 import validateStates from './validation/validateStates'
+import { getLanguageService as getAslYamlLanguageService } from './yaml/aslYamlLanguageService'
 
 export * from 'vscode-json-languageservice'
 
@@ -79,4 +80,15 @@ export const getLanguageService = function( params: ASLLanguageServiceParams): L
     }
 
     return languageService
+}
+
+export const getYamlLanguageService = function( params: ASLLanguageServiceParams): LanguageService {
+    const aslLanguageService: LanguageService = getLanguageService({
+        ...params,
+        aslOptions: {
+            ignoreColonOffset: true,
+        },
+    })
+
+    return getAslYamlLanguageService(params, ASL_SCHEMA, aslLanguageService);
 }
