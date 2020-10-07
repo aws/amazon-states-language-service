@@ -84,9 +84,7 @@ export const getLanguageService = function( params: ASLLanguageServiceParams): L
 
 export const getYamlLanguageService = function( params: ASLLanguageServiceParams): LanguageService {
     const aslLanguageService: LanguageService = getLanguageService({
-        workspaceContext: params.workspaceContext,
-        contributions: params.contributions,
-        clientCapabilities: params.clientCapabilities,
+        ...params,
         aslOptions: {
             ignoreColonOffset: true,
         },

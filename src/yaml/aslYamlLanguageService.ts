@@ -54,9 +54,7 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
     const completer = new YAMLCompletion(schemaService)
 
     languageService.doValidation = async function(
-        textDocument: TextDocument,
-        jsonDocument: JSONDocument,
-        documentSettings: DocumentLanguageSettings
+        textDocument: TextDocument
     ) {
         const yamlDocument: YAMLDocument = parseYAML(textDocument.getText())
         const validationResult: any[] = []
@@ -79,8 +77,7 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
 
     languageService.doComplete = async function(
         document: TextDocument,
-        position: Position,
-        doc: JSONDocument
+        position: Position
     ): Promise<CompletionList> {
         const yamldoc = parseYAML(document.getText())
         const offset = document.offsetAt(position)
@@ -154,8 +151,7 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
 
     languageService.doHover = function(
         document: TextDocument,
-        position: Position,
-        jsonDocument: JSONDocument
+        position: Position
     ): Thenable<Hover | null> {
         const doc = parseYAML(document.getText())
         const offset = document.offsetAt(position)
@@ -172,9 +168,7 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
     }
 
     languageService.format = function(
-        document: TextDocument,
-        range: Range,
-        options: FormattingOptions
+        document: TextDocument
     ): TextEdit[] {
         try {
             const text = document.getText()
