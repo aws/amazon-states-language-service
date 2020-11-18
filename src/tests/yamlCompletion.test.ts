@@ -4,6 +4,8 @@
  */
 
 import * as assert from 'assert'
+import { CompletionItemKind } from 'vscode-json-languageservice'
+import { stateSnippets } from '../completion/completeSnippets'
 import { getYamlLanguageService, Position, Range } from '../service'
 import { toDocument } from './utils/testUtilities'
 
@@ -114,6 +116,83 @@ const completionsEdgeCase2 = `
 
 `
 
+const snippetsCompletionCase1 = `
+StartAt: Hello
+States:
+\u0020\u0020
+  Hello:
+    Type: Pass
+    Result: Hello
+    Next: World
+
+  World:
+    Type: Pass
+    Result: World
+    End: true
+`
+
+const snippetsCompletionCase2 = `
+StartAt: Hello
+States:
+
+  Hello:
+    Type: Pass
+    Result: Hello
+    Next: World
+
+  World:
+    Type: Pass
+    Result: World
+    End: true
+`
+
+const snippetsCompletionCase3 = `
+StartAt: Hello
+States:
+  Hello:
+    Type: Pass
+    Result: Hello
+    Next: World
+\u0020\u0020
+
+  World:
+    Type: Pass
+    Result: World
+    End: true
+`
+
+const snippetsCompletionCase4 = `
+StartAt: Hello
+States:
+  Hello:
+    Type: Pass
+    Result: Hello
+    Next: World
+
+  World:
+    Type: Pass
+    Result: World
+    End: true
+\u0020\u0020\u0020\u0020
+`
+
+const snippetsCompletionCase5 = `
+StartAt: Hello
+States:
+  Hello:
+    Type: Pass
+    Result: Hello
+    Next: World
+
+  World:
+    Type: Pass
+    Result: World
+    End: true
+
+
+\u0020\u0020
+`
+
 const itemLabels = [
     'FirstState',
     'ChoiceState',
@@ -167,6 +246,24 @@ async function testCompletions(options: TestCompletionOptions) {
     res?.items.forEach(item => {
         assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
     })
+}
+
+interface TestScenario {
+  json: string,
+  position: [number, number],
+  start: [number, number],
+  end: [number, number],
+}
+
+export async function getSuggestedSnippets(options: TestScenario) {
+  const { json, position } = options
+  const { textDoc, jsonDoc } = toDocument(json)
+  const pos = Position.create(...position)
+  const ls = getYamlLanguageService({})
+  const res = await ls.doComplete(textDoc, pos, jsonDoc)
+  const suggestedSnippetLabels = res?.items.filter(item => item.kind === CompletionItemKind.Snippet).map(item => item.label)
+
+  return suggestedSnippetLabels
 }
 
 suite('ASL YAML context-aware completion', () => {
@@ -295,6 +392,62 @@ suite('ASL YAML context-aware completion', () => {
             await assert.doesNotReject(getCompletions(completionsEdgeCase1, [17, 4]), TypeError)
 
             await assert.doesNotReject(getCompletions(completionsEdgeCase2, [3, 5]), TypeError)
+        })
+    })
+
+    suite('Snippets', () => {
+        test('Shows state snippets when cursor placed on first line after States prop with greater indendation', async () => {
+          const expectedSnippets = stateSnippets.map(item => item.label)
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionCase1,
+            position: [3, 2],
+            start: [3, 2],
+            end: [3, 2]
+          })
+
+          assert.deepEqual(suggestedSnippets, expectedSnippets)
+        })
+        test('Does not show state snippets when cursor placed on first line after States prop with same indentation indendation', async () => {
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionCase2,
+            position: [3, 0],
+            start: [3, 0],
+            end: [3, 0]
+          })
+
+          assert.deepEqual(suggestedSnippets, [])
+        })
+        test('Shows state snippets when cursor placed on line after state declaration with the indentation same as the previous state name ', async () => {
+          const expectedSnippets = stateSnippets.map(item => item.label)
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionCase1,
+            position: [7, 2],
+            start: [7, 2],
+            end: [7, 2]
+          })
+
+          assert.deepEqual(suggestedSnippets, expectedSnippets)
+        })
+        test('Does not show state snippets when cursor placed on line after state declaration with the indentation same as the nested state property name ', async () => {
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionCase1,
+            position: [7, 4],
+            start: [7, 4],
+            end: [7, 4]
+          })
+
+          assert.deepEqual(suggestedSnippets, [])
+        })
+        test('Shows state snippets when cursor placed 2 lines below last declared state machine with same indentation level as its name', async () => {
+          const expectedSnippets = stateSnippets.map(item => item.label)
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionCase5,
+            position: [14, 2],
+            start: [14, 2],
+            end: [14, 2]
+          })
+
+          assert.deepEqual(suggestedSnippets, expectedSnippets)
         })
     })
 })
