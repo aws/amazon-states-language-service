@@ -193,6 +193,44 @@ States:
 \u0020\u0020
 `
 
+const snippetsCompletionWithinMap = `
+StartAt: Map
+States:
+  Map:
+    Type: Map
+    Next: Final State
+    Iterator:
+      StartAt: Pass
+      States:
+        Pass:
+          Type: Pass
+          Result: Done!
+          End: true
+\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020
+  Final State:
+    Type: Pass
+    End: true
+`
+
+const snippetsCompletionWithinParallel = `
+StartAt: Parallel
+States:
+  Parallel:
+    Type: Parallel
+    Next: Final State
+    Branches:
+    - StartAt: Wait 20s
+      States:
+        Wait 20s:
+          Type: Wait
+          Seconds: 20
+          End: true
+\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020
+  Final State:
+    Type: Pass
+    End: true
+`
+
 const itemLabels = [
     'FirstState',
     'ChoiceState',
@@ -407,6 +445,7 @@ suite('ASL YAML context-aware completion', () => {
 
           assert.deepEqual(suggestedSnippets, expectedSnippets)
         })
+
         test('Does not show state snippets when cursor placed on first line after States prop with same indentation indendation', async () => {
           const suggestedSnippets = await getSuggestedSnippets({
             json: snippetsCompletionCase2,
@@ -417,6 +456,7 @@ suite('ASL YAML context-aware completion', () => {
 
           assert.deepEqual(suggestedSnippets, [])
         })
+
         test('Shows state snippets when cursor placed on line after state declaration with the indentation same as the previous state name ', async () => {
           const expectedSnippets = stateSnippets.map(item => item.label)
           const suggestedSnippets = await getSuggestedSnippets({
@@ -428,6 +468,7 @@ suite('ASL YAML context-aware completion', () => {
 
           assert.deepEqual(suggestedSnippets, expectedSnippets)
         })
+
         test('Does not show state snippets when cursor placed on line after state declaration with the indentation same as the nested state property name ', async () => {
           const suggestedSnippets = await getSuggestedSnippets({
             json: snippetsCompletionCase1,
@@ -438,6 +479,7 @@ suite('ASL YAML context-aware completion', () => {
 
           assert.deepEqual(suggestedSnippets, [])
         })
+
         test('Shows state snippets when cursor placed 2 lines below last declared state machine with same indentation level as its name', async () => {
           const expectedSnippets = stateSnippets.map(item => item.label)
           const suggestedSnippets = await getSuggestedSnippets({
@@ -445,6 +487,30 @@ suite('ASL YAML context-aware completion', () => {
             position: [14, 2],
             start: [14, 2],
             end: [14, 2]
+          })
+
+          assert.deepEqual(suggestedSnippets, expectedSnippets)
+        })
+
+        test('Shows state snippets when cursor placed within States object of Map state', async () => {
+          const expectedSnippets = stateSnippets.map(item => item.label)
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionWithinMap,
+            position: [13, 8],
+            start: [13, 8],
+            end: [13, 8]
+          })
+
+          assert.deepEqual(suggestedSnippets, expectedSnippets)
+        })
+
+        test('Shows state snippets when cursor placed within States object of Parallel state', async () => {
+          const expectedSnippets = stateSnippets.map(item => item.label)
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionWithinParallel,
+            position: [13, 8],
+            start: [13, 8],
+            end: [13, 8]
           })
 
           assert.deepEqual(suggestedSnippets, expectedSnippets)

@@ -56,7 +56,7 @@ function doesStateSupportErrorHandling(node: ASTNode): boolean {
 export default function completeSnippets(node: ASTNode | undefined, offset: number, shouldShowStateSnippets?: boolean): CompletionItem[] {
     if (node) {
         // If the value of shouldShowStateSnippets is false prevent the snippets from being displayed
-        if ((isChildOfStates(node) && shouldShowStateSnippets !== false) || shouldShowStateSnippets) {
+        if (shouldShowStateSnippets === undefined ? isChildOfStates(node) : shouldShowStateSnippets) {
             return stateSnippets
         }
 
