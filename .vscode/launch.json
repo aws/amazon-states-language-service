@@ -18,7 +18,7 @@
 			"runtimeArgs": [],
 			"env": {},
 			"sourceMaps": true,
-			"outFiles": [ "${workspaceRoot}/server/out/asl-language-service/tests/**/*.js" ],
+			"outFiles": [ "${workspaceRoot}/out/**/*.js", "${workspaceRoot}/out/*.js" ],
 			"preLaunchTask": "npm: watch"
 		}
 	]

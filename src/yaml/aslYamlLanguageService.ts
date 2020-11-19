@@ -5,9 +5,7 @@
 
 import * as prettier from 'prettier'
 import {
-    DocumentLanguageSettings,
     getLanguageService as getLanguageServiceVscode,
-    JSONDocument,
     JSONSchema,
     LanguageService,
     LanguageServiceParams,
@@ -16,7 +14,6 @@ import { TextDocument } from 'vscode-languageserver-textdocument'
 import {
     CompletionList,
     DocumentSymbol,
-    FormattingOptions,
     Hover,
     Position,
     Range,
@@ -75,6 +72,54 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
         return validationResult
     }
 
+// Returns true if the given offest is in a position of immediate child of the "States" property. False otherwise.
+function isChildOfStates(document: TextDocument, offset: number) {
+    let isDirectChildOfStates = false
+    const prevText = document.getText().substring(0, offset).split('\n')
+    const cursorLine = prevText[prevText.length - 1]
+    let hasCursorLineNonSpace = false
+    let numberOfSpacesCursorLine = 0
+
+    Array.from(cursorLine).forEach(char => {
+        if (char !== ' ') {
+            hasCursorLineNonSpace = true;
+        } else {
+            numberOfSpacesCursorLine ++
+        }
+    })
+
+    if (!hasCursorLineNonSpace && numberOfSpacesCursorLine > 0) {
+        for (let lineNum = prevText.length - 2; lineNum > 0; lineNum--) {
+            let leftLineSpaces = 0
+            const line = prevText[lineNum]
+
+            for (const char of line) {
+                if (char === ' ') {
+                    leftLineSpaces++
+                } else {
+                    break
+                }
+            }
+
+            // Check if the number of spaces of the line is lower than that of cursor line
+            if (leftLineSpaces < numberOfSpacesCursorLine) {
+                const trimmedLine = line.trim()
+                // Ignore empty lines or lines that only contain whitespace
+                if (trimmedLine.length === 0) {
+                    continue
+                // Check if the line starts with "States:"
+                } else if (trimmedLine.startsWith('States:')) {
+                    isDirectChildOfStates = true
+                } else {
+                    break
+                }
+            }
+        }
+    }
+
+    return isDirectChildOfStates
+}
+
     languageService.doComplete = async function(
         document: TextDocument,
         position: Position
@@ -113,20 +158,12 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
             currentDoc = matchOffsetToDocument(offset, parsedDoc)
             position.character += 1
         } else if (node.type === 'property' || (node.type === 'object' && position.character !== 0)) {
-            // allow auto-completion of States field from empty space
-            if (document.getText().substring(offset - 2, offset) === '  ') {
-                atSpace = true
-                currentDoc = initializeDocument(document, offset)
-                // move cursor position into new empty object
-                position.character += 1
-            } else {
-                // adjust cursor back after parsing to keep it within States node
-                position.character -= 1
-            }
+            position.character -= 1
         }
         if (currentDoc) {
             const aslCompletions : CompletionList  = doCompleteAsl(document, position, currentDoc, yamlCompletions, {
                 ignoreColonOffset: true,
+                shouldShowStateSnippets: isChildOfStates(document, offset)
             })
 
             aslCompletions.items.forEach(completion => {
