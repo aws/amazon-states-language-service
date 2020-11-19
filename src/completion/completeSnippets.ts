@@ -53,13 +53,10 @@ function doesStateSupportErrorHandling(node: ASTNode): boolean {
     return ERROR_HANDLING_STATES.includes(typeNode?.valueNode?.value as string)
 }
 
-export default function completeSnippets(node: ASTNode | undefined, offset: number, forceShowStateSnippets?: boolean): CompletionItem[] {
+export default function completeSnippets(node: ASTNode | undefined, offset: number, shouldShowStateSnippets?: boolean): CompletionItem[] {
     if (node) {
-        // If the value of forceShowStateSnippets is false prevent the snippets from being displayed
-        const shouldShowStateSnippets = (isChildOfStates(node) && forceShowStateSnippets !== false)
-            || forceShowStateSnippets
-
-        if (shouldShowStateSnippets) {
+        // If the value of shouldShowStateSnippets is false prevent the snippets from being displayed
+        if ((isChildOfStates(node) && shouldShowStateSnippets !== false) || shouldShowStateSnippets) {
             return stateSnippets
         }
 

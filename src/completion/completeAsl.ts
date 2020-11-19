@@ -33,7 +33,7 @@ export default function completeAsl(document: TextDocument, position: Position, 
 
     const node = findNodeAtLocation(rootNode, offset)
 
-    const snippetsList = completeSnippets(node, offset, aslOptions?.forceShowStateSnippets)
+    const snippetsList = completeSnippets(node, offset, aslOptions?.shouldShowStateSnippets)
     let completionList = completeStateNames(node, offset, document, aslOptions) ?? jsonCompletions
 
     if (completionList?.items) {

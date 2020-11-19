@@ -71,8 +71,10 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
 
         return validationResult
     }
+
+// Returns true if the given offest is in a position of immediate child of the "States" property. False otherwise.
 function isChildOfStates(document: TextDocument, offset: number) {
-    let shouldShowStateSnippets = false
+    let isDirectChildOfStates = false
     const prevText = document.getText().substring(0, offset).split('\n')
     const cursorLine = prevText[prevText.length - 1]
     let hasCursorLineNonSpace = false
@@ -101,11 +103,13 @@ function isChildOfStates(document: TextDocument, offset: number) {
 
             // Check if the number of spaces of the line is lower than that of cursor line
             if (leftLineSpaces < numberOfSpacesCursorLine) {
-                // Check if the line starts with "States:"
-                if (line.trimLeft().startsWith('States:')) {
-                    shouldShowStateSnippets = true
-                } else if (line.length === 0) {
+                const trimmedLine = line.trim()
+                // Ignore empty lines or lines that only contain whitespace
+                if (trimmedLine.length === 0) {
                     continue
+                // Check if the line starts with "States:"
+                } else if (trimmedLine.startsWith('States:')) {
+                    isDirectChildOfStates = true
                 } else {
                     break
                 }
@@ -113,7 +117,7 @@ function isChildOfStates(document: TextDocument, offset: number) {
         }
     }
 
-    return shouldShowStateSnippets
+    return isDirectChildOfStates
 }
 
     languageService.doComplete = async function(
@@ -159,7 +163,7 @@ function isChildOfStates(document: TextDocument, offset: number) {
         if (currentDoc) {
             const aslCompletions : CompletionList  = doCompleteAsl(document, position, currentDoc, yamlCompletions, {
                 ignoreColonOffset: true,
-                forceShowStateSnippets: isChildOfStates(document, offset)
+                shouldShowStateSnippets: isChildOfStates(document, offset)
             })
 
             aslCompletions.items.forEach(completion => {
