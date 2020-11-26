@@ -3,8 +3,10 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { safeDump, safeLoad } from 'js-yaml'
 import * as prettier from 'prettier'
 import {
+    CompletionItemKind,
     getLanguageService as getLanguageServiceVscode,
     JSONSchema,
     LanguageService,
@@ -45,8 +47,8 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
     }
     const schemaService = new YAMLSchemaService(requestServiceMock, params.workspaceContext)
     // initialize schema
-    schemaService.registerExternalSchema('yasl', ['*.asl.yaml', '*.asl.yml'], schema)
-    schemaService.getOrAddSchemaHandle('yasl', schema)
+    schemaService.registerExternalSchema('asl-yaml', ['*.asl.yaml', '*.asl.yml'], schema)
+    schemaService.getOrAddSchemaHandle('asl-yaml', schema)
 
     const completer = new YAMLCompletion(schemaService)
 
@@ -177,6 +179,10 @@ function isChildOfStates(document: TextDocument, offset: number) {
                     } else {
                         completion.textEdit.range.start.character = position.character
                     }
+                } else if (completion.insertText && completion.kind === CompletionItemKind.Snippet && document.languageId === 'asl-yaml') {
+                    completion.insertText = safeDump(safeLoad(completion.insertText))
+                    // Remove quotes
+                    completion.insertText = completion.insertText.replace(/[']/g, '')
                 }
             })
 
