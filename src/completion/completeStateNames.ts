@@ -77,7 +77,8 @@ function getCompletionList(
     items: string[],
     replaceRange: Range,
     shouldAddLeftQuote?: boolean,
-    shouldAddLeftSpace?: boolean,
+    shouldAddRightQuote?: boolean,
+    shouldAddLeadingSpace?: boolean,
     shoudlAddTrailingComma?: boolean
 ) {
     const list: CompletionList = {
@@ -89,7 +90,7 @@ function getCompletionList(
             item.kind = CompletionItemKind.Value
             item.textEdit = TextEdit.replace(
                 replaceRange,
-                `${shouldAddLeftSpace ? ' ' : ''}${shouldAddLeftQuote ? '"' : ''}${name}"${shoudlAddTrailingComma ? ',' : ''}`
+                `${shouldAddLeadingSpace ? ' ' : ''}${shouldAddLeftQuote ? '"' : ''}${name}${shouldAddRightQuote ? '"' : ''}${shoudlAddTrailingComma ? ',' : ''}`
             )
             item.filterText = name
 
@@ -117,7 +118,7 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
 
             const range = Range.create(colonPosition, endPosition)
 
-            return getCompletionList(states, range, true, true, true)
+            return getCompletionList(states, range, true, true, true, true)
         }
     }
 
@@ -134,9 +135,14 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
                 const endPosition = document.positionAt(node.offset + node.length)
 
                 const range = Range.create(startPosition, endPosition)
-                const isCursorAtTheBeginning = offset === node.offset
+                if (document.languageId === 'yasl') {
+                    return getCompletionList(states, range, false, false, false, false)
+                } else {
+                    const isCursorAtTheBeginning = offset === node.offset
 
-                return getCompletionList(states, range, isCursorAtTheBeginning)
+                    return getCompletionList(states, range, undefined, isCursorAtTheBeginning)
+                }
+
             }
         }
     }

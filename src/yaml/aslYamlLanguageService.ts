@@ -14,6 +14,7 @@ import {
 } from 'vscode-json-languageservice'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import {
+    CompletionItemKind,
     CompletionList,
     DocumentSymbol,
     FormattingOptions,
@@ -32,6 +33,7 @@ import { YAMLCompletion } from 'yaml-language-server/out/server/src/languageserv
 import { YAMLSchemaService } from 'yaml-language-server/out/server/src/languageservice/services/yamlSchemaService'
 import { matchOffsetToDocument } from 'yaml-language-server/out/server/src/languageservice/utils/arrUtils'
 import doCompleteAsl from '../completion/completeAsl'
+import { processYamlDocForCompletion } from './yamlUtils'
 
 export const getLanguageService = function(params: LanguageServiceParams, schema: JSONSchema, aslLanguageService: LanguageService): LanguageService {
     const builtInParams = {}
@@ -79,74 +81,54 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
         document: TextDocument,
         position: Position
     ): Promise<CompletionList> {
-        const yamldoc = parseYAML(document.getText())
-        const offset = document.offsetAt(position)
-        let currentDoc = matchOffsetToDocument(offset, yamldoc)
-        let atSpace = false
+        const {
+            modifiedDocText,
+            tempPositionForCompletions,
+            startPositionForInsertion,
+            endPositionForInsertion,
+            shouldPrependSpace
+        } = processYamlDocForCompletion(document, position)
 
-        // if a yaml doc is null, it must be given text to allow auto-completion
-        if (!currentDoc) {
-            currentDoc = initializeDocument(document, offset)
-            // move cursor position into new empty object
-            position.character += 1
-        }
+        const processedDocument = TextDocument.create(document.uri, document.languageId, document.version, modifiedDocText)
 
-        const yamlCompletions = await completer.doComplete(document, position, false)
+        const offsetIntoProcessedDocument = processedDocument.offsetAt(tempPositionForCompletions)
+        const processedYamlDoc: YAMLDocument = parseYAML(modifiedDocText)
+        const currentDoc = matchOffsetToDocument(offsetIntoProcessedDocument, processedYamlDoc)
 
         if (!currentDoc) {
             return { items: [], isIncomplete: false }
         }
-        // adjust position for completion
-        const node = currentDoc.getNodeFromOffsetEndInclusive(offset)
-        if (node.type === 'array') {
-            // Resolves issue with array item insert text being off by a space
-            position.character -= 1
-        } else if (document.getText().substring(offset, offset + 1) === '"') {
-            // When attempting to auto-complete from inside an empty string, the position must be adjusted within bounds
-            position.character += 1
-        } else if (document.getText().substring(offset - 2, offset) === ': ') {
-            // yaml doesn't allow auto-completion from white-space after certain nodes
-            atSpace = true
-            // initialize an empty string and adjust position to within the string before parsing yaml to json
-            const newText = `${document.getText().substring(0, offset)}""\n${document.getText().substr(offset)}`
-            const parsedDoc = parseYAML(newText)
-            currentDoc = matchOffsetToDocument(offset, parsedDoc)
-            position.character += 1
-        } else if (node.type === 'property' || (node.type === 'object' && position.character !== 0)) {
-            // allow auto-completion of States field from empty space
-            if (document.getText().substring(offset - 2, offset) === '  ') {
-                atSpace = true
-                currentDoc = initializeDocument(document, offset)
-                // move cursor position into new empty object
-                position.character += 1
-            } else {
-                // adjust cursor back after parsing to keep it within States node
-                position.character -= 1
-            }
-        }
-        if (currentDoc) {
-            const aslCompletions : CompletionList  = doCompleteAsl(document, position, currentDoc, yamlCompletions, {
-                ignoreColonOffset: true,
-            })
 
-            aslCompletions.items.forEach(completion => {
-                // format json completions for yaml
-                if (completion.textEdit) {
-                    // textEdit can't be done on white-space so insert text is used instead
-                    if (atSpace) {
-                        // remove any commas from json-completions
-                        completion.insertText = completion.textEdit.newText.replace(/[\,]/g, '')
-                        completion.textEdit = undefined
-                    } else {
-                        completion.textEdit.range.start.character = position.character
+        const positionForDoComplete = {...tempPositionForCompletions} // Copy position to new object since doComplete modifies the position
+        const yamlCompletions = await completer.doComplete(processedDocument, positionForDoComplete, false)
+
+        const aslOptions = {
+            ignoreColonOffset: true,
+        }
+        const aslCompletions : CompletionList  = doCompleteAsl(processedDocument, tempPositionForCompletions, currentDoc, yamlCompletions, aslOptions)
+
+        aslCompletions.items.forEach(completion => {
+            const currentTextEdit = completion.textEdit
+
+            if (currentTextEdit) {
+                if (shouldPrependSpace && currentTextEdit.newText?.charAt(0) !== ' ') {
+                    currentTextEdit.newText = ' ' + currentTextEdit.newText
+                }
+
+                currentTextEdit.range.start = startPositionForInsertion
+                currentTextEdit.range.end = endPositionForInsertion
+
+                // Completions that include both a key and a value should replace everything right of the cursor.
+                if (completion.kind === CompletionItemKind.Property) {
+                    currentTextEdit.range.end = {
+                        line: endPositionForInsertion.line,
+                        character: document.getText().length
                     }
                 }
-            })
+            }
+        })
 
-            return Promise.resolve(aslCompletions)
-        } else {
-            return { items: [], isIncomplete: false }
-        }
+        return Promise.resolve(aslCompletions)
     }
 
     languageService.doHover = function(

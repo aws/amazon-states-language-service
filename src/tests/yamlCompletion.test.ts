@@ -7,6 +7,20 @@ import * as assert from 'assert'
 import { getYamlLanguageService, Position, Range } from '../service'
 import { toDocument } from './utils/testUtilities'
 
+const emptyDocument = ''
+
+const documentWithPartialTopLevel = `
+St
+`
+
+const documentWithStates = `
+
+StartAt:
+
+States:
+  |
+`
+
 const document1 = `
   StartAt:
   States:
@@ -69,6 +83,20 @@ const document4 = `
     ChoiceStateX:
 `
 
+const document5 = `
+StartAt: Choice1
+States:
+    "Choice1":
+      Type: Choice
+      Choices:
+        - Variable: "$.var"
+          IsNumeric: false
+          Next:
+    "Pass1":
+        Type: Pass
+        End: true
+`
+
 const documentNested = `
   StartAt: First
   States:
@@ -114,6 +142,28 @@ const completionsEdgeCase2 = `
 
 `
 
+const topLevelLabels = [
+    'Version',
+    'Comment',
+    'TimeoutSeconds',
+    'StartAt',
+    'States',
+]
+const stateSnippetLabels = [
+    'Pass State',
+    'Lambda Task State',
+    'SNS Task State',
+    'Batch Task State',
+    'ECS Task State',
+    'SQS Task State',
+    'Choice State',
+    'Wait State',
+    'Succeed State',
+    'Fail State',
+    'Parallel State',
+    'Map State'
+]
+
 const itemLabels = [
     'FirstState',
     'ChoiceState',
@@ -129,13 +179,13 @@ interface TestCompletionOptions {
     labels: string[]
     json: string
     position: [number, number]
-    start: [number, number]
-    end: [number, number]
-    labelToInsertText(label: string): string
+    start?: [number, number]
+    end?: [number, number]
+    labelToInsertText?(label: string): string
 }
 
 async function getCompletions(json: string, position: [number, number]) {
-    const { textDoc, jsonDoc } = toDocument(json)
+    const { textDoc, jsonDoc } = toDocument(json, true)
     const pos = Position.create(...position)
     const ls = getYamlLanguageService({})
 
@@ -149,27 +199,110 @@ async function testCompletions(options: TestCompletionOptions) {
 
     assert.strictEqual(res?.items.length, labels.length)
 
-    // space before quoted item
-    const itemInsertTexts = labels.map(labelToInsertText)
-
     assert.deepEqual(
         res?.items.map(item => item.label),
         labels
     )
-    assert.deepEqual(
-        res?.items.map(item => item.textEdit?.newText),
-        itemInsertTexts
-    )
 
-    const leftPos = Position.create(...start)
-    const rightPos = Position.create(...end)
+    if (labelToInsertText) {
+        // space before quoted item
+        const itemInsertTexts = labels.map(labelToInsertText)
+        assert.deepEqual(
+            res?.items.map(item => item.textEdit?.newText),
+            itemInsertTexts
+        )
+    }
 
-    res?.items.forEach(item => {
-        assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
-    })
+    if (start && end) {
+        const leftPos = Position.create(...start)
+        const rightPos = Position.create(...end)
+
+        res?.items.forEach(item => {
+            assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
+        })
+    }
 }
 
 suite('ASL YAML context-aware completion', () => {
+    suite('Top Level Properties', () => {
+        test('Empty document', async () => {
+            await testCompletions({
+                labels: topLevelLabels,
+                json: emptyDocument,
+                position: [0, 0],
+                start: [0, 0],
+                end: [0, 0],
+                labelToInsertText: undefined,
+            })
+        })
+
+        test('Partially defined property, cursor in front of first letter', async () => {
+            await testCompletions({
+                labels: topLevelLabels,
+                json: documentWithPartialTopLevel,
+                position: [1, 0],
+                start: [1, 0],
+                end: [1, 2],
+                labelToInsertText: undefined,
+            })
+        })
+
+        test('Partially defined property, cursor in middle', async () => {
+            await testCompletions({
+                labels: topLevelLabels,
+                json: documentWithPartialTopLevel,
+                position: [1, 1],
+                start: [1, 0],
+                end: [1, 2],
+                labelToInsertText: undefined,
+            })
+        })
+
+        test('Partially defined property, cursor after final letter', async () => {
+            await testCompletions({
+                labels: topLevelLabels,
+                json: documentWithPartialTopLevel,
+                position: [1, 2],
+                start: [1, 0],
+                end: [1, 2],
+                labelToInsertText: undefined,
+            })
+        })
+
+        test('States snippets', async () => {
+            await testCompletions({
+                labels: stateSnippetLabels,
+                json: documentWithStates,
+                position: [5, 2],
+                start: undefined,
+                end: undefined,
+                labelToInsertText: undefined,
+            })
+        })
+
+        test('Existing top level property, cursor on empty line', async () => {
+            await testCompletions({
+                labels: topLevelLabels.filter(item => item !== 'States' && item !== 'StartAt'),
+                json: documentWithStates,
+                position: [3, 0],
+                start: [3, 0],
+                end: [3, 0],
+                labelToInsertText: undefined,
+            })
+        })
+
+        test('Existing top level property, cursor at top', async () => {
+            await testCompletions({
+                labels: topLevelLabels.filter(item => item !== 'States' && item !== 'StartAt'),
+                json: documentWithStates,
+                position: [1, 0],
+                start: [1, 0],
+                end: [1, 0],
+                labelToInsertText: undefined,
+            })
+        })
+    })
+
     suite('StartAt', () => {
         test('Both quotation marks present and cursor between them', async () => {
             await testCompletions({

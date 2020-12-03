@@ -224,7 +224,7 @@ interface TestScenario {
 }
 
 async function getCompletions(json: string, position: [number, number]) {
-    const { textDoc, jsonDoc } = toDocument(json)
+    const { textDoc, jsonDoc } = toDocument(json, false)
     const pos = Position.create(...position)
     const ls = getLanguageService({})
 
@@ -264,7 +264,7 @@ function getArrayIntersection(arrayOne: String[] | undefined, arrayTwo: String[]
 
 async function getSuggestedSnippets(options: TestScenario) {
   const { json, position, start, end } = options
-  const { textDoc, jsonDoc } = toDocument(json)
+  const { textDoc, jsonDoc } = toDocument(json, false)
 
   const pos = Position.create(...position)
 
