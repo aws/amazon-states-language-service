@@ -242,6 +242,9 @@ const itemLabels = [
 ]
 const nestedItemLabels = ['Nested1', 'Nested2', 'Nested3', 'Nested4']
 
+// tslint:disable-next-line: no-invalid-template-strings
+const passSnippetYaml = '${1:PassState}:\n  Type: Pass\n  Result:\n    data1: 0.5\n    data2: 1.5\n  ResultPath: $.result\n  Next: ${2:NextState}\n'
+
 interface TestCompletionOptions {
     labels: string[]
     json: string
@@ -460,7 +463,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Shows state snippets when cursor placed on line after state declaration with the indentation same as the previous state name ', async () => {
           const expectedSnippets = stateSnippets.map(item => item.label)
           const suggestedSnippets = await getSuggestedSnippets({
-            json: snippetsCompletionCase1,
+            json: snippetsCompletionCase3,
             position: [7, 2],
             start: [7, 2],
             end: [7, 2]
@@ -471,7 +474,7 @@ suite('ASL YAML context-aware completion', () => {
 
         test('Does not show state snippets when cursor placed on line after state declaration with the indentation same as the nested state property name ', async () => {
           const suggestedSnippets = await getSuggestedSnippets({
-            json: snippetsCompletionCase1,
+            json: snippetsCompletionCase4,
             position: [7, 4],
             start: [7, 4],
             end: [7, 4]
@@ -514,6 +517,15 @@ suite('ASL YAML context-aware completion', () => {
           })
 
           assert.deepEqual(suggestedSnippets, expectedSnippets)
+        })
+
+        test('Shows the snippets in correct YAML format', async () => {
+          const { textDoc, jsonDoc } = toDocument(snippetsCompletionCase1, true)
+          const pos = Position.create(3, 2)
+          const ls = getYamlLanguageService({})
+          const res = await ls.doComplete(textDoc, pos, jsonDoc)
+
+          assert.ok(res?.items.find(item => item.insertText === passSnippetYaml))
         })
     })
 })
