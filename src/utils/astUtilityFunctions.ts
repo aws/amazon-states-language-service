@@ -11,6 +11,7 @@ export interface ASTTree extends JSONDocument {
 
 export interface ASLOptions {
     ignoreColonOffset?: boolean
+    shouldShowStateSnippets?: boolean
 }
 
 export function isStringNode(node: ASTNode): node is StringASTNode {
