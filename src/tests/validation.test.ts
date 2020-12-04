@@ -66,7 +66,7 @@ export interface TestValidationOptions {
 }
 
 async function getValidations(json: string) {
-    const { textDoc, jsonDoc } = toDocument(json, false);
+    const { textDoc, jsonDoc } = toDocument(json);
     const ls = getLanguageService({});
 
     return await ls.doValidation(textDoc, jsonDoc)

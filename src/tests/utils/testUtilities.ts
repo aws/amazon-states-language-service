@@ -5,14 +5,8 @@
 
 import { getLanguageService, JSONDocument, TextDocument } from '../../service'
 
-export function toDocument(text: string, isYaml: boolean): { textDoc: TextDocument, jsonDoc: JSONDocument } {
-    let textDoc: TextDocument;
-
-    if (isYaml) {
-        textDoc = TextDocument.create('foo://bar/file.asl.yaml', 'yasl', 0, text);
-    } else {
-        textDoc = TextDocument.create('foo://bar/file.asl', 'json', 0, text);
-    }
+export function toDocument(text: string, isYaml?: boolean): { textDoc: TextDocument, jsonDoc: JSONDocument } {
+    const textDoc = TextDocument.create(`foo://bar/file.${isYaml ? 'asl.yaml' : 'asl'}`, isYaml ? 'asl-yaml' : 'asl', 0, text);
 
     const ls = getLanguageService({});
     // tslint:disable-next-line: no-inferred-empty-object-type

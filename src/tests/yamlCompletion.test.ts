@@ -4,6 +4,8 @@
  */
 
 import * as assert from 'assert'
+import { CompletionItemKind } from 'vscode-json-languageservice'
+import { stateSnippets } from '../completion/completeSnippets'
 import { getYamlLanguageService, Position, Range } from '../service'
 import { toDocument } from './utils/testUtilities'
 
@@ -142,26 +144,141 @@ const completionsEdgeCase2 = `
 
 `
 
+const snippetsCompletionCase1 = `
+StartAt: Hello
+States:
+\u0020\u0020
+  Hello:
+    Type: Pass
+    Result: Hello
+    Next: World
+
+  World:
+    Type: Pass
+    Result: World
+    End: true
+`
+
+const snippetsCompletionCase2 = `
+StartAt: Hello
+States:
+
+  Hello:
+    Type: Pass
+    Result: Hello
+    Next: World
+
+  World:
+    Type: Pass
+    Result: World
+    End: true
+`
+
+const snippetsCompletionCase3 = `
+StartAt: Hello
+States:
+  Hello:
+    Type: Pass
+    Result: Hello
+    Next: World
+\u0020\u0020
+
+  World:
+    Type: Pass
+    Result: World
+    End: true
+`
+
+const snippetsCompletionCase4 = `
+StartAt: Hello
+States:
+  Hello:
+    Type: Pass
+    Result: Hello
+    Next: World
+
+  World:
+    Type: Pass
+    Result: World
+    End: true
+\u0020\u0020\u0020\u0020
+`
+
+const snippetsCompletionCase5 = `
+StartAt: Hello
+States:
+  Hello:
+    Type: Pass
+    Result: Hello
+    Next: World
+
+  World:
+    Type: Pass
+    Result: World
+    End: true
+
+
+\u0020\u0020
+`
+
+const snippetsCompletionWithinMap = `
+StartAt: Map
+States:
+  Map:
+    Type: Map
+    Next: Final State
+    Iterator:
+      StartAt: Pass
+      States:
+        Pass:
+          Type: Pass
+          Result: Done!
+          End: true
+\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020
+  Final State:
+    Type: Pass
+    End: true
+`
+
+const snippetsCompletionWithinParallel = `
+StartAt: Parallel
+States:
+  Parallel:
+    Type: Parallel
+    Next: Final State
+    Branches:
+    - StartAt: Wait 20s
+      States:
+        Wait 20s:
+          Type: Wait
+          Seconds: 20
+          End: true
+\u0020\u0020\u0020\u0020\u0020\u0020\u0020\u0020
+  Final State:
+    Type: Pass
+    End: true
+`
+
 const topLevelLabels = [
-    'Version',
-    'Comment',
-    'TimeoutSeconds',
-    'StartAt',
-    'States',
+  'Version',
+  'Comment',
+  'TimeoutSeconds',
+  'StartAt',
+  'States',
 ]
 const stateSnippetLabels = [
-    'Pass State',
-    'Lambda Task State',
-    'SNS Task State',
-    'Batch Task State',
-    'ECS Task State',
-    'SQS Task State',
-    'Choice State',
-    'Wait State',
-    'Succeed State',
-    'Fail State',
-    'Parallel State',
-    'Map State'
+  'Pass State',
+  'Lambda Task State',
+  'SNS Task State',
+  'Batch Task State',
+  'ECS Task State',
+  'SQS Task State',
+  'Choice State',
+  'Wait State',
+  'Succeed State',
+  'Fail State',
+  'Parallel State',
+  'Map State'
 ]
 
 const itemLabels = [
@@ -174,6 +291,9 @@ const itemLabels = [
     'ChoiceStateX',
 ]
 const nestedItemLabels = ['Nested1', 'Nested2', 'Nested3', 'Nested4']
+
+// tslint:disable-next-line: no-invalid-template-strings
+const passSnippetYaml = '${1:PassState}:\n  Type: Pass\n  Result:\n    data1: 0.5\n    data2: 1.5\n  ResultPath: $.result\n  Next: ${2:NextState}\n'
 
 interface TestCompletionOptions {
     labels: string[]
@@ -221,6 +341,24 @@ async function testCompletions(options: TestCompletionOptions) {
             assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
         })
     }
+}
+
+interface TestScenario {
+  json: string,
+  position: [number, number],
+  start: [number, number],
+  end: [number, number],
+}
+
+export async function getSuggestedSnippets(options: TestScenario) {
+  const { json, position } = options
+  const { textDoc, jsonDoc } = toDocument(json)
+  const pos = Position.create(...position)
+  const ls = getYamlLanguageService({})
+  const res = await ls.doComplete(textDoc, pos, jsonDoc)
+  const suggestedSnippetLabels = res?.items.filter(item => item.kind === CompletionItemKind.Snippet).map(item => item.label)
+
+  return suggestedSnippetLabels
 }
 
 suite('ASL YAML context-aware completion', () => {
@@ -428,6 +566,99 @@ suite('ASL YAML context-aware completion', () => {
             await assert.doesNotReject(getCompletions(completionsEdgeCase1, [17, 4]), TypeError)
 
             await assert.doesNotReject(getCompletions(completionsEdgeCase2, [3, 5]), TypeError)
+        })
+    })
+
+    suite('Snippets', () => {
+        test('Shows state snippets when cursor placed on first line after States prop with greater indendation', async () => {
+          const expectedSnippets = stateSnippets.map(item => item.label)
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionCase1,
+            position: [3, 2],
+            start: [3, 2],
+            end: [3, 2]
+          })
+
+          assert.deepEqual(suggestedSnippets, expectedSnippets)
+        })
+
+        test('Does not show state snippets when cursor placed on first line after States prop with same indentation indendation', async () => {
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionCase2,
+            position: [3, 0],
+            start: [3, 0],
+            end: [3, 0]
+          })
+
+          assert.deepEqual(suggestedSnippets, [])
+        })
+
+        test('Shows state snippets when cursor placed on line after state declaration with the indentation same as the previous state name ', async () => {
+          const expectedSnippets = stateSnippets.map(item => item.label)
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionCase3,
+            position: [7, 2],
+            start: [7, 2],
+            end: [7, 2]
+          })
+
+          assert.deepEqual(suggestedSnippets, expectedSnippets)
+        })
+
+        test('Does not show state snippets when cursor placed on line after state declaration with the indentation same as the nested state property name ', async () => {
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionCase4,
+            position: [7, 4],
+            start: [7, 4],
+            end: [7, 4]
+          })
+
+          assert.deepEqual(suggestedSnippets, [])
+        })
+
+        test('Shows state snippets when cursor placed 2 lines below last declared state machine with same indentation level as its name', async () => {
+          const expectedSnippets = stateSnippets.map(item => item.label)
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionCase5,
+            position: [14, 2],
+            start: [14, 2],
+            end: [14, 2]
+          })
+
+          assert.deepEqual(suggestedSnippets, expectedSnippets)
+        })
+
+        test('Shows state snippets when cursor placed within States object of Map state', async () => {
+          const expectedSnippets = stateSnippets.map(item => item.label)
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionWithinMap,
+            position: [13, 8],
+            start: [13, 8],
+            end: [13, 8]
+          })
+
+          assert.deepEqual(suggestedSnippets, expectedSnippets)
+        })
+
+        test('Shows state snippets when cursor placed within States object of Parallel state', async () => {
+          const expectedSnippets = stateSnippets.map(item => item.label)
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionWithinParallel,
+            position: [13, 8],
+            start: [13, 8],
+            end: [13, 8]
+          })
+
+          assert.deepEqual(suggestedSnippets, expectedSnippets)
+        })
+
+        test('Shows the snippets in correct YAML format', async () => {
+          const { textDoc, jsonDoc } = toDocument(snippetsCompletionCase1, true)
+          const pos = Position.create(3, 2)
+          const ls = getYamlLanguageService({})
+          const res = await ls.doComplete(textDoc, pos, jsonDoc)
+
+          assert.ok(res?.items.find(item => item.insertText === passSnippetYaml))
         })
     })
 })
