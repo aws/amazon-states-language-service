@@ -84,10 +84,10 @@ function isChildOfStates(document: TextDocument, offset: number) {
     let numberOfSpacesCursorLine = 0
 
     Array.from(cursorLine).forEach(char => {
-        if (char !== ' ') {
-            hasCursorLineNonSpace = true;
-        } else {
+        if (char === ' ') {
             numberOfSpacesCursorLine ++
+        } else if (char !== "'" && char !== '"') {
+            hasCursorLineNonSpace = true;
         }
     })
 
@@ -150,6 +150,7 @@ function isChildOfStates(document: TextDocument, offset: number) {
 
         const aslOptions = {
             ignoreColonOffset: true,
+            shouldShowStateSnippets: isChildOfStates(processedDocument, offsetIntoProcessedDocument)
         }
         const aslCompletions : CompletionList  = doCompleteAsl(processedDocument, tempPositionForCompletions, currentDoc, yamlCompletions, aslOptions)
 
@@ -244,14 +245,6 @@ function isChildOfStates(document: TextDocument, offset: number) {
         }
 
         return results
-    }
-
-    // initialize brackets to surround the empty space when parsing
-    const initializeDocument = function(text: TextDocument, offset: number) {
-        // tslint:disable-next-line: prefer-template
-        const newText = `${text.getText().substring(0, offset)}{}\r${text.getText().substr(offset)}`
-
-        return matchOffsetToDocument(offset, parseYAML(newText))
     }
 
     return languageService
