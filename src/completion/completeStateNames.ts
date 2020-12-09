@@ -16,6 +16,7 @@ import {
 
 import {
     ASLOptions,
+    CompleteStateNameOptions,
     findClosestAncestorStateNode,
     getListOfStateNamesFromStateNode,
     isObjectNode,
@@ -76,11 +77,15 @@ function getListOfItems(node: PropertyASTNode, options?: ASLOptions): string[] {
 function getCompletionList(
     items: string[],
     replaceRange: Range,
-    shouldAddLeftQuote?: boolean,
-    shouldAddRightQuote?: boolean,
-    shouldAddLeadingSpace?: boolean,
-    shoudlAddTrailingComma?: boolean
+    options: CompleteStateNameOptions
 ) {
+    const {
+        shouldAddLeftQuote,
+        shouldAddRightQuote,
+        shouldAddLeadingSpace,
+        shoudlAddTrailingComma
+    } = options
+
     const list: CompletionList = {
         isIncomplete: false,
         items: items.map(name => {
@@ -118,7 +123,14 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
 
             const range = Range.create(colonPosition, endPosition)
 
-            return getCompletionList(states, range, true, true, true, true)
+            const completeStateNameOptions = {
+                shouldAddLeftQuote: true,
+                shouldAddRightQuote: true,
+                shouldAddLeadingSpace: true,
+                shoudlAddTrailingComma: true
+            }
+
+            return getCompletionList(states, range, completeStateNameOptions)
         }
     }
 
@@ -135,12 +147,25 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
                 const endPosition = document.positionAt(node.offset + node.length)
 
                 const range = Range.create(startPosition, endPosition)
-                if (document.languageId === 'yasl') {
-                    return getCompletionList(states, range, false, false, false, false)
+                if (document.languageId === 'asl-yaml') {
+                    const completeStateNameOptions = {
+                        shouldAddLeftQuote: false,
+                        shouldAddRightQuote: false,
+                        shouldAddLeadingSpace: false,
+                        shoudlAddTrailingComma: false
+                    }
+
+                    return getCompletionList(states, range, completeStateNameOptions)
                 } else {
                     const isCursorAtTheBeginning = offset === node.offset
+                    const completeStateNameOptions = {
+                        shouldAddLeftQuote: isCursorAtTheBeginning,
+                        shouldAddRightQuote: false,
+                        shouldAddLeadingSpace: false,
+                        shoudlAddTrailingComma: false
+                    }
 
-                    return getCompletionList(states, range, undefined, isCursorAtTheBeginning)
+                    return getCompletionList(states, range, completeStateNameOptions)
                 }
 
             }

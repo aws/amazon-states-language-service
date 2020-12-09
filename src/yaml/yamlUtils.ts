@@ -5,21 +5,24 @@
 
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { Position } from 'vscode-languageserver-types'
+import { ProcessYamlDocForCompletionOutput } from '../utils/astUtilityFunctions'
 
-/* Returns an object with the following properties:
-    modifiedDocText: The text document derived from the document parameter which will be used to generate code completions
-    tempPositionForCompletions: The Position within modifiedDocText which will be used to generate code completions
-    startPositionForInsertion: The starting Position for the insert range applied to the generated code completions
-    endPositionForInsertion: The ending Position for the insert range applied to the generated code completions
-    shouldPrependSpace: A boolean indicating whether the generated code completions should have a space prepended to them
-*/
-export function processYamlDocForCompletion(document: TextDocument, position: Position): {
-    modifiedDocText: string,
-    tempPositionForCompletions: Position,
-    startPositionForInsertion: Position,
-    endPositionForInsertion: Position,
-    shouldPrependSpace: boolean
-} {
+/**
+ * @typedef {Object} ProcessYamlDocForCompletionOutput
+ * @property {string} modifiedDocText - The text document derived from the document parameter which will be used to generate code completions
+ * @property {Position} tempPositionForCompletions - The Position within modifiedDocText which will be used to generate code completions
+ * @property {Position} startPositionForInsertion - The starting Position for the insert range applied to the generated code completions
+ * @property {Position} endPositionForInsertion - The ending Position for the insert range applied to the generated code completions
+ * @property {Position} shouldPrependSpace - A boolean indicating whether the generated code completions should have a space prepended to them
+ */
+
+/**
+ *
+ * @param {TextDocument} document
+ * @param {Position} position
+ * @returns {ProcessYamlDocForCompletionOutput}
+ */
+export function processYamlDocForCompletion(document: TextDocument, position: Position): ProcessYamlDocForCompletionOutput {
     const lineOffsets = getLineOffsets(document.getText())
     const { currentLine, currentLineEnd } = getCurrentLine(document, position, lineOffsets)
 
@@ -30,33 +33,32 @@ export function processYamlDocForCompletion(document: TextDocument, position: Po
     }
 }
 
-function processLineWithoutColon(document: TextDocument, cursorPosition: Position, currentLine: string, currentLineEnd: number): {
-    modifiedDocText: string,
-    tempPositionForCompletions: Position,
-    startPositionForInsertion: Position,
-    endPositionForInsertion: Position,
-    shouldPrependSpace: boolean
-} {
+function processLineWithoutColon(document: TextDocument, cursorPosition: Position, currentLine: string, currentLineEnd: number): ProcessYamlDocForCompletionOutput {
     let modifiedDocText: string
     let shouldPrependSpace: boolean = false
 
     const tempPositionForCompletions: Position = {...cursorPosition}
     const startPositionForInsertion: Position = {...cursorPosition}
-    const endPositionForInsertion: Position = {...cursorPosition}
 
     // Since there's no colon to separate the key and value, replace all text after the cursor.
-    endPositionForInsertion.character = currentLine.length
+    const endPositionForInsertion: Position = {
+        line: cursorPosition.line,
+        character: currentLine.length
+    }
 
-    const lineOffsets = getLineOffsets(document.getText())
-
+    const docText = document.getText()
+    const docTextLength = docText.length
+    const lineOffsets = getLineOffsets(docText)
     const trimmedLine = currentLine.trim()
 
+    let preText: string;
+    let postText: string;
+    let insertedText: string;
+
     if (trimmedLine.length === 0) {
-        modifiedDocText =
-            // tslint:disable-next-line: prefer-template
-            document.getText().substring(0, currentLineEnd) +
-                '"":\r\n' +
-                document.getText().substr(lineOffsets[cursorPosition.line + 1] || document.getText().length)
+        preText = docText.substring(0, currentLineEnd)
+        insertedText = '"":\r\n'
+        postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
         tempPositionForCompletions.character += 1
 
@@ -67,24 +69,21 @@ function processLineWithoutColon(document: TextDocument, cursorPosition: Positio
         startPositionForInsertion.character = indexOfHyphen + 1
         shouldPrependSpace = true
 
-        modifiedDocText =
-            // tslint:disable-next-line: prefer-template
-            document.getText().substring(0, currentLineEnd) +
-                (!currentLine.endsWith(' ') ? ' ' : '') +
-                ':\r\n' +
-                document.getText().substr(lineOffsets[cursorPosition.line + 1] || document.getText().length)
+        preText = docText.substring(0, currentLineEnd)
+        insertedText = (!currentLine.endsWith(' ') ? ' ' : '') + ':\r\n'
+        postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
     // Non-empty line but missing colon, add colon to end of current line
     } else {
-        modifiedDocText =
-            // tslint:disable-next-line: prefer-template
-            document.getText().substring(0, currentLineEnd) +
-                ':\r\n' +
-                document.getText().substr(lineOffsets[cursorPosition.line + 1] || document.getText().length)
+        preText = docText.substring(0, currentLineEnd)
+        insertedText = ':\r\n'
+        postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
         // Starting pos is first non-space character
         startPositionForInsertion.character = currentLine.indexOf(trimmedLine)
     }
+
+    modifiedDocText = `${preText}${insertedText}${postText}`
 
     return {
         modifiedDocText,
@@ -95,14 +94,11 @@ function processLineWithoutColon(document: TextDocument, cursorPosition: Positio
     }
 }
 
-function processLineWithColon(document: TextDocument, cursorPosition: Position, currentLine: string, currentLineEnd: number): {
-    modifiedDocText: string,
-    tempPositionForCompletions: Position,
-    startPositionForInsertion: Position,
-    endPositionForInsertion: Position,
-    shouldPrependSpace: boolean
-} {
-    let modifiedDocText: string = document.getText()
+function processLineWithColon(document: TextDocument, cursorPosition: Position, currentLine: string, currentLineEnd: number): ProcessYamlDocForCompletionOutput {
+    const docText = document.getText()
+    const docTextLength = docText.length
+
+    let modifiedDocText: string = docText
     let shouldPrependSpace: boolean = false
 
     const tempPositionForCompletions: Position = {...cursorPosition}
@@ -110,7 +106,7 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
     const endPositionForInsertion: Position = {...cursorPosition}
 
     const charNum = cursorPosition.character
-    const lineOffsets = getLineOffsets(document.getText())
+    const lineOffsets = getLineOffsets(docText)
 
     // Current line has a colon, determine if cursor position is right or left of it
     const colonIndex = currentLine.indexOf(':')
@@ -125,9 +121,9 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
             // Insert placeholder quotes and place cursor inside of them.
             modifiedDocText =
                 // tslint:disable-next-line: prefer-template
-                document.getText().substring(0, lineOffsets[cursorPosition.line] + colonIndex) +
+                docText.substring(0, lineOffsets[cursorPosition.line] + colonIndex) +
                     "''" +
-                    document.getText().substr(lineOffsets[cursorPosition.line] + colonIndex)
+                    docText.substr(lineOffsets[cursorPosition.line] + colonIndex)
             startPositionForInsertion.character = colonIndex
             endPositionForInsertion.character = colonIndex
             tempPositionForCompletions.character = colonIndex + 1
@@ -137,9 +133,9 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
             // Insert placeholder quotes and place cursor inside of them.
             modifiedDocText =
                 // tslint:disable-next-line: prefer-template
-                document.getText().substring(0, lineOffsets[cursorPosition.line] + colonIndex) +
+                docText.substring(0, lineOffsets[cursorPosition.line] + colonIndex) +
                     " ''" +
-                    document.getText().substr(lineOffsets[cursorPosition.line] + colonIndex)
+                    docText.substr(lineOffsets[cursorPosition.line] + colonIndex)
             startPositionForInsertion.character = colonIndex
             endPositionForInsertion.character = colonIndex
             tempPositionForCompletions.character = colonIndex + 2
@@ -177,10 +173,10 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
 
         modifiedDocText =
             // tslint:disable-next-line: prefer-template
-            document.getText().substring(0, currentLineEnd - numTrailingSpacesToRemove) +
+            docText.substring(0, currentLineEnd - numTrailingSpacesToRemove) +
                 (hasOnlyWhitespaceAfterColon ? ' ""' : '') +
                 '\r\n' +
-                document.getText().substr(lineOffsets[cursorPosition.line + 1] || document.getText().length)
+                docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
         if (hasOnlyWhitespaceAfterColon) {
             tempPositionForCompletions.character += 2
@@ -234,16 +230,17 @@ function getCurrentLine(document: TextDocument, position: Position, lineOffsets:
     currentLine: string,
     currentLineEnd: number
 } {
+    const docText = document.getText()
     const lineNum: number = position.line
 
     const lineStart = lineOffsets[lineNum]
-    let lineEnd = lineOffsets[lineNum + 1] ? lineOffsets[lineNum + 1] : document.getText().length
+    let lineEnd = lineOffsets[lineNum + 1] ? lineOffsets[lineNum + 1] : docText.length
 
-    while (lineEnd - 1 >= 0 && isCharEol(document.getText().charCodeAt(lineEnd - 1))) {
+    while (lineEnd - 1 >= 0 && isCharEol(docText.charCodeAt(lineEnd - 1))) {
         lineEnd--
     }
 
-    const textLine = document.getText().substring(lineStart, lineEnd)
+    const textLine = docText.substring(lineStart, lineEnd)
 
     return {
         currentLine: textLine,
