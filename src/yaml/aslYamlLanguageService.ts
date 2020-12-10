@@ -7,11 +7,11 @@ import { safeDump, safeLoad } from 'js-yaml'
 import * as prettier from 'prettier'
 import {
     CompletionItemKind,
+    Diagnostic,
     getLanguageService as getLanguageServiceVscode,
     JSONSchema,
     LanguageService,
     LanguageServiceParams,
-    Diagnostic
 } from 'vscode-json-languageservice'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import {
@@ -56,13 +56,13 @@ function convertYAMLDiagnostic(yamlDiagnostic: YAMLDocDiagnostic, textDocument: 
     }
 
     const startPos = textDocument.positionAt(startLoc)
-    let endPos = textDocument.positionAt(endLoc)
-    
+    const endPos = textDocument.positionAt(endLoc)
+
     return {
         range: Range.create(startPos, endPos),
         message: yamlDiagnostic.message,
         severity
-    } 
+    }
 }
 
 export const getLanguageService = function(params: LanguageServiceParams, schema: JSONSchema, aslLanguageService: LanguageService): LanguageService {
