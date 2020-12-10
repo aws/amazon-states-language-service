@@ -11,6 +11,7 @@ import {
     JSONSchema,
     LanguageService,
     LanguageServiceParams,
+    Diagnostic
 } from 'vscode-json-languageservice'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import {
@@ -30,7 +31,39 @@ import {
 import { YAMLCompletion } from 'yaml-language-server/out/server/src/languageservice/services/yamlCompletion'
 import { YAMLSchemaService } from 'yaml-language-server/out/server/src/languageservice/services/yamlSchemaService'
 import { matchOffsetToDocument } from 'yaml-language-server/out/server/src/languageservice/utils/arrUtils'
+import { YAMLDocDiagnostic } from 'yaml-language-server/out/server/src/languageservice/utils/parseUtils'
 import doCompleteAsl from '../completion/completeAsl'
+
+function convertYAMLDiagnostic(yamlDiagnostic: YAMLDocDiagnostic, textDocument: TextDocument): Diagnostic {
+    const startLoc = yamlDiagnostic.location.start
+    let endLoc = yamlDiagnostic.location.end
+    let severity = yamlDiagnostic.severity
+
+    // Duplicate positining returns incorect end position and needs to be ovewritten
+    if (yamlDiagnostic.message === 'duplicate key') {
+        const text = textDocument.getText()
+        // Update severity to error
+        severity = 1
+
+        for (let loc = yamlDiagnostic.location.start; loc < text.length; loc++) {
+            // Colon and whitespace character signal end of the key.
+            if (text.slice(loc, loc + 2).match(/:\s/)) {
+                endLoc = loc
+            } else if (text[loc] === '\n') {
+                break
+            }
+        }
+    }
+
+    const startPos = textDocument.positionAt(startLoc)
+    let endPos = textDocument.positionAt(endLoc)
+    
+    return {
+        range: Range.create(startPos, endPos),
+        message: yamlDiagnostic.message,
+        severity
+    } 
+}
 
 export const getLanguageService = function(params: LanguageServiceParams, schema: JSONSchema, aslLanguageService: LanguageService): LanguageService {
     const builtInParams = {}
@@ -56,18 +89,14 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
         textDocument: TextDocument
     ) {
         const yamlDocument: YAMLDocument = parseYAML(textDocument.getText())
-        const validationResult: any[] = []
+        const validationResult: Diagnostic[] = []
 
         for (const currentYAMLDoc of yamlDocument.documents) {
             const validation = await aslLanguageService.doValidation(textDocument, currentYAMLDoc)
-            const syd = (currentYAMLDoc as unknown) as SingleYAMLDocument
-            if (syd.errors.length > 0) {
-                validationResult.push(...syd.errors)
-            }
-            if (syd.warnings.length > 0) {
-                validationResult.push(...syd.warnings)
-            }
-
+            const syd = currentYAMLDoc
+            validationResult.push(
+                ...syd.errors.concat(syd.warnings).map(err => convertYAMLDiagnostic(err, textDocument)
+            ))
             validationResult.push(...validation)
         }
 

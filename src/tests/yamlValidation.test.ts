@@ -14,6 +14,7 @@ import {
     documentChoiceNoDefault,
     documentChoiceValidDefault,
     documentChoiceValidNext,
+    documentDuplicateKey,
     documentInvalidNext,
     documentInvalidNextNested,
     documentInvalidParametersIntrinsicFunction,
@@ -99,13 +100,43 @@ async function testValidations(options: TestValidationOptions) {
 }
 
 suite('ASL YAML context-aware validation', () => {
-    suite('Invalid JSON Input', () => {
+    suite('Invalid YAML Input', () => {
         test("Empty string doesn't throw errors", async () => {
             await assert.doesNotReject(getValidations(''))
         })
 
         test("[] string doesn't throw type errors", async () => {
             await assert.doesNotReject(getValidations('[]'), TypeError)
+        })
+
+        test('Shows diagnostic for duplicate key', async () => {
+            const message = 'duplicate key'
+
+            await testValidations({
+                json: documentDuplicateKey,
+                diagnostics: [
+                    {
+                        message,
+                        start: [3, 2],
+                        end: [3, 9],
+                    },
+                    {
+                        message,
+                        start: [1, 2],
+                        end: [1, 9],
+                    },
+                    {
+                        message,
+                        start: [12, 4],
+                        end: [12, 9],
+                    },
+                    {
+                        message,
+                        start: [9, 4],
+                        end: [9, 9],
+                    },
+                ],
+            })
         })
     })
 
