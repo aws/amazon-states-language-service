@@ -4,7 +4,7 @@
  */
 
 import * as assert from 'assert'
-import { MESSAGES } from '../constants/diagnosticStrings'
+import { MESSAGES, YAML_PARSER_MESSAGES } from '../constants/diagnosticStrings'
 import { Diagnostic, DiagnosticSeverity, getYamlLanguageService, Position, Range } from '../service'
 
 import {
@@ -110,7 +110,7 @@ suite('ASL YAML context-aware validation', () => {
         })
 
         test('Shows diagnostic for duplicate key', async () => {
-            const message = 'duplicate key'
+            const message = YAML_PARSER_MESSAGES.DUPLICATE_KEY
 
             await testValidations({
                 json: documentDuplicateKey,

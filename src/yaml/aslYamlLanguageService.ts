@@ -25,7 +25,6 @@ import {
 } from 'vscode-languageserver-types'
 import {
     parse as parseYAML,
-    SingleYAMLDocument,
     YAMLDocument,
 } from 'yaml-language-server/out/server/src/languageservice/parser/yamlParser07'
 import { YAMLCompletion } from 'yaml-language-server/out/server/src/languageservice/services/yamlCompletion'
@@ -33,20 +32,21 @@ import { YAMLSchemaService } from 'yaml-language-server/out/server/src/languages
 import { matchOffsetToDocument } from 'yaml-language-server/out/server/src/languageservice/utils/arrUtils'
 import { YAMLDocDiagnostic } from 'yaml-language-server/out/server/src/languageservice/utils/parseUtils'
 import doCompleteAsl from '../completion/completeAsl'
+import { YAML_PARSER_MESSAGES } from '../constants/diagnosticStrings'
 
 function convertYAMLDiagnostic(yamlDiagnostic: YAMLDocDiagnostic, textDocument: TextDocument): Diagnostic {
     const startLoc = yamlDiagnostic.location.start
     let endLoc = yamlDiagnostic.location.end
     let severity = yamlDiagnostic.severity
 
-    // Duplicate positining returns incorect end position and needs to be ovewritten
-    if (yamlDiagnostic.message === 'duplicate key') {
+    // Duplicate positioning returns incorrect end position and needs to be ovewritten
+    if (yamlDiagnostic.message === YAML_PARSER_MESSAGES.DUPLICATE_KEY) {
         const text = textDocument.getText()
         // Update severity to error
         severity = 1
 
         for (let loc = yamlDiagnostic.location.start; loc < text.length; loc++) {
-            // Colon and whitespace character signal end of the key.
+            // Colon and whitespace character signal the end of the key.
             if (text.slice(loc, loc + 2).match(/:\s/)) {
                 endLoc = loc
             } else if (text[loc] === '\n') {
@@ -93,10 +93,11 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
 
         for (const currentYAMLDoc of yamlDocument.documents) {
             const validation = await aslLanguageService.doValidation(textDocument, currentYAMLDoc)
-            const syd = currentYAMLDoc
             validationResult.push(
-                ...syd.errors.concat(syd.warnings).map(err => convertYAMLDiagnostic(err, textDocument)
-            ))
+                ...currentYAMLDoc.errors
+                    .concat(currentYAMLDoc.warnings)
+                    .map(err => convertYAMLDiagnostic(err, textDocument))
+            )
             validationResult.push(...validation)
         }
 
