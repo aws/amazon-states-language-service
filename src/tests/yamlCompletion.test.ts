@@ -252,7 +252,7 @@ const stateSnippetLabels = [
   'Map State'
 ]
 
-const itemLabels = [
+const stateNameLabels = [
     'FirstState',
     'ChoiceState',
     'FirstMatchState',
@@ -406,13 +406,10 @@ suite('ASL YAML context-aware completion', () => {
         })
 
         test('States snippets', async () => {
-            const { labels, json, position  } = {
-                labels: stateSnippetLabels,
-                json: documentWithStates,
-                position: [5, 2]
-            } as TestPropertyCompletionOptions
+            const labels = stateSnippetLabels
+            const json = documentWithStates
 
-            const res = await getCompletions(json, position)
+            const res = await getCompletions(json, [5,2])
 
             assert.strictEqual(res?.items.length, labels.length)
 
@@ -434,7 +431,7 @@ suite('ASL YAML context-aware completion', () => {
     suite('StartAt', () => {
         test('Both quotation marks present and cursor between them', async () => {
             await testCompletions({
-                labels: itemLabels,
+                labels: stateNameLabels,
                 json: document3,
                 position: [1, 12],
                 start: [1, 10],
@@ -445,7 +442,7 @@ suite('ASL YAML context-aware completion', () => {
 
         test('Suggests completions when text present and cursor is on it', async () => {
             await testCompletions({
-                labels: itemLabels,
+                labels: stateNameLabels,
                 json: document4,
                 position: [1, 13],
                 start: [1, 10],
@@ -470,7 +467,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Cursor after colon but no quotes', async () => {
             await testCompletions({
                 // remove last label as it is the name of the current state
-                labels: itemLabels.filter(label => label !== 'NextState'),
+                labels: stateNameLabels.filter(label => label !== 'NextState'),
                 json: document2,
                 position: [9, 12],
                 start: [9, 11],
@@ -482,7 +479,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Both quotation marks present and cursor between them', async () => {
             await testCompletions({
                 // remove last label as it is the name of the current state
-                labels: itemLabels.filter(label => label !== 'NextState'),
+                labels: stateNameLabels.filter(label => label !== 'NextState'),
                 json: document3,
                 position: [9, 13],
                 start: [9, 11],
@@ -494,7 +491,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Suggests completions when text present and cursor is on it', async () => {
             await testCompletions({
                 // remove last label as it is the name of the current state
-                labels: itemLabels.filter(label => label !== 'NextState'),
+                labels: stateNameLabels.filter(label => label !== 'NextState'),
                 json: document4,
                 position: [9, 18],
                 start: [9, 11],
@@ -517,7 +514,7 @@ suite('ASL YAML context-aware completion', () => {
 
         test('Suggests completions for the Next property within Choice state', async () => {
             await testCompletions({
-                labels: itemLabels.filter(label => label !== 'ChoiceStateX'),
+                labels: stateNameLabels.filter(label => label !== 'ChoiceStateX'),
                 json: document1,
                 position: [13, 17],
                 start: [13, 15],
@@ -530,7 +527,7 @@ suite('ASL YAML context-aware completion', () => {
     suite('Default', () => {
         test('Suggests completion items for Default property of the Choice state when cursor positioned after first quote', async () => {
             await testCompletions({
-                labels: itemLabels.filter(label => label !== 'ChoiceStateX'),
+                labels: stateNameLabels.filter(label => label !== 'ChoiceStateX'),
                 json: document1,
                 position: [16, 16],
                 start: [16, 14],
@@ -541,7 +538,7 @@ suite('ASL YAML context-aware completion', () => {
 
         test('Suggests completion items for Default property of the Choice state when cursor is a space after colon', async () => {
             await testCompletions({
-                labels: itemLabels.filter(label => label !== 'ChoiceStateX'),
+                labels: stateNameLabels.filter(label => label !== 'ChoiceStateX'),
                 json: document2,
                 position: [16, 15],
                 start: [16, 14],
