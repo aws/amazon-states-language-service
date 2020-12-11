@@ -13,3 +13,7 @@ export const MESSAGES = {
     INVALID_PROPERTY_NAME: 'Field is not supported.',
     MUTUALLY_EXCLUSIVE_CHOICE_PROPERTIES: 'Each Choice Rule can only have one comparison operator.',
 } as const
+
+export const YAML_PARSER_MESSAGES = {
+    DUPLICATE_KEY: 'duplicate key'
+} as const
