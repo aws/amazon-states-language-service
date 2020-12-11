@@ -160,7 +160,7 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
                     const isCursorAtTheBeginning = offset === node.offset
                     const completeStateNameOptions = {
                         shouldAddLeftQuote: isCursorAtTheBeginning,
-                        shouldAddRightQuote: false,
+                        shouldAddRightQuote: true,
                         shouldAddLeadingSpace: false,
                         shoudlAddTrailingComma: false
                     }

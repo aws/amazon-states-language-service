@@ -155,27 +155,34 @@ function isChildOfStates(document: TextDocument, offset: number) {
         const aslCompletions : CompletionList  = doCompleteAsl(processedDocument, tempPositionForCompletions, currentDoc, yamlCompletions, aslOptions)
 
         aslCompletions.items.forEach(completion => {
-            const currentTextEdit = completion.textEdit
+            if (completion.insertText && completion.kind === CompletionItemKind.Snippet && document.languageId === 'asl-yaml') {
+                // tslint:disable-next-line: no-unsafe-any
+                completion.insertText = safeDump(safeLoad(completion.insertText))
+                // Remove quotes
+                completion.insertText = completion.insertText?.replace(/[']/g, '')
+            } else {
+                const currentTextEdit = completion.textEdit
 
-            if (currentTextEdit) {
-                if (shouldPrependSpace && currentTextEdit.newText?.charAt(0) !== ' ') {
-                    currentTextEdit.newText = ' ' + currentTextEdit.newText
-                }
-
-                currentTextEdit.range.start = startPositionForInsertion
-                currentTextEdit.range.end = endPositionForInsertion
-
-                // Completions that include both a key and a value should replace everything right of the cursor.
-                if (completion.kind === CompletionItemKind.Property) {
-                    currentTextEdit.range.end = {
-                        line: endPositionForInsertion.line,
-                        character: document.getText().length
+                if (currentTextEdit) {
+                    if (shouldPrependSpace) {
+                        if (currentTextEdit.newText && currentTextEdit.newText.charAt(0) !== ' ') {
+                            currentTextEdit.newText = ' ' + currentTextEdit.newText
+                        }
+                        if (completion.insertText && completion.insertText.charAt(0) !== ' ') {
+                            completion.insertText = ' ' + completion.insertText
+                        }
                     }
-                } else if (completion.insertText && completion.kind === CompletionItemKind.Snippet && document.languageId === 'asl-yaml') {
-                    // tslint:disable-next-line: no-unsafe-any
-                    completion.insertText = safeDump(safeLoad(completion.insertText))
-                    // Remove quotes
-                    completion.insertText = completion.insertText?.replace(/[']/g, '')
+
+                    currentTextEdit.range.start = startPositionForInsertion
+                    currentTextEdit.range.end = endPositionForInsertion
+
+                    // Completions that include both a key and a value should replace everything right of the cursor.
+                    if (completion.kind === CompletionItemKind.Property) {
+                        currentTextEdit.range.end = {
+                            line: endPositionForInsertion.line,
+                            character: document.getText().length
+                        }
+                    }
                 }
             }
         })

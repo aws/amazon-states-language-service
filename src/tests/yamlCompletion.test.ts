@@ -4,7 +4,7 @@
  */
 
 import * as assert from 'assert'
-import { CompletionItemKind } from 'vscode-json-languageservice'
+import { CompletionItemKind, InsertTextFormat } from 'vscode-json-languageservice'
 import { stateSnippets } from '../completion/completeSnippets'
 import { getYamlLanguageService, Position, Range } from '../service'
 import { toDocument } from './utils/testUtilities'
@@ -85,20 +85,6 @@ const document4 = `
     ChoiceStateX:
 `
 
-const document5 = `
-StartAt: Choice1
-States:
-    "Choice1":
-      Type: Choice
-      Choices:
-        - Variable: "$.var"
-          IsNumeric: false
-          Next:
-    "Pass1":
-        Type: Pass
-        End: true
-`
-
 const documentNested = `
   StartAt: First
   States:
@@ -148,21 +134,6 @@ const snippetsCompletionCase1 = `
 StartAt: Hello
 States:
 \u0020\u0020
-  Hello:
-    Type: Pass
-    Result: Hello
-    Next: World
-
-  World:
-    Type: Pass
-    Result: World
-    End: true
-`
-
-const snippetsCompletionCase2 = `
-StartAt: Hello
-States:
-
   Hello:
     Type: Pass
     Result: Hello
@@ -299,9 +270,15 @@ interface TestCompletionOptions {
     labels: string[]
     json: string
     position: [number, number]
-    start?: [number, number]
-    end?: [number, number]
-    labelToInsertText?(label: string): string
+    start: [number, number]
+    end: [number, number]
+    labelToInsertText(label: string): string
+}
+
+interface TestPropertyCompletionOptions {
+    labels: string[]
+    json: string
+    position: [number, number]
 }
 
 async function getCompletions(json: string, position: [number, number]) {
@@ -319,124 +296,137 @@ async function testCompletions(options: TestCompletionOptions) {
 
     assert.strictEqual(res?.items.length, labels.length)
 
+    // space before quoted item
+    const itemInsertTexts = labels.map(labelToInsertText)
+
     assert.deepEqual(
         res?.items.map(item => item.label),
         labels
     )
+    assert.deepEqual(
+        res?.items.map(item => item.textEdit?.newText),
+        itemInsertTexts
+    )
 
-    if (labelToInsertText) {
-        // space before quoted item
-        const itemInsertTexts = labels.map(labelToInsertText)
-        assert.deepEqual(
-            res?.items.map(item => item.textEdit?.newText),
-            itemInsertTexts
-        )
-    }
+    const leftPos = Position.create(...start)
+    const rightPos = Position.create(...end)
 
-    if (start && end) {
-        const leftPos = Position.create(...start)
-        const rightPos = Position.create(...end)
+    res?.items.forEach(item => {
+        assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
+    })
+}
 
-        res?.items.forEach(item => {
-            assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
-        })
-    }
+// Validate completions that include a full property (key-val pair)
+async function testPropertyCompletions(options: TestPropertyCompletionOptions) {
+    const { labels, json, position  } = options
+
+    const res = await getCompletions(json, position)
+
+    assert.strictEqual(res?.items.length, labels.length)
+
+    const itemLabels = res?.items.map(item => item.label)
+    assert.deepEqual(
+        itemLabels,
+        labels
+    )
+
+    // Test property keys match labels.
+    const itemInsertTextKeys = res?.items.map(item => item.insertText?.split(':')[0])
+    assert.deepEqual(
+        itemInsertTextKeys,
+        labels
+    )
+
+    // Test textEdit newText matches the insertText
+    const itemInsertTexts = res?.items.map(item => item.insertText)
+    const itemTextEditNewTexts = res?.items.map(item => item.textEdit?.newText)
+    assert.deepEqual(
+        itemInsertTexts,
+        itemTextEditNewTexts
+    )
+
+    // Test range is from position to end of line.
+    const leftPos = Position.create(position[0], 0)
+    const rightPos = Position.create(position[0], json.length)
+    res?.items.forEach(item => {
+        assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
+    })
 }
 
 interface TestScenario {
-  json: string,
-  position: [number, number],
-  start: [number, number],
-  end: [number, number],
+    json: string,
+    position: [number, number],
+    start: [number, number],
+    end: [number, number],
 }
 
 export async function getSuggestedSnippets(options: TestScenario) {
-  const { json, position } = options
-  const { textDoc, jsonDoc } = toDocument(json)
-  const pos = Position.create(...position)
-  const ls = getYamlLanguageService({})
-  const res = await ls.doComplete(textDoc, pos, jsonDoc)
-  const suggestedSnippetLabels = res?.items.filter(item => item.kind === CompletionItemKind.Snippet).map(item => item.label)
+    const { json, position } = options
+    const { textDoc, jsonDoc } = toDocument(json)
+    const pos = Position.create(...position)
+    const ls = getYamlLanguageService({})
+    const res = await ls.doComplete(textDoc, pos, jsonDoc)
+    const suggestedSnippetLabels = res?.items.filter(item => item.kind === CompletionItemKind.Snippet).map(item => item.label)
 
-  return suggestedSnippetLabels
+    return suggestedSnippetLabels
 }
 
 suite('ASL YAML context-aware completion', () => {
     suite('Top Level Properties', () => {
         test('Empty document', async () => {
-            await testCompletions({
+            await testPropertyCompletions({
                 labels: topLevelLabels,
                 json: emptyDocument,
                 position: [0, 0],
-                start: [0, 0],
-                end: [0, 0],
-                labelToInsertText: undefined,
             })
         })
 
         test('Partially defined property, cursor in front of first letter', async () => {
-            await testCompletions({
+            await testPropertyCompletions({
                 labels: topLevelLabels,
                 json: documentWithPartialTopLevel,
                 position: [1, 0],
-                start: [1, 0],
-                end: [1, 2],
-                labelToInsertText: undefined,
             })
         })
 
         test('Partially defined property, cursor in middle', async () => {
-            await testCompletions({
+            await testPropertyCompletions({
                 labels: topLevelLabels,
                 json: documentWithPartialTopLevel,
-                position: [1, 1],
-                start: [1, 0],
-                end: [1, 2],
-                labelToInsertText: undefined,
+                position: [1, 1]
             })
         })
 
         test('Partially defined property, cursor after final letter', async () => {
-            await testCompletions({
+            await testPropertyCompletions({
                 labels: topLevelLabels,
                 json: documentWithPartialTopLevel,
-                position: [1, 2],
-                start: [1, 0],
-                end: [1, 2],
-                labelToInsertText: undefined,
+                position: [1, 2]
             })
         })
 
         test('States snippets', async () => {
-            await testCompletions({
+            const { labels, json, position  } = {
                 labels: stateSnippetLabels,
                 json: documentWithStates,
-                position: [5, 2],
-                start: undefined,
-                end: undefined,
-                labelToInsertText: undefined,
-            })
-        })
+                position: [5, 2]
+            } as TestPropertyCompletionOptions
 
-        test('Existing top level property, cursor on empty line', async () => {
-            await testCompletions({
-                labels: topLevelLabels.filter(item => item !== 'States' && item !== 'StartAt'),
-                json: documentWithStates,
-                position: [3, 0],
-                start: [3, 0],
-                end: [3, 0],
-                labelToInsertText: undefined,
-            })
-        })
+            const res = await getCompletions(json, position)
 
-        test('Existing top level property, cursor at top', async () => {
-            await testCompletions({
-                labels: topLevelLabels.filter(item => item !== 'States' && item !== 'StartAt'),
-                json: documentWithStates,
-                position: [1, 0],
-                start: [1, 0],
-                end: [1, 0],
-                labelToInsertText: undefined,
+            assert.strictEqual(res?.items.length, labels.length)
+
+            const itemLabels = res?.items.map(item => item.label)
+            assert.deepEqual(
+                itemLabels,
+                labels
+            )
+
+            res?.items.forEach(item => {
+                assert.strictEqual(item.kind, CompletionItemKind.Snippet)
+                assert.strictEqual(item.insertTextFormat, InsertTextFormat.Snippet)
+                assert.equal(item.insertText !== undefined, true)
+                assert.equal(item.documentation !== undefined, true)
             })
         })
     })
@@ -447,9 +437,9 @@ suite('ASL YAML context-aware completion', () => {
                 labels: itemLabels,
                 json: document3,
                 position: [1, 12],
-                start: [1, 12],
+                start: [1, 10],
                 end: [1, 13],
-                labelToInsertText: label => `${label}"`,
+                labelToInsertText: label => ` ${label}`,
             })
         })
 
@@ -458,9 +448,9 @@ suite('ASL YAML context-aware completion', () => {
                 labels: itemLabels,
                 json: document4,
                 position: [1, 13],
-                start: [1, 12],
+                start: [1, 10],
                 end: [1, 16],
-                labelToInsertText: label => `${label}"`,
+                labelToInsertText: label => ` ${label}`,
             })
         })
 
@@ -469,9 +459,9 @@ suite('ASL YAML context-aware completion', () => {
                 labels: nestedItemLabels,
                 json: documentNested,
                 position: [6, 18],
-                start: [6, 18],
+                start: [6, 16],
                 end: [6, 19],
-                labelToInsertText: label => `${label}"`,
+                labelToInsertText: label => ` ${label}`,
             })
         })
     })
@@ -483,9 +473,9 @@ suite('ASL YAML context-aware completion', () => {
                 labels: itemLabels.filter(label => label !== 'NextState'),
                 json: document2,
                 position: [9, 12],
-                start: [9, 12],
+                start: [9, 11],
                 end: [9, 14],
-                labelToInsertText: label => `"${label}"`,
+                labelToInsertText: label => ` ${label}`,
             })
         })
 
@@ -495,9 +485,9 @@ suite('ASL YAML context-aware completion', () => {
                 labels: itemLabels.filter(label => label !== 'NextState'),
                 json: document3,
                 position: [9, 13],
-                start: [9, 13],
+                start: [9, 11],
                 end: [9, 14],
-                labelToInsertText: label => `${label}"`,
+                labelToInsertText: label => ` ${label}`,
             })
         })
 
@@ -507,9 +497,9 @@ suite('ASL YAML context-aware completion', () => {
                 labels: itemLabels.filter(label => label !== 'NextState'),
                 json: document4,
                 position: [9, 18],
-                start: [9, 16],
+                start: [9, 11],
                 end: [9, 17],
-                labelToInsertText: label => `${label}"`,
+                labelToInsertText: label => ` ${label}`,
             })
         })
 
@@ -519,9 +509,9 @@ suite('ASL YAML context-aware completion', () => {
                 labels: nestedItemLabels.filter(label => label !== 'Nested4'),
                 json: documentNested,
                 position: [12, 21],
-                start: [12, 19],
+                start: [12, 17],
                 end: [12, 20],
-                labelToInsertText: label => `${label}"`,
+                labelToInsertText: label => ` ${label}`,
             })
         })
 
@@ -530,9 +520,9 @@ suite('ASL YAML context-aware completion', () => {
                 labels: itemLabels.filter(label => label !== 'ChoiceStateX'),
                 json: document1,
                 position: [13, 17],
-                start: [13, 17],
+                start: [13, 15],
                 end: [13, 18],
-                labelToInsertText: label => `${label}"`,
+                labelToInsertText: label => ` ${label}`,
             })
         })
     })
@@ -543,9 +533,9 @@ suite('ASL YAML context-aware completion', () => {
                 labels: itemLabels.filter(label => label !== 'ChoiceStateX'),
                 json: document1,
                 position: [16, 16],
-                start: [16, 16],
+                start: [16, 14],
                 end: [16, 17],
-                labelToInsertText: label => `${label}"`,
+                labelToInsertText: label => ` ${label}`,
             })
         })
 
@@ -554,9 +544,9 @@ suite('ASL YAML context-aware completion', () => {
                 labels: itemLabels.filter(label => label !== 'ChoiceStateX'),
                 json: document2,
                 position: [16, 15],
-                start: [16, 15],
+                start: [16, 14],
                 end: [16, 17],
-                labelToInsertText: label => `"${label}"`,
+                labelToInsertText: label => ` ${label}`,
             })
         })
     })
@@ -580,17 +570,6 @@ suite('ASL YAML context-aware completion', () => {
           })
 
           assert.deepEqual(suggestedSnippets, expectedSnippets)
-        })
-
-        test('Does not show state snippets when cursor placed on first line after States prop with same indentation indendation', async () => {
-          const suggestedSnippets = await getSuggestedSnippets({
-            json: snippetsCompletionCase2,
-            position: [3, 0],
-            start: [3, 0],
-            end: [3, 0]
-          })
-
-          assert.deepEqual(suggestedSnippets, [])
         })
 
         test('Shows state snippets when cursor placed on line after state declaration with the indentation same as the previous state name ', async () => {

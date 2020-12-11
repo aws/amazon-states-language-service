@@ -65,14 +65,21 @@ function processLineWithoutColon(document: TextDocument, cursorPosition: Positio
     // Trimmed line starts with '-'
     } else if (trimmedLine.length >= 1 && trimmedLine[0] === '-') {
         // Set start of insertion range to be immediately after the hyphen.
-        const indexOfHyphen = currentLine.indexOf('-')
-        startPositionForInsertion.character = indexOfHyphen + 1
+        const hyphenIndex = currentLine.indexOf('-')
+        startPositionForInsertion.character = hyphenIndex + 1
         shouldPrependSpace = true
 
-        preText = docText.substring(0, currentLineEnd)
-        insertedText = (!currentLine.endsWith(' ') ? ' ' : '') + ':\r\n'
-        postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
-
+        const postHyphenTextTrimmed = currentLine.substring(hyphenIndex + 1).trim()
+        if (postHyphenTextTrimmed.length === 0) {
+            tempPositionForCompletions.character = hyphenIndex + 3
+            preText = docText.substring(0, lineOffsets[cursorPosition.line] + hyphenIndex)
+            insertedText = "- '':\n"
+            postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
+        } else {
+            preText = docText.substring(0, currentLineEnd)
+            insertedText = (!currentLine.endsWith(' ') ? ' ' : '') + ':\r\n'
+            postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
+        }
     // Non-empty line but missing colon, add colon to end of current line
     } else {
         preText = docText.substring(0, currentLineEnd)
@@ -108,6 +115,10 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
     const charNum = cursorPosition.character
     const lineOffsets = getLineOffsets(docText)
 
+    let preText: string;
+    let postText: string;
+    let insertedText: string;
+
     // Current line has a colon, determine if cursor position is right or left of it
     const colonIndex = currentLine.indexOf(':')
 
@@ -119,11 +130,10 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
         // Only whitespace before the colon.
         if (preColonTextTrimmed.length === 0) {
             // Insert placeholder quotes and place cursor inside of them.
-            modifiedDocText =
-                // tslint:disable-next-line: prefer-template
-                docText.substring(0, lineOffsets[cursorPosition.line] + colonIndex) +
-                    "''" +
-                    docText.substr(lineOffsets[cursorPosition.line] + colonIndex)
+            preText = docText.substring(0, lineOffsets[cursorPosition.line] + colonIndex)
+            insertedText = "''"
+            postText = docText.substr(lineOffsets[cursorPosition.line] + colonIndex)
+
             startPositionForInsertion.character = colonIndex
             endPositionForInsertion.character = colonIndex
             tempPositionForCompletions.character = colonIndex + 1
@@ -131,21 +141,23 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
         // Only hyphen before the colon.
         } else if (preColonTextTrimmed.length === 1 && preColonTextTrimmed.charAt(0) === '-') {
             // Insert placeholder quotes and place cursor inside of them.
-            modifiedDocText =
-                // tslint:disable-next-line: prefer-template
-                docText.substring(0, lineOffsets[cursorPosition.line] + colonIndex) +
-                    " ''" +
-                    docText.substr(lineOffsets[cursorPosition.line] + colonIndex)
+            preText = docText.substring(0, lineOffsets[cursorPosition.line] + colonIndex)
+            insertedText = " ''"
+            postText = docText.substr(lineOffsets[cursorPosition.line] + colonIndex)
+
             startPositionForInsertion.character = colonIndex
             endPositionForInsertion.character = colonIndex
             tempPositionForCompletions.character = colonIndex + 2
             shouldPrependSpace = currentLine.charAt(Math.max(colonIndex - 1, 0)) !== ' '
-
         } else {
             // Set start of insertion range to be where the non-whitespace characters start.
             startPositionForInsertion.character = currentLine.indexOf(preColonTextTrimmed)
             // Set end of insertion range to be immediately before the colon.
             endPositionForInsertion.character = colonIndex
+
+            preText = docText
+            insertedText = ''
+            postText = ''
 
             // If the non-whitespace characters start with a hyphen, adjust starting position to be after the hyphen
             if (preColonTextTrimmed.charAt(0) === '-') {
@@ -171,12 +183,9 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
         const postColonTextTrimmed = currentLine.substring(colonIndex + 1).trim()
         const hasOnlyWhitespaceAfterColon = postColonTextTrimmed.length === 0
 
-        modifiedDocText =
-            // tslint:disable-next-line: prefer-template
-            docText.substring(0, currentLineEnd - numTrailingSpacesToRemove) +
-                (hasOnlyWhitespaceAfterColon ? ' ""' : '') +
-                '\r\n' +
-                docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
+        preText = docText.substring(0, currentLineEnd - numTrailingSpacesToRemove)
+        insertedText = (hasOnlyWhitespaceAfterColon ? ' ""' : '') + '\r\n'
+        postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
         if (hasOnlyWhitespaceAfterColon) {
             tempPositionForCompletions.character += 2
@@ -191,6 +200,8 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
             }
         }
     }
+
+    modifiedDocText = `${preText}${insertedText}${postText}`
 
     return {
         modifiedDocText,
