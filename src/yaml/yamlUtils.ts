@@ -55,7 +55,11 @@ function processLineWithoutColon(document: TextDocument, cursorPosition: Positio
     let postText: string;
     let insertedText: string;
 
-    if (trimmedLine.length === 0) {
+    if (currentLine.length === 1 && currentLine.charAt(0) === '\n') {
+        preText = docText.substring(0, currentLineEnd);
+        insertedText = "\n'':\r\n";
+        postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength);
+    } else if (trimmedLine.length === 0) {
         preText = docText.substring(0, currentLineEnd)
         insertedText = '"":\r\n'
         postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)

@@ -48,7 +48,7 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
     }
     const schemaService = new YAMLSchemaService(requestServiceMock, params.workspaceContext)
     // initialize schema
-    schemaService.registerExternalSchema('asl-yaml', ['*.asl.yaml', '*.asl.yml'], schema)
+    schemaService.registerExternalSchema('asl-yaml', ['*'], schema)
     schemaService.getOrAddSchemaHandle('asl-yaml', schema)
 
     const completer = new YAMLCompletion(schemaService)

@@ -145,6 +145,19 @@ States:
     End: true
 `
 
+const snippetsCompletionCase2 = `
+StartAt: Hello
+States:
+  Hello:
+    Type: Pass
+    Result: Hello
+    Next: World
+  World:
+    Type: Pass
+    Result: World
+    End: true
+`
+
 const snippetsCompletionCase3 = `
 StartAt: Hello
 States:
@@ -568,6 +581,17 @@ suite('ASL YAML context-aware completion', () => {
 
           assert.deepEqual(suggestedSnippets, expectedSnippets)
         })
+
+        test('Does not show state snippets when cursor placed on first line after States prop with same indentation indendation', async () => {
+          const suggestedSnippets = await getSuggestedSnippets({
+            json: snippetsCompletionCase2,
+            position: [3, 0],
+            start: [3, 0],
+            end: [3, 0]
+          })
+
+        assert.deepEqual(suggestedSnippets, [])
+      })
 
         test('Shows state snippets when cursor placed on line after state declaration with the indentation same as the previous state name ', async () => {
           const expectedSnippets = stateSnippets.map(item => item.label)
