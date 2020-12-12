@@ -281,7 +281,7 @@ const passSnippetYaml = '${1:PassState}:\n  Type: Pass\n  Result:\n    data1: 0.
 
 interface TestCompletionOptions {
     labels: string[]
-    json: string
+    yaml: string
     position: [number, number]
     start: [number, number]
     end: [number, number]
@@ -290,12 +290,12 @@ interface TestCompletionOptions {
 
 interface TestPropertyCompletionOptions {
     labels: string[]
-    json: string
+    yaml: string
     position: [number, number]
 }
 
-async function getCompletions(json: string, position: [number, number]) {
-    const { textDoc, jsonDoc } = toDocument(json, true)
+async function getCompletions(yaml: string, position: [number, number]) {
+    const { textDoc, jsonDoc } = toDocument(yaml, true)
     const pos = Position.create(...position)
     const ls = getYamlLanguageService({})
 
@@ -303,9 +303,9 @@ async function getCompletions(json: string, position: [number, number]) {
 }
 
 async function testCompletions(options: TestCompletionOptions) {
-    const { labels, json, position, start, end, labelToInsertText } = options
+    const { labels, yaml, position, start, end, labelToInsertText } = options
 
-    const res = await getCompletions(json, position)
+    const res = await getCompletions(yaml, position)
 
     assert.strictEqual(res?.items.length, labels.length)
 
@@ -331,9 +331,9 @@ async function testCompletions(options: TestCompletionOptions) {
 
 // Validate completions that include a full property (key-val pair)
 async function testPropertyCompletions(options: TestPropertyCompletionOptions) {
-    const { labels, json, position  } = options
+    const { labels, yaml, position  } = options
 
-    const res = await getCompletions(json, position)
+    const res = await getCompletions(yaml, position)
 
     assert.strictEqual(res?.items.length, labels.length)
 
@@ -360,22 +360,22 @@ async function testPropertyCompletions(options: TestPropertyCompletionOptions) {
 
     // Test range is from position to end of line.
     const leftPos = Position.create(position[0], 0)
-    const rightPos = Position.create(position[0], json.length)
+    const rightPos = Position.create(position[0], yaml.length)
     res?.items.forEach(item => {
         assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
     })
 }
 
 interface TestScenario {
-    json: string,
+    yaml: string,
     position: [number, number],
     start: [number, number],
     end: [number, number],
 }
 
 export async function getSuggestedSnippets(options: TestScenario) {
-    const { json, position } = options
-    const { textDoc, jsonDoc } = toDocument(json)
+    const { yaml, position } = options
+    const { textDoc, jsonDoc } = toDocument(yaml)
     const pos = Position.create(...position)
     const ls = getYamlLanguageService({})
     const res = await ls.doComplete(textDoc, pos, jsonDoc)
@@ -389,7 +389,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Empty document', async () => {
             await testPropertyCompletions({
                 labels: topLevelLabels,
-                json: emptyDocument,
+                yaml: emptyDocument,
                 position: [0, 0],
             })
         })
@@ -397,7 +397,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Partially defined property, cursor in front of first letter', async () => {
             await testPropertyCompletions({
                 labels: topLevelLabels,
-                json: documentWithPartialTopLevel,
+                yaml: documentWithPartialTopLevel,
                 position: [1, 0],
             })
         })
@@ -405,7 +405,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Partially defined property, cursor in middle', async () => {
             await testPropertyCompletions({
                 labels: topLevelLabels,
-                json: documentWithPartialTopLevel,
+                yaml: documentWithPartialTopLevel,
                 position: [1, 1]
             })
         })
@@ -413,16 +413,16 @@ suite('ASL YAML context-aware completion', () => {
         test('Partially defined property, cursor after final letter', async () => {
             await testPropertyCompletions({
                 labels: topLevelLabels,
-                json: documentWithPartialTopLevel,
+                yaml: documentWithPartialTopLevel,
                 position: [1, 2]
             })
         })
 
         test('States snippets', async () => {
             const labels = stateSnippetLabels
-            const json = documentWithStates
+            const yaml = documentWithStates
 
-            const res = await getCompletions(json, [5,2])
+            const res = await getCompletions(yaml, [5,2])
 
             assert.strictEqual(res?.items.length, labels.length)
 
@@ -445,7 +445,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Both quotation marks present and cursor between them', async () => {
             await testCompletions({
                 labels: stateNameLabels,
-                json: document3,
+                yaml: document3,
                 position: [1, 12],
                 start: [1, 10],
                 end: [1, 13],
@@ -456,7 +456,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Suggests completions when text present and cursor is on it', async () => {
             await testCompletions({
                 labels: stateNameLabels,
-                json: document4,
+                yaml: document4,
                 position: [1, 13],
                 start: [1, 10],
                 end: [1, 16],
@@ -467,7 +467,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Suggests nested completions when StartAt is nested within Map state', async () => {
             await testCompletions({
                 labels: nestedItemLabels,
-                json: documentNested,
+                yaml: documentNested,
                 position: [6, 18],
                 start: [6, 16],
                 end: [6, 19],
@@ -481,7 +481,7 @@ suite('ASL YAML context-aware completion', () => {
             await testCompletions({
                 // remove last label as it is the name of the current state
                 labels: stateNameLabels.filter(label => label !== 'NextState'),
-                json: document2,
+                yaml: document2,
                 position: [9, 12],
                 start: [9, 11],
                 end: [9, 14],
@@ -493,7 +493,7 @@ suite('ASL YAML context-aware completion', () => {
             await testCompletions({
                 // remove last label as it is the name of the current state
                 labels: stateNameLabels.filter(label => label !== 'NextState'),
-                json: document3,
+                yaml: document3,
                 position: [9, 13],
                 start: [9, 11],
                 end: [9, 14],
@@ -505,7 +505,7 @@ suite('ASL YAML context-aware completion', () => {
             await testCompletions({
                 // remove last label as it is the name of the current state
                 labels: stateNameLabels.filter(label => label !== 'NextState'),
-                json: document4,
+                yaml: document4,
                 position: [9, 18],
                 start: [9, 11],
                 end: [9, 17],
@@ -517,7 +517,7 @@ suite('ASL YAML context-aware completion', () => {
             await testCompletions({
                 // remove last label as it is the name of the current state
                 labels: nestedItemLabels.filter(label => label !== 'Nested4'),
-                json: documentNested,
+                yaml: documentNested,
                 position: [12, 21],
                 start: [12, 17],
                 end: [12, 20],
@@ -528,7 +528,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Suggests completions for the Next property within Choice state', async () => {
             await testCompletions({
                 labels: stateNameLabels.filter(label => label !== 'ChoiceStateX'),
-                json: document1,
+                yaml: document1,
                 position: [13, 17],
                 start: [13, 15],
                 end: [13, 18],
@@ -541,7 +541,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Suggests completion items for Default property of the Choice state when cursor positioned after first quote', async () => {
             await testCompletions({
                 labels: stateNameLabels.filter(label => label !== 'ChoiceStateX'),
-                json: document1,
+                yaml: document1,
                 position: [16, 16],
                 start: [16, 14],
                 end: [16, 17],
@@ -552,7 +552,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Suggests completion items for Default property of the Choice state when cursor is a space after colon', async () => {
             await testCompletions({
                 labels: stateNameLabels.filter(label => label !== 'ChoiceStateX'),
-                json: document2,
+                yaml: document2,
                 position: [16, 15],
                 start: [16, 14],
                 end: [16, 17],
@@ -573,7 +573,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Shows state snippets when cursor placed on first line after States prop with greater indendation', async () => {
           const expectedSnippets = stateSnippets.map(item => item.label)
           const suggestedSnippets = await getSuggestedSnippets({
-            json: snippetsCompletionCase1,
+            yaml: snippetsCompletionCase1,
             position: [3, 2],
             start: [3, 2],
             end: [3, 2]
@@ -584,7 +584,7 @@ suite('ASL YAML context-aware completion', () => {
 
         test('Does not show state snippets when cursor placed on first line after States prop with same indentation indendation', async () => {
           const suggestedSnippets = await getSuggestedSnippets({
-            json: snippetsCompletionCase2,
+            yaml: snippetsCompletionCase2,
             position: [3, 0],
             start: [3, 0],
             end: [3, 0]
@@ -596,7 +596,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Shows state snippets when cursor placed on line after state declaration with the indentation same as the previous state name ', async () => {
           const expectedSnippets = stateSnippets.map(item => item.label)
           const suggestedSnippets = await getSuggestedSnippets({
-            json: snippetsCompletionCase3,
+            yaml: snippetsCompletionCase3,
             position: [7, 2],
             start: [7, 2],
             end: [7, 2]
@@ -607,7 +607,7 @@ suite('ASL YAML context-aware completion', () => {
 
         test('Does not show state snippets when cursor placed on line after state declaration with the indentation same as the nested state property name ', async () => {
           const suggestedSnippets = await getSuggestedSnippets({
-            json: snippetsCompletionCase4,
+            yaml: snippetsCompletionCase4,
             position: [7, 4],
             start: [7, 4],
             end: [7, 4]
@@ -619,7 +619,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Shows state snippets when cursor placed 2 lines below last declared state machine with same indentation level as its name', async () => {
           const expectedSnippets = stateSnippets.map(item => item.label)
           const suggestedSnippets = await getSuggestedSnippets({
-            json: snippetsCompletionCase5,
+            yaml: snippetsCompletionCase5,
             position: [14, 2],
             start: [14, 2],
             end: [14, 2]
@@ -631,7 +631,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Shows state snippets when cursor placed within States object of Map state', async () => {
           const expectedSnippets = stateSnippets.map(item => item.label)
           const suggestedSnippets = await getSuggestedSnippets({
-            json: snippetsCompletionWithinMap,
+            yaml: snippetsCompletionWithinMap,
             position: [13, 8],
             start: [13, 8],
             end: [13, 8]
@@ -643,7 +643,7 @@ suite('ASL YAML context-aware completion', () => {
         test('Shows state snippets when cursor placed within States object of Parallel state', async () => {
           const expectedSnippets = stateSnippets.map(item => item.label)
           const suggestedSnippets = await getSuggestedSnippets({
-            json: snippetsCompletionWithinParallel,
+            yaml: snippetsCompletionWithinParallel,
             position: [13, 8],
             start: [13, 8],
             end: [13, 8]
