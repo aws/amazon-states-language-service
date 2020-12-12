@@ -435,8 +435,8 @@ suite('ASL YAML context-aware completion', () => {
             res?.items.forEach(item => {
                 assert.strictEqual(item.kind, CompletionItemKind.Snippet)
                 assert.strictEqual(item.insertTextFormat, InsertTextFormat.Snippet)
-                assert.equal(item.insertText !== undefined, true)
-                assert.equal(item.documentation !== undefined, true)
+                assert.ok(item.insertText)
+                assert.ok(item.documentation)
             })
         })
     })
