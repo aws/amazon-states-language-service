@@ -1098,3 +1098,20 @@ export const documentInvalidResultSelectorIntrinsicFunction = `
     Succeed state:
       Type: Succeed
 `
+
+export const documentDuplicateKey = `
+  StartAt: Hello
+  Comment: A Hello World example of the Amazon States Language using Pass states
+  StartAt: Hello
+  States:
+    Hello:
+      Type: Pass
+      Result: Hello
+      Next: World
+    World:
+      Type: Pass
+      End: true
+    World:
+      Type: Pass
+      End: true
+`
