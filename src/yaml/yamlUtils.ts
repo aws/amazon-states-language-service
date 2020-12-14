@@ -78,12 +78,14 @@ function processLineWithoutColon(document: TextDocument, cursorPosition: Positio
             preText = docText.substring(0, lineOffsets[cursorPosition.line] + hyphenIndex)
             insertedText = "- '':\n"
             postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
+
         // There are non-space character after the hyphen, but no colon. Just insert colon at end of line.
         } else {
             preText = docText.substring(0, currentLineEnd)
             insertedText = (!currentLine.endsWith(' ') ? ' ' : '') + ':\n'
             postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
         }
+
     // Non-empty line but missing colon, add colon to end of current line
     } else {
         preText = docText.substring(0, currentLineEnd)

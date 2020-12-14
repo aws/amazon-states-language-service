@@ -15,6 +15,7 @@ import {
 } from 'vscode-json-languageservice'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import {
+    CompletionItem,
     CompletionList,
     DocumentSymbol,
     Hover,
@@ -184,24 +185,25 @@ function isChildOfStates(document: TextDocument, offset: number) {
             ignoreColonOffset: true,
             shouldShowStateSnippets: isChildOfStates(document, offsetIntoOriginalDocument)
         }
-        const aslCompletions : CompletionList  = doCompleteAsl(processedDocument, tempPositionForCompletions, currentDoc, yamlCompletions, aslOptions)
+        const aslCompletions: CompletionList  = doCompleteAsl(processedDocument, tempPositionForCompletions, currentDoc, yamlCompletions, aslOptions)
 
-        aslCompletions.items.forEach(completion => {
-            if (completion.insertText && completion.kind === CompletionItemKind.Snippet && document.languageId === 'asl-yaml') {
-                // tslint:disable-next-line: no-unsafe-any
-                completion.insertText = safeDump(safeLoad(completion.insertText))
-                // Remove quotes
-                completion.insertText = completion.insertText?.replace(/[']/g, '')
+        const modifiedAslCompletionItems: CompletionItem[] = aslCompletions.items.map(completionItem => {
+            const completionItemCopy = {...completionItem} // Copy completion to new object to avoid overwriting any snippets
+
+            if (completionItemCopy.insertText && completionItemCopy.kind === CompletionItemKind.Snippet && document.languageId === 'asl-yaml') {
+                completionItemCopy.insertText = safeDump(safeLoad(completionItemCopy.insertText))
+                // Remove quotation marks
+                completionItemCopy.insertText = completionItemCopy.insertText?.replace(/[']/g, '')
             } else {
-                const currentTextEdit = completion.textEdit
+                const currentTextEdit = completionItemCopy.textEdit
 
                 if (currentTextEdit) {
                     if (shouldPrependSpace) {
                         if (currentTextEdit.newText && currentTextEdit.newText.charAt(0) !== ' ') {
                             currentTextEdit.newText = ' ' + currentTextEdit.newText
                         }
-                        if (completion.insertText && completion.insertText.charAt(0) !== ' ') {
-                            completion.insertText = ' ' + completion.insertText
+                        if (completionItemCopy.insertText && completionItemCopy.insertText.charAt(0) !== ' ') {
+                            completionItemCopy.insertText = ' ' + completionItemCopy.insertText
                         }
                     }
 
@@ -209,7 +211,7 @@ function isChildOfStates(document: TextDocument, offset: number) {
                     currentTextEdit.range.end = endPositionForInsertion
 
                     // Completions that include both a key and a value should replace everything right of the cursor.
-                    if (completion.kind === CompletionItemKind.Property) {
+                    if (completionItemCopy.kind === CompletionItemKind.Property) {
                         currentTextEdit.range.end = {
                             line: endPositionForInsertion.line,
                             character: document.getText().length
@@ -217,9 +219,16 @@ function isChildOfStates(document: TextDocument, offset: number) {
                     }
                 }
             }
+
+            return completionItemCopy
         })
 
-        return Promise.resolve(aslCompletions)
+        const modifiedAslCompletions: CompletionList = {
+            isIncomplete: aslCompletions.isIncomplete,
+            items: modifiedAslCompletionItems
+        }
+
+        return Promise.resolve(modifiedAslCompletions)
     }
 
     languageService.doHover = function(
