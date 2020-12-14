@@ -137,7 +137,9 @@ function isChildOfStates(document: TextDocument, offset: number) {
 
         const processedDocument = TextDocument.create(document.uri, document.languageId, document.version, modifiedDocText)
 
+        const offsetIntoOriginalDocument = document.offsetAt(position)
         const offsetIntoProcessedDocument = processedDocument.offsetAt(tempPositionForCompletions)
+
         const processedYamlDoc: YAMLDocument = parseYAML(modifiedDocText)
         const currentDoc = matchOffsetToDocument(offsetIntoProcessedDocument, processedYamlDoc)
 
@@ -150,7 +152,7 @@ function isChildOfStates(document: TextDocument, offset: number) {
 
         const aslOptions = {
             ignoreColonOffset: true,
-            shouldShowStateSnippets: isChildOfStates(processedDocument, offsetIntoProcessedDocument)
+            shouldShowStateSnippets: isChildOfStates(document, offsetIntoOriginalDocument)
         }
         const aslCompletions : CompletionList  = doCompleteAsl(processedDocument, tempPositionForCompletions, currentDoc, yamlCompletions, aslOptions)
 

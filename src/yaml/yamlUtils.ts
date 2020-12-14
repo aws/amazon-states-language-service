@@ -51,17 +51,14 @@ function processLineWithoutColon(document: TextDocument, cursorPosition: Positio
     const lineOffsets = getLineOffsets(docText)
     const trimmedLine = currentLine.trim()
 
-    let preText: string;
-    let postText: string;
-    let insertedText: string;
+    let preText: string
+    let postText: string
+    let insertedText: string
 
-    if (currentLine.length === 1 && currentLine.charAt(0) === '\n') {
-        preText = docText.substring(0, currentLineEnd);
-        insertedText = "\n'':\r\n";
-        postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength);
-    } else if (trimmedLine.length === 0) {
+    // Current line has no non-space characters, insert a placeholder node at the end of the line
+    if (trimmedLine.length === 0) {
         preText = docText.substring(0, currentLineEnd)
-        insertedText = '"":\r\n'
+        insertedText = '"":\n'
         postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
         tempPositionForCompletions.character += 1
@@ -74,20 +71,23 @@ function processLineWithoutColon(document: TextDocument, cursorPosition: Positio
         shouldPrependSpace = true
 
         const postHyphenTextTrimmed = currentLine.substring(hyphenIndex + 1).trim()
+
+        // No non-space characters after the hyphen, insert a placeholder node after the hyphen
         if (postHyphenTextTrimmed.length === 0) {
             tempPositionForCompletions.character = hyphenIndex + 3
             preText = docText.substring(0, lineOffsets[cursorPosition.line] + hyphenIndex)
             insertedText = "- '':\n"
             postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
+        // There are non-space character after the hyphen, but no colon. Just insert colon at end of line.
         } else {
             preText = docText.substring(0, currentLineEnd)
-            insertedText = (!currentLine.endsWith(' ') ? ' ' : '') + ':\r\n'
+            insertedText = (!currentLine.endsWith(' ') ? ' ' : '') + ':\n'
             postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
         }
     // Non-empty line but missing colon, add colon to end of current line
     } else {
         preText = docText.substring(0, currentLineEnd)
-        insertedText = ':\r\n'
+        insertedText = ':\n'
         postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
         // Starting pos is first non-space character
@@ -119,9 +119,9 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
     const charNum = cursorPosition.character
     const lineOffsets = getLineOffsets(docText)
 
-    let preText: string;
-    let postText: string;
-    let insertedText: string;
+    let preText: string
+    let postText: string
+    let insertedText: string
 
     // Current line has a colon, determine if cursor position is right or left of it
     const colonIndex = currentLine.indexOf(':')
@@ -151,6 +151,8 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
 
             startPositionForInsertion.character = colonIndex
             endPositionForInsertion.character = colonIndex
+
+            // Move cursor to be inside the quotes
             tempPositionForCompletions.character = colonIndex + 2
             shouldPrependSpace = currentLine.charAt(Math.max(colonIndex - 1, 0)) !== ' '
         } else {
@@ -188,10 +190,11 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
         const hasOnlyWhitespaceAfterColon = postColonTextTrimmed.length === 0
 
         preText = docText.substring(0, currentLineEnd - numTrailingSpacesToRemove)
-        insertedText = (hasOnlyWhitespaceAfterColon ? ' ""' : '') + '\r\n'
+        insertedText = (hasOnlyWhitespaceAfterColon ? ' ""' : '') + '\n'
         postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
         if (hasOnlyWhitespaceAfterColon) {
+            // Move cursor inside of quotes
             tempPositionForCompletions.character += 2
         } else {
             // Current line has non-whitespace characters following the colon.
@@ -251,7 +254,7 @@ function getCurrentLine(document: TextDocument, position: Position, lineOffsets:
     const lineStart = lineOffsets[lineNum]
     let lineEnd = lineOffsets[lineNum + 1] ? lineOffsets[lineNum + 1] : docText.length
 
-    while (lineEnd - 1 >= 0 && isCharEol(docText.charCodeAt(lineEnd - 1))) {
+    if (lineEnd - 1 >= 0 && isCharEol(docText.charCodeAt(lineEnd - 1))) {
         lineEnd--
     }
 
