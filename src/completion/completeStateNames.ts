@@ -24,6 +24,8 @@ import {
     isStringNode
 } from '../utils/astUtilityFunctions'
 
+const YAML_RESERVED_KEYWORDS = ['y', 'yes', 'n', 'no', 'true', 'false', 'on', 'off']
+
 function getStatesFromStartAtNode(node: PropertyASTNode, options?: ASLOptions): string[] {
     if (node.keyNode.value === 'StartAt') {
         if (node.parent && isObjectNode(node.parent)) {
@@ -77,6 +79,7 @@ function getListOfItems(node: PropertyASTNode, options?: ASLOptions): string[] {
 function getCompletionList(
     items: string[],
     replaceRange: Range,
+    languageId: string,
     options: CompleteStateNameOptions
 ) {
     const {
@@ -89,13 +92,20 @@ function getCompletionList(
     const list: CompletionList = {
         isIncomplete: false,
         items: items.map(name => {
+            const shouldWrapStateNameInQuotes = languageId === 'asl-yaml' && isStateNameReservedKeyword(name)
             const item = CompletionItem.create(name)
             item.commitCharacters = [',']
 
             item.kind = CompletionItemKind.Value
             item.textEdit = TextEdit.replace(
                 replaceRange,
-                `${shouldAddLeadingSpace ? ' ' : ''}${shouldAddLeftQuote ? '"' : ''}${name}${shouldAddRightQuote ? '"' : ''}${shoudlAddTrailingComma ? ',' : ''}`
+                (shouldAddLeadingSpace ? ' ' : '') +
+                    (shouldAddLeftQuote ? '"' : '') +
+                    (shouldWrapStateNameInQuotes ? "'" : '') +
+                    name +
+                    (shouldWrapStateNameInQuotes ? "'" : '') +
+                    (shouldAddRightQuote ? '"' : '') +
+                    (shoudlAddTrailingComma ? ',' : '')
             )
             item.filterText = name
 
@@ -104,6 +114,10 @@ function getCompletionList(
     }
 
     return list
+}
+
+function isStateNameReservedKeyword(stateName: string) {
+    return YAML_RESERVED_KEYWORDS.indexOf(stateName.toLowerCase()) !== -1
 }
 
 export default function completeStateNames(node: ASTNode | undefined, offset: number, document: TextDocument, options?: ASLOptions): CompletionList | undefined {
@@ -130,7 +144,7 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
                 shoudlAddTrailingComma: true
             }
 
-            return getCompletionList(states, range, completeStateNameOptions)
+            return getCompletionList(states, range, document.languageId, completeStateNameOptions)
         }
     }
 
@@ -155,7 +169,7 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
                         shoudlAddTrailingComma: false
                     }
 
-                    return getCompletionList(states, range, completeStateNameOptions)
+                    return getCompletionList(states, range, document.languageId, completeStateNameOptions)
                 } else {
                     const isCursorAtTheBeginning = offset === node.offset
                     const completeStateNameOptions = {
@@ -165,7 +179,7 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
                         shoudlAddTrailingComma: false
                     }
 
-                    return getCompletionList(states, range, completeStateNameOptions)
+                    return getCompletionList(states, range, document.languageId, completeStateNameOptions)
                 }
 
             }
