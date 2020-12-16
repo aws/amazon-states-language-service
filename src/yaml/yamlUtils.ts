@@ -2,7 +2,7 @@
  * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  * SPDX-License-Identifier: MIT
  */
-
+import { safeDump, safeLoad } from 'js-yaml'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { Position } from 'vscode-languageserver-types'
 import { ProcessYamlDocForCompletionOutput } from '../utils/astUtilityFunctions'
@@ -39,8 +39,8 @@ function processLineWithoutColon(document: TextDocument, cursorPosition: Positio
     let modifiedDocText: string
     let shouldPrependSpace: boolean = false
 
-    const tempPositionForCompletions: Position = {...cursorPosition}
-    const startPositionForInsertion: Position = {...cursorPosition}
+    const tempPositionForCompletions: Position = { ...cursorPosition }
+    const startPositionForInsertion: Position = { ...cursorPosition }
 
     // Since there's no colon to separate the key and value, replace all text after the cursor.
     const endPositionForInsertion: Position = {
@@ -116,9 +116,9 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
     let modifiedDocText: string = docText
     let shouldPrependSpace: boolean = false
 
-    const tempPositionForCompletions: Position = {...cursorPosition}
-    const startPositionForInsertion: Position = {...cursorPosition}
-    const endPositionForInsertion: Position = {...cursorPosition}
+    const tempPositionForCompletions: Position = { ...cursorPosition }
+    const startPositionForInsertion: Position = { ...cursorPosition }
+    const endPositionForInsertion: Position = { ...cursorPosition }
 
     const charNum = cursorPosition.character
     const lineOffsets = getLineOffsets(docText)
@@ -277,4 +277,34 @@ function isCharEol(c: number) {
 
 export function isStateNameReservedYamlKeyword(stateName: string): boolean {
     return YAML_RESERVED_KEYWORDS.indexOf(stateName.toLowerCase()) !== -1
+}
+
+export function convertJsonSnippetToYaml(snippetText: string) {
+    // Convert to YAML with indendation of 1 space
+    return safeDump(safeLoad(snippetText), { indent: 1 })
+        // Remove quotation marks
+        .replace(/[']/g, '')
+        .split('\n')
+        // For each line replace left padding spaces with tabs
+        .map(line => {
+            if (line.length) {
+                let numOfSpaces = 0
+
+                // Count number of spaces that the line begins with
+                for (const char of line) {
+                    if (char === ' ') {
+                        numOfSpaces++
+                    } else {
+                        break
+                    }
+                }
+
+                // Convert each space to tab character. Even though tab carracters are not valid yaml whitespace characters
+                // the vscode will convert them to the correct number of spaces according to user preferences.
+                return '\t'.repeat(numOfSpaces) + line.slice(numOfSpaces, line.length)
+            } else {
+                return line
+            }
+        })
+        .join('\n')
 }

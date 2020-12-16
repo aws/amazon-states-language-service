@@ -277,7 +277,7 @@ const stateNameLabels = [
 const nestedItemLabels = ['Nested1', 'Nested2', 'Nested3', 'Nested4']
 
 // tslint:disable-next-line: no-invalid-template-strings
-const passSnippetYaml = '${1:PassState}:\n  Type: Pass\n  Result:\n    data1: 0.5\n    data2: 1.5\n  ResultPath: $.result\n  Next: ${2:NextState}\n'
+const passSnippetYaml = '${1:PassState}:\n\tType: Pass\n\tResult:\n\t\tdata1: 0.5\n\t\tdata2: 1.5\n\tResultPath: $.result\n\tNext: ${2:NextState}\n'
 
 interface TestCompletionOptions {
     labels: string[]
