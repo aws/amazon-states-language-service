@@ -21,6 +21,7 @@ import {
 } from './utils/astUtilityFunctions'
 
 import completeAsl from './completion/completeAsl'
+import { LANGUAGE_IDS } from './constants/constants';
 import validateStates from './validation/validateStates'
 import { getLanguageService as getAslYamlLanguageService } from './yaml/aslYamlLanguageService'
 
@@ -43,7 +44,7 @@ export const getLanguageService = function( params: ASLLanguageServiceParams): L
         allowComments: false,
         schemas: [
             {
-                uri: 'asl',
+                uri: LANGUAGE_IDS.JSON,
                 fileMatch: ['*'],
                 schema: aslSchema as JSONSchema
             }
@@ -55,7 +56,7 @@ export const getLanguageService = function( params: ASLLanguageServiceParams): L
         // there is no option to configure this behavior so severity needs to be overwritten as error
         const diagnostics = (await doValidation(document, jsonDocument, documentSettings)).map(diagnostic => {
             // Non JSON Schema validation will have source: 'asl'
-            if (diagnostic.source !== 'asl') {
+            if (diagnostic.source !== LANGUAGE_IDS.JSON) {
                 return { ...diagnostic, severity: DiagnosticSeverity.Error }
             }
 

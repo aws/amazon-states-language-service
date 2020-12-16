@@ -4,5 +4,11 @@
  */
 
 export const LANGUAGE_IDS = {
-    YAML: 'asl-yaml'
+    YAML: 'asl-yaml',
+    JSON: 'asl'
+} as const
+
+export const FILE_EXTENSIONS = {
+    YAML: 'asl.yaml',
+    JSON: 'asl'
 } as const
