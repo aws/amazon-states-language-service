@@ -65,7 +65,7 @@ export interface TestValidationOptions {
 }
 
 async function getValidations(json: string) {
-    const { textDoc, jsonDoc } = toDocument(json)
+    const { textDoc, jsonDoc } = toDocument(json, true)
     const ls = getYamlLanguageService({})
 
     return await ls.doValidation(textDoc, jsonDoc)

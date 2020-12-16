@@ -4,6 +4,7 @@
  */
 
 import { ArrayASTNode, ASTNode, JSONDocument, LanguageServiceParams, ObjectASTNode, PropertyASTNode, StringASTNode } from 'vscode-json-languageservice'
+import { Position } from 'vscode-languageserver-types'
 
 export interface ASTTree extends JSONDocument {
     root?: ASTNode
@@ -12,6 +13,21 @@ export interface ASTTree extends JSONDocument {
 export interface ASLOptions {
     ignoreColonOffset?: boolean
     shouldShowStateSnippets?: boolean
+}
+
+export interface CompleteStateNameOptions {
+    shouldAddLeftQuote?: boolean,
+    shouldAddRightQuote?: boolean,
+    shouldAddLeadingSpace?: boolean,
+    shoudlAddTrailingComma?: boolean
+}
+
+export interface ProcessYamlDocForCompletionOutput {
+    modifiedDocText: string,
+    tempPositionForCompletions: Position,
+    startPositionForInsertion: Position,
+    endPositionForInsertion: Position,
+    shouldPrependSpace: boolean
 }
 
 export function isStringNode(node: ASTNode): node is StringASTNode {

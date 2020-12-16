@@ -13,15 +13,18 @@ import {
     TextDocument,
     TextEdit,
 } from 'vscode-json-languageservice';
+import { LANGUAGE_IDS } from '../constants/constants';
 
 import {
     ASLOptions,
+    CompleteStateNameOptions,
     findClosestAncestorStateNode,
     getListOfStateNamesFromStateNode,
     isObjectNode,
     isPropertyNode,
     isStringNode
 } from '../utils/astUtilityFunctions'
+import { isStateNameReservedYamlKeyword } from '../yaml/yamlUtils';
 
 function getStatesFromStartAtNode(node: PropertyASTNode, options?: ASLOptions): string[] {
     if (node.keyNode.value === 'StartAt') {
@@ -76,21 +79,33 @@ function getListOfItems(node: PropertyASTNode, options?: ASLOptions): string[] {
 function getCompletionList(
     items: string[],
     replaceRange: Range,
-    shouldAddLeftQuote?: boolean,
-    shouldAddLeftSpace?: boolean,
-    shoudlAddTrailingComma?: boolean
+    languageId: string,
+    options: CompleteStateNameOptions
 ) {
+    const {
+        shouldAddLeftQuote,
+        shouldAddRightQuote,
+        shouldAddLeadingSpace,
+        shoudlAddTrailingComma
+    } = options
+
     const list: CompletionList = {
         isIncomplete: false,
         items: items.map(name => {
+            const shouldWrapStateNameInQuotes = languageId === LANGUAGE_IDS.YAML && isStateNameReservedYamlKeyword(name)
             const item = CompletionItem.create(name)
             item.commitCharacters = [',']
 
             item.kind = CompletionItemKind.Value
-            item.textEdit = TextEdit.replace(
-                replaceRange,
-                `${shouldAddLeftSpace ? ' ' : ''}${shouldAddLeftQuote ? '"' : ''}${name}"${shoudlAddTrailingComma ? ',' : ''}`
-            )
+
+            const newText = (shouldAddLeadingSpace ? ' ' : '') +
+                (shouldAddLeftQuote ? '"' : '') +
+                (shouldWrapStateNameInQuotes ? "'" : '') +
+                name +
+                (shouldWrapStateNameInQuotes ? "'" : '') +
+                (shouldAddRightQuote ? '"' : '') +
+                (shoudlAddTrailingComma ? ',' : '')
+            item.textEdit = TextEdit.replace(replaceRange, newText)
             item.filterText = name
 
             return item
@@ -117,7 +132,14 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
 
             const range = Range.create(colonPosition, endPosition)
 
-            return getCompletionList(states, range, true, true, true)
+            const completeStateNameOptions = {
+                shouldAddLeftQuote: true,
+                shouldAddRightQuote: true,
+                shouldAddLeadingSpace: true,
+                shoudlAddTrailingComma: true
+            }
+
+            return getCompletionList(states, range, document.languageId, completeStateNameOptions)
         }
     }
 
@@ -134,9 +156,27 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
                 const endPosition = document.positionAt(node.offset + node.length)
 
                 const range = Range.create(startPosition, endPosition)
-                const isCursorAtTheBeginning = offset === node.offset
+                if (document.languageId === LANGUAGE_IDS.YAML) {
+                    const completeStateNameOptions = {
+                        shouldAddLeftQuote: false,
+                        shouldAddRightQuote: false,
+                        shouldAddLeadingSpace: false,
+                        shoudlAddTrailingComma: false
+                    }
 
-                return getCompletionList(states, range, isCursorAtTheBeginning)
+                    return getCompletionList(states, range, document.languageId, completeStateNameOptions)
+                } else {
+                    const isCursorAtTheBeginning = offset === node.offset
+                    const completeStateNameOptions = {
+                        shouldAddLeftQuote: isCursorAtTheBeginning,
+                        shouldAddRightQuote: true,
+                        shouldAddLeadingSpace: false,
+                        shoudlAddTrailingComma: false
+                    }
+
+                    return getCompletionList(states, range, document.languageId, completeStateNameOptions)
+                }
+
             }
         }
     }
