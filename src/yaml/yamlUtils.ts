@@ -7,6 +7,8 @@ import { TextDocument } from 'vscode-languageserver-textdocument'
 import { Position } from 'vscode-languageserver-types'
 import { ProcessYamlDocForCompletionOutput } from '../utils/astUtilityFunctions'
 
+const YAML_RESERVED_KEYWORDS = ['y', 'yes', 'n', 'no', 'true', 'false', 'on', 'off']
+
 /**
  * @typedef {Object} ProcessYamlDocForCompletionOutput
  * @property {string} modifiedDocText - The text document derived from the document parameter which will be used to generate code completions
@@ -271,4 +273,8 @@ function getCurrentLine(document: TextDocument, position: Position, lineOffsets:
 // Returns true iff the character code matches LF or CR
 function isCharEol(c: number) {
     return c === 0x0A || c === 0x0D
+}
+
+export function isStateNameReservedYamlKeyword(stateName: string): boolean {
+    return YAML_RESERVED_KEYWORDS.indexOf(stateName.toLowerCase()) !== -1
 }

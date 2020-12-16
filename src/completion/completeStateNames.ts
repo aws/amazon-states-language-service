@@ -23,8 +23,7 @@ import {
     isPropertyNode,
     isStringNode
 } from '../utils/astUtilityFunctions'
-
-const YAML_RESERVED_KEYWORDS = ['y', 'yes', 'n', 'no', 'true', 'false', 'on', 'off']
+import { isStateNameReservedYamlKeyword } from '../yaml/yamlUtils';
 
 function getStatesFromStartAtNode(node: PropertyASTNode, options?: ASLOptions): string[] {
     if (node.keyNode.value === 'StartAt') {
@@ -92,21 +91,20 @@ function getCompletionList(
     const list: CompletionList = {
         isIncomplete: false,
         items: items.map(name => {
-            const shouldWrapStateNameInQuotes = languageId === 'asl-yaml' && isStateNameReservedKeyword(name)
+            const shouldWrapStateNameInQuotes = languageId === 'asl-yaml' && isStateNameReservedYamlKeyword(name)
             const item = CompletionItem.create(name)
             item.commitCharacters = [',']
 
             item.kind = CompletionItemKind.Value
-            item.textEdit = TextEdit.replace(
-                replaceRange,
-                (shouldAddLeadingSpace ? ' ' : '') +
-                    (shouldAddLeftQuote ? '"' : '') +
-                    (shouldWrapStateNameInQuotes ? "'" : '') +
-                    name +
-                    (shouldWrapStateNameInQuotes ? "'" : '') +
-                    (shouldAddRightQuote ? '"' : '') +
-                    (shoudlAddTrailingComma ? ',' : '')
-            )
+
+            const newText = (shouldAddLeadingSpace ? ' ' : '') +
+                (shouldAddLeftQuote ? '"' : '') +
+                (shouldWrapStateNameInQuotes ? "'" : '') +
+                name +
+                (shouldWrapStateNameInQuotes ? "'" : '') +
+                (shouldAddRightQuote ? '"' : '') +
+                (shoudlAddTrailingComma ? ',' : '')
+            item.textEdit = TextEdit.replace(replaceRange, newText)
             item.filterText = name
 
             return item
@@ -114,10 +112,6 @@ function getCompletionList(
     }
 
     return list
-}
-
-function isStateNameReservedKeyword(stateName: string) {
-    return YAML_RESERVED_KEYWORDS.indexOf(stateName.toLowerCase()) !== -1
 }
 
 export default function completeStateNames(node: ASTNode | undefined, offset: number, document: TextDocument, options?: ASLOptions): CompletionList | undefined {
