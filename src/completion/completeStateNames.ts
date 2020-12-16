@@ -13,6 +13,7 @@ import {
     TextDocument,
     TextEdit,
 } from 'vscode-json-languageservice';
+import { LANGUAGE_IDS } from '../constants/constants';
 
 import {
     ASLOptions,
@@ -91,7 +92,7 @@ function getCompletionList(
     const list: CompletionList = {
         isIncomplete: false,
         items: items.map(name => {
-            const shouldWrapStateNameInQuotes = languageId === 'asl-yaml' && isStateNameReservedYamlKeyword(name)
+            const shouldWrapStateNameInQuotes = languageId === LANGUAGE_IDS.YAML && isStateNameReservedYamlKeyword(name)
             const item = CompletionItem.create(name)
             item.commitCharacters = [',']
 
@@ -155,7 +156,7 @@ export default function completeStateNames(node: ASTNode | undefined, offset: nu
                 const endPosition = document.positionAt(node.offset + node.length)
 
                 const range = Range.create(startPosition, endPosition)
-                if (document.languageId === 'asl-yaml') {
+                if (document.languageId === LANGUAGE_IDS.YAML) {
                     const completeStateNameOptions = {
                         shouldAddLeftQuote: false,
                         shouldAddRightQuote: false,

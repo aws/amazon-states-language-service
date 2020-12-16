@@ -33,6 +33,7 @@ import { YAMLSchemaService } from 'yaml-language-server/out/server/src/languages
 import { matchOffsetToDocument } from 'yaml-language-server/out/server/src/languageservice/utils/arrUtils'
 import { YAMLDocDiagnostic } from 'yaml-language-server/out/server/src/languageservice/utils/parseUtils'
 import doCompleteAsl from '../completion/completeAsl'
+import { LANGUAGE_IDS } from '../constants/constants'
 import { YAML_PARSER_MESSAGES } from '../constants/diagnosticStrings'
 import { processYamlDocForCompletion } from './yamlUtils'
 
@@ -82,8 +83,8 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
     }
     const schemaService = new YAMLSchemaService(requestServiceMock, params.workspaceContext)
     // initialize schema
-    schemaService.registerExternalSchema('asl-yaml', ['*'], schema)
-    schemaService.getOrAddSchemaHandle('asl-yaml', schema)
+    schemaService.registerExternalSchema(LANGUAGE_IDS.YAML, ['*'], schema)
+    schemaService.getOrAddSchemaHandle(LANGUAGE_IDS.YAML, schema)
 
     const completer = new YAMLCompletion(schemaService)
 
@@ -190,7 +191,7 @@ function isChildOfStates(document: TextDocument, offset: number) {
         const modifiedAslCompletionItems: CompletionItem[] = aslCompletions.items.map(completionItem => {
             const completionItemCopy = {...completionItem} // Copy completion to new object to avoid overwriting any snippets
 
-            if (completionItemCopy.insertText && completionItemCopy.kind === CompletionItemKind.Snippet && document.languageId === 'asl-yaml') {
+            if (completionItemCopy.insertText && completionItemCopy.kind === CompletionItemKind.Snippet && document.languageId === LANGUAGE_IDS.YAML) {
                 completionItemCopy.insertText = safeDump(safeLoad(completionItemCopy.insertText))
                 // Remove quotation marks
                 completionItemCopy.insertText = completionItemCopy.insertText?.replace(/[']/g, '')
