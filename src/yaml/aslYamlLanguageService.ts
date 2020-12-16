@@ -35,7 +35,7 @@ import { YAMLDocDiagnostic } from 'yaml-language-server/out/server/src/languages
 import doCompleteAsl from '../completion/completeAsl'
 import { LANGUAGE_IDS } from '../constants/constants'
 import { YAML_PARSER_MESSAGES } from '../constants/diagnosticStrings'
-import { processYamlDocForCompletion } from './yamlUtils'
+import { convertJsonSnippetToYaml, processYamlDocForCompletion } from './yamlUtils'
 
 function convertYAMLDiagnostic(yamlDiagnostic: YAMLDocDiagnostic, textDocument: TextDocument): Diagnostic {
     const startLoc = yamlDiagnostic.location.start
@@ -124,7 +124,7 @@ function isChildOfStates(document: TextDocument, offset: number) {
     })
 
     if (!hasCursorLineNonSpace && numberOfSpacesCursorLine > 0) {
-        for (let lineNum = prevText.length - 2; lineNum > 0; lineNum--) {
+        for (let lineNum = prevText.length - 2; lineNum >= 0; lineNum--) {
             let leftLineSpaces = 0
             const line = prevText[lineNum]
 
@@ -192,9 +192,7 @@ function isChildOfStates(document: TextDocument, offset: number) {
             const completionItemCopy = {...completionItem} // Copy completion to new object to avoid overwriting any snippets
 
             if (completionItemCopy.insertText && completionItemCopy.kind === CompletionItemKind.Snippet && document.languageId === LANGUAGE_IDS.YAML) {
-                completionItemCopy.insertText = safeDump(safeLoad(completionItemCopy.insertText))
-                // Remove quotation marks
-                completionItemCopy.insertText = completionItemCopy.insertText?.replace(/[']/g, '')
+                completionItemCopy.insertText = convertJsonSnippetToYaml(completionItemCopy.insertText)
             } else {
                 const currentTextEdit = completionItemCopy.textEdit
 
