@@ -37,6 +37,9 @@ import { LANGUAGE_IDS } from '../constants/constants'
 import { YAML_PARSER_MESSAGES } from '../constants/diagnosticStrings'
 import { convertJsonSnippetToYaml, processYamlDocForCompletion, getOffsetData } from './yamlUtils'
 
+const CATCH_INSERT = 'Catch:\n\t- '
+const RETRY_INSERT = 'Retry:\n\t- '
+
 function convertYAMLDiagnostic(yamlDiagnostic: YAMLDocDiagnostic, textDocument: TextDocument): Diagnostic {
     const startLoc = yamlDiagnostic.location.start
     let endLoc = yamlDiagnostic.location.end
@@ -134,6 +137,24 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
 
         const positionForDoComplete = {...tempPositionForCompletions} // Copy position to new object since doComplete modifies the position
         const yamlCompletions = await completer.doComplete(processedDocument, positionForDoComplete, false)
+        // yaml-language-server does not output corrrect completions for retry/catch
+        // we need to overwrite the text
+        yamlCompletions.items.forEach(item => {
+            if (item.label === 'Catch') {
+                item.insertText = CATCH_INSERT
+
+                if (item.textEdit) {
+                    item.textEdit.newText = CATCH_INSERT
+                }
+            } else if (item.label === 'Retry') {
+                item.insertText = RETRY_INSERT
+
+                if (item.textEdit) {
+                    item.textEdit.newText = RETRY_INSERT
+                }
+            }
+        })
+
         const { isDirectChildOfStates, isWithinCatchRetryState, hasCatchPropSibling, hasRetryPropSibling } = getOffsetData(document, offsetIntoOriginalDocument)
 
         const aslOptions = {
