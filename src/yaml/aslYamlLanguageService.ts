@@ -35,10 +35,7 @@ import { YAMLDocDiagnostic } from 'yaml-language-server/out/server/src/languages
 import doCompleteAsl from '../completion/completeAsl'
 import { LANGUAGE_IDS } from '../constants/constants'
 import { YAML_PARSER_MESSAGES } from '../constants/diagnosticStrings'
-import { convertJsonSnippetToYaml, processYamlDocForCompletion } from './yamlUtils'
-
-const RETRY_CATCH_STATES = ['Task', 'Map', 'Parallel']
-const RETRY_CATCH_STATES_REGEX_STRING = `(${RETRY_CATCH_STATES.join(')|(')})`
+import { convertJsonSnippetToYaml, processYamlDocForCompletion, getOffsetData } from './yamlUtils'
 
 function convertYAMLDiagnostic(yamlDiagnostic: YAMLDocDiagnostic, textDocument: TextDocument): Diagnostic {
     const startLoc = yamlDiagnostic.location.start
@@ -110,145 +107,6 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
         return validationResult
     }
 
-function getNumberOfLeftSpaces(text: string) {
-    let numOfLeftSpaces = 0
-
-    for (const char of text) {
-        if (char === ' ') {
-            numOfLeftSpaces++
-        } else {
-            break
-        }
-    }
-
-    return numOfLeftSpaces
-}
-
-// Returns true if the given offest is in a position of immediate child of the "States" property. False otherwise.
-function isChildOfStates(document: TextDocument, offset: number) {
-    let isDirectChildOfStates = false
-    let isGrandChildOfStates = false
-    let isWithinCatchRetryState = false;
-    let hasCatchPropSibling = false;
-    let hasRetryPropSibling = false;
-    const prevText = document.getText().substring(0, offset).split('\n')
-    const cursorLine = prevText[prevText.length - 1]
-    let hasCursorLineNonSpace = false
-    let numberOfSpacesCursorLine = 0
-
-    Array.from(cursorLine).forEach(char => {
-        if (char === ' ') {
-            numberOfSpacesCursorLine++
-        } else if (char !== "'" && char !== '"') {
-            hasCursorLineNonSpace = true;
-        }
-    })
-    const initialNumberOfSpaces = numberOfSpacesCursorLine
-    const catchRetryStateRegex = new RegExp(`['"]{0,1}Type['"]{0,1}\\s*:\\s*['"]{0,1}(${RETRY_CATCH_STATES_REGEX_STRING})['"]{0,1}`)
-
-
-    if (!hasCursorLineNonSpace && numberOfSpacesCursorLine > 0) {
-        const text = document.getText()
-        let beginLineOffset = offset;
-        let levelsDown = 0;
-
-        // Iterate the text backwards from the offset
-        for (let i = offset; i >= 0; i--) {
-            if (text[i] === '\n') {
-                const lineText = text.slice(i + 1, beginLineOffset)
-                const numberOfPrecedingSpaces = getNumberOfLeftSpaces(lineText)
-                const trimmedLine = lineText.trim()
-                beginLineOffset = i
-
-                // Ignore empty lines
-                if (trimmedLine.length === 0) {
-                    continue
-                }
-
-                // If number of spaces lower than that of the cursor
-                // it is a parent property or a sibling of parent property
-                if (numberOfPrecedingSpaces < initialNumberOfSpaces) {
-                    if (trimmedLine.startsWith('States:')) {
-                        isDirectChildOfStates = levelsDown === 0;
-                        isGrandChildOfStates = levelsDown === 1;
-                        break
-                    } else if (levelsDown === 0) {
-                        levelsDown++
-                        continue
-                    } else {
-                        break
-                    }
-
-                // If number of spaces is higher than that of the cursor it means it is a child
-                // of the property or of its siblings
-                } else if (numberOfPrecedingSpaces > initialNumberOfSpaces) {
-                    continue
-                } else if (levelsDown > 0) {
-                    continue
-                }
-
-                hasCatchPropSibling = trimmedLine.startsWith('Catch:') || hasCatchPropSibling
-                hasRetryPropSibling = trimmedLine.startsWith('Retry:') || hasRetryPropSibling
-
-                const isCatchRetryState = catchRetryStateRegex.test(trimmedLine)
-
-                if (isCatchRetryState) {
-                    isWithinCatchRetryState = true
-                    break
-                } else {
-                    continue
-                }
-            }
-        }
-
-        // Reset begin line offset to offset
-        beginLineOffset = offset;
-
-        // Iterate the text forwards from the offset
-        for (let i = offset; i <= text.length; i++) {
-            if (text[i] === '\n') {
-                const lineText = text.slice(beginLineOffset + 1, i)
-                const trimmedLine = lineText.trim()
-                const numberOfPrecedingSpaces = getNumberOfLeftSpaces(lineText)
-                beginLineOffset = i
-
-                // Ignore empty lines
-                if (trimmedLine.length === 0) {
-                    continue
-                }
-
-                // If number of spaces lower than that of the cursor
-                // it is a parent property or a sibling of parent property
-                if (numberOfPrecedingSpaces < initialNumberOfSpaces) {
-                    break
-                // If number of spaces is higher than that of the cursor it means it is a child
-                // of the property or of its siblings
-                } else if (numberOfPrecedingSpaces > initialNumberOfSpaces) {
-                    continue
-                }
-
-                hasCatchPropSibling = trimmedLine.startsWith('Catch:') || hasCatchPropSibling
-                hasRetryPropSibling = trimmedLine.startsWith('Retry:') || hasRetryPropSibling
-
-                const isCatchRetryState = catchRetryStateRegex.test(trimmedLine)
-
-                if (isCatchRetryState) {
-                    isWithinCatchRetryState = true
-                    break
-                } else {
-                    continue
-                }
-            }
-        }
-    }
-
-    return {
-        isDirectChildOfStates,
-        isWithinCatchRetryState,
-        hasCatchPropSibling,
-        hasRetryPropSibling
-    }
-}
 
     languageService.doComplete = async function(
         document: TextDocument,
@@ -276,7 +134,7 @@ function isChildOfStates(document: TextDocument, offset: number) {
 
         const positionForDoComplete = {...tempPositionForCompletions} // Copy position to new object since doComplete modifies the position
         const yamlCompletions = await completer.doComplete(processedDocument, positionForDoComplete, false)
-        const { isDirectChildOfStates, isWithinCatchRetryState, hasCatchPropSibling, hasRetryPropSibling } = isChildOfStates(document, offsetIntoOriginalDocument)
+        const { isDirectChildOfStates, isWithinCatchRetryState, hasCatchPropSibling, hasRetryPropSibling } = getOffsetData(document, offsetIntoOriginalDocument)
 
         const aslOptions = {
             ignoreColonOffset: true,

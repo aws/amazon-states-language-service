@@ -67,8 +67,6 @@ export default function completeSnippets(node: ASTNode | undefined, offset: numb
         }
 
         if (shouldShowErrorSnippets === undefined ? (insideStateNode(node) && doesStateSupportErrorHandling(node)) : shouldShowErrorSnippets) {
-            let snippets = errorHandlingSnippets;
-
             const toShow: string[] = []
 
             if (options?.shouldShowCatchSnippet) {
