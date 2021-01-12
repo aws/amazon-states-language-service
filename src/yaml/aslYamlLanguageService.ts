@@ -4,7 +4,6 @@
  */
 
 import { safeDump, safeLoad } from 'js-yaml'
-import * as prettier from 'prettier'
 import {
     CompletionItemKind,
     Diagnostic,
@@ -18,6 +17,7 @@ import {
     CompletionItem,
     CompletionList,
     DocumentSymbol,
+    FormattingOptions,
     Hover,
     Position,
     Range,
@@ -249,12 +249,13 @@ function isChildOfStates(document: TextDocument, offset: number) {
     }
 
     languageService.format = function(
-        document: TextDocument
+        document: TextDocument,
+        range: Range,
+        options: FormattingOptions
     ): TextEdit[] {
         try {
             const text = document.getText()
-
-            const formatted = prettier.format(text, { parser: 'yaml' })
+            const formatted = safeDump(safeLoad(text), { indent: options.tabSize })
 
             return [TextEdit.replace(Range.create(Position.create(0, 0), document.positionAt(text.length)), formatted)]
         } catch (error) {
