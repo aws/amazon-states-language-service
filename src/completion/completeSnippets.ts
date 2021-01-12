@@ -72,7 +72,7 @@ export default function completeSnippets(node: ASTNode | undefined, offset: numb
             if (options?.shouldShowCatchSnippet) {
                 toShow.push('Catch')
             }
-            
+
             if (options?.shouldShowRetrySnippet) {
                 toShow.push('Retry')
             }

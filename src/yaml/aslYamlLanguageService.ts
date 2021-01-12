@@ -35,7 +35,7 @@ import { YAMLDocDiagnostic } from 'yaml-language-server/out/server/src/languages
 import doCompleteAsl from '../completion/completeAsl'
 import { LANGUAGE_IDS } from '../constants/constants'
 import { YAML_PARSER_MESSAGES } from '../constants/diagnosticStrings'
-import { convertJsonSnippetToYaml, processYamlDocForCompletion, getOffsetData } from './yamlUtils'
+import { convertJsonSnippetToYaml, getOffsetData ,processYamlDocForCompletion } from './yamlUtils'
 
 const CATCH_INSERT = 'Catch:\n\t- '
 const RETRY_INSERT = 'Retry:\n\t- '
@@ -109,7 +109,6 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
 
         return validationResult
     }
-
 
     languageService.doComplete = async function(
         document: TextDocument,

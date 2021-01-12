@@ -309,7 +309,6 @@ export function convertJsonSnippetToYaml(snippetText: string) {
         .join('\n')
 }
 
-
 function getNumberOfLeftSpaces(text: string) {
     let numOfLeftSpaces = 0
 
@@ -328,6 +327,7 @@ const RETRY_CATCH_STATES = ['Task', 'Map', 'Parallel']
 const RETRY_CATCH_STATES_REGEX_STRING = `(${RETRY_CATCH_STATES.join(')|(')})`
 const CATCH_RETRY_STATE_REGEX = new RegExp(`['"]{0,1}Type['"]{0,1}\\s*:\\s*['"]{0,1}(${RETRY_CATCH_STATES_REGEX_STRING})['"]{0,1}`)
 
+// tslint:disable:cyclomatic-complexity
 // Returns true if the given offest is in a position of immediate child of the "States" property. False otherwise.
 export function getOffsetData(document: TextDocument, offset: number) {
     let isDirectChildOfStates = false
