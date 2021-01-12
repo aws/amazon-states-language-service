@@ -35,7 +35,10 @@ import { YAMLDocDiagnostic } from 'yaml-language-server/out/server/src/languages
 import doCompleteAsl from '../completion/completeAsl'
 import { LANGUAGE_IDS } from '../constants/constants'
 import { YAML_PARSER_MESSAGES } from '../constants/diagnosticStrings'
-import { convertJsonSnippetToYaml, processYamlDocForCompletion } from './yamlUtils'
+import { convertJsonSnippetToYaml, getOffsetData ,processYamlDocForCompletion } from './yamlUtils'
+
+const CATCH_INSERT = 'Catch:\n\t- '
+const RETRY_INSERT = 'Retry:\n\t- '
 
 function convertYAMLDiagnostic(yamlDiagnostic: YAMLDocDiagnostic, textDocument: TextDocument): Diagnostic {
     const startLoc = yamlDiagnostic.location.start
@@ -107,54 +110,6 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
         return validationResult
     }
 
-// Returns true if the given offest is in a position of immediate child of the "States" property. False otherwise.
-function isChildOfStates(document: TextDocument, offset: number) {
-    let isDirectChildOfStates = false
-    const prevText = document.getText().substring(0, offset).split('\n')
-    const cursorLine = prevText[prevText.length - 1]
-    let hasCursorLineNonSpace = false
-    let numberOfSpacesCursorLine = 0
-
-    Array.from(cursorLine).forEach(char => {
-        if (char === ' ') {
-            numberOfSpacesCursorLine ++
-        } else if (char !== "'" && char !== '"') {
-            hasCursorLineNonSpace = true;
-        }
-    })
-
-    if (!hasCursorLineNonSpace && numberOfSpacesCursorLine > 0) {
-        for (let lineNum = prevText.length - 2; lineNum >= 0; lineNum--) {
-            let leftLineSpaces = 0
-            const line = prevText[lineNum]
-
-            for (const char of line) {
-                if (char === ' ') {
-                    leftLineSpaces++
-                } else {
-                    break
-                }
-            }
-
-            // Check if the number of spaces of the line is lower than that of cursor line
-            if (leftLineSpaces < numberOfSpacesCursorLine) {
-                const trimmedLine = line.trim()
-                // Ignore empty lines or lines that only contain whitespace
-                if (trimmedLine.length === 0) {
-                    continue
-                // Check if the line starts with "States:"
-                } else if (trimmedLine.startsWith('States:')) {
-                    isDirectChildOfStates = true
-                } else {
-                    break
-                }
-            }
-        }
-    }
-
-    return isDirectChildOfStates
-}
-
     languageService.doComplete = async function(
         document: TextDocument,
         position: Position
@@ -181,11 +136,33 @@ function isChildOfStates(document: TextDocument, offset: number) {
 
         const positionForDoComplete = {...tempPositionForCompletions} // Copy position to new object since doComplete modifies the position
         const yamlCompletions = await completer.doComplete(processedDocument, positionForDoComplete, false)
+        // yaml-language-server does not output corrrect completions for retry/catch
+        // we need to overwrite the text
+        yamlCompletions.items.forEach(item => {
+            if (item.label === 'Catch') {
+                item.insertText = CATCH_INSERT
+
+                if (item.textEdit) {
+                    item.textEdit.newText = CATCH_INSERT
+                }
+            } else if (item.label === 'Retry') {
+                item.insertText = RETRY_INSERT
+
+                if (item.textEdit) {
+                    item.textEdit.newText = RETRY_INSERT
+                }
+            }
+        })
+
+        const { isDirectChildOfStates, isWithinCatchRetryState, hasCatchPropSibling, hasRetryPropSibling } = getOffsetData(document, offsetIntoOriginalDocument)
 
         const aslOptions = {
             ignoreColonOffset: true,
-            shouldShowStateSnippets: isChildOfStates(document, offsetIntoOriginalDocument)
+            shouldShowStateSnippets: isDirectChildOfStates,
+            shouldShowRetrySnippet: isWithinCatchRetryState && !hasRetryPropSibling,
+            shouldShowCatchSnippet: isWithinCatchRetryState && !hasCatchPropSibling
         }
+
         const aslCompletions: CompletionList  = doCompleteAsl(processedDocument, tempPositionForCompletions, currentDoc, yamlCompletions, aslOptions)
 
         const modifiedAslCompletionItems: CompletionItem[] = aslCompletions.items.map(completionItem => {

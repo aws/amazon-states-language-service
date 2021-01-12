@@ -243,26 +243,78 @@ States:
     End: true
 `
 
+const catchRetrySnippetsCompletionWithinMap = `
+StartAt: Map
+States:
+  Map:
+    Type: Map
+    Next: Final State
+\u0020\u0020\u0020\u0020
+    Iterator:
+      StartAt: Pass
+      States:
+        Pass:
+          Type: Pass
+          Result: Done!
+          End: true
+  Final State:
+    Type: Pass
+    End: true
+`
+
+const catchRetrySnippetsCompletionWithinParallel = `
+StartAt: Parallel
+States:
+  Parallel:
+\u0020\u0020\u0020\u0020
+    Type: Parallel
+    Next: Final State
+    Branches:
+    - StartAt: Wait 20s
+      States:
+        Wait 20s:
+          Type: Wait
+          Seconds: 20
+          End: true
+  Final State:
+    Type: Pass
+    End: true
+\u0020\u0020\u0020\u0020
+\u0020\u0020
+`
+
+const catchRetrySnippetsCompletionWithinTask = `
+StartAt: FirstState
+States:
+  FirstState:
+    Type: Task
+
+\u0020\u0020\u0020\u0020
+
+    Resource: 'arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME'
+    End: true
+`
+
 const topLevelLabels = [
-  'Version',
-  'Comment',
-  'TimeoutSeconds',
-  'StartAt',
-  'States',
+    'Version',
+    'Comment',
+    'TimeoutSeconds',
+    'StartAt',
+    'States',
 ]
 const stateSnippetLabels = [
-  'Pass State',
-  'Lambda Task State',
-  'SNS Task State',
-  'Batch Task State',
-  'ECS Task State',
-  'SQS Task State',
-  'Choice State',
-  'Wait State',
-  'Succeed State',
-  'Fail State',
-  'Parallel State',
-  'Map State'
+    'Pass State',
+    'Lambda Task State',
+    'SNS Task State',
+    'Batch Task State',
+    'ECS Task State',
+    'SQS Task State',
+    'Choice State',
+    'Wait State',
+    'Succeed State',
+    'Fail State',
+    'Parallel State',
+    'Map State'
 ]
 
 const stateNameLabels = [
@@ -331,7 +383,7 @@ async function testCompletions(options: TestCompletionOptions) {
 
 // Validate completions that include a full property (key-val pair)
 async function testPropertyCompletions(options: TestPropertyCompletionOptions) {
-    const { labels, yaml, position  } = options
+    const { labels, yaml, position } = options
 
     const res = await getCompletions(yaml, position)
 
@@ -422,7 +474,7 @@ suite('ASL YAML context-aware completion', () => {
             const labels = stateSnippetLabels
             const yaml = documentWithStates
 
-            const res = await getCompletions(yaml, [5,2])
+            const res = await getCompletions(yaml, [5, 2])
 
             assert.strictEqual(res?.items.length, labels.length)
 
@@ -570,95 +622,157 @@ suite('ASL YAML context-aware completion', () => {
     })
 
     suite('Snippets', () => {
-        test('Shows state snippets when cursor placed on first line after States prop with greater indendation', async () => {
-          const expectedSnippets = stateSnippets.map(item => item.label)
-          const suggestedSnippets = await getSuggestedSnippets({
-            yaml: snippetsCompletionCase1,
-            position: [3, 2],
-            start: [3, 2],
-            end: [3, 2]
-          })
+        suite('State snippets', () => {
+            test('Shows state snippets when cursor placed on first line after States prop with greater indendation', async () => {
+                const expectedSnippets = stateSnippets.map(item => item.label)
+                const suggestedSnippets = await getSuggestedSnippets({
+                    yaml: snippetsCompletionCase1,
+                    position: [3, 2],
+                    start: [3, 2],
+                    end: [3, 2]
+                })
 
-          assert.deepEqual(suggestedSnippets, expectedSnippets)
+                assert.deepEqual(suggestedSnippets, expectedSnippets)
+            })
+
+            test('Does not show state snippets when cursor placed on first line after States prop with same indentation indendation', async () => {
+                const suggestedSnippets = await getSuggestedSnippets({
+                    yaml: snippetsCompletionCase2,
+                    position: [3, 0],
+                    start: [3, 0],
+                    end: [3, 0]
+                })
+
+                assert.deepEqual(suggestedSnippets, [])
+            })
+
+            test('Shows state snippets when cursor placed on line after state declaration with the indentation same as the previous state name ', async () => {
+                const expectedSnippets = stateSnippets.map(item => item.label)
+                const suggestedSnippets = await getSuggestedSnippets({
+                    yaml: snippetsCompletionCase3,
+                    position: [7, 2],
+                    start: [7, 2],
+                    end: [7, 2]
+                })
+
+                assert.deepEqual(suggestedSnippets, expectedSnippets)
+            })
+
+            test('Does not show state snippets when cursor placed on line after state declaration with the indentation same as the nested state property name ', async () => {
+                const suggestedSnippets = await getSuggestedSnippets({
+                    yaml: snippetsCompletionCase4,
+                    position: [7, 4],
+                    start: [7, 4],
+                    end: [7, 4]
+                })
+
+                assert.deepEqual(suggestedSnippets, [])
+            })
+
+            test('Shows state snippets when cursor placed 2 lines below last declared state machine with same indentation level as its name', async () => {
+                const expectedSnippets = stateSnippets.map(item => item.label)
+                const suggestedSnippets = await getSuggestedSnippets({
+                    yaml: snippetsCompletionCase5,
+                    position: [14, 2],
+                    start: [14, 2],
+                    end: [14, 2]
+                })
+
+                assert.deepEqual(suggestedSnippets, expectedSnippets)
+            })
+
+            test('Shows state snippets when cursor placed within States object of Map state', async () => {
+                const expectedSnippets = stateSnippets.map(item => item.label)
+                const suggestedSnippets = await getSuggestedSnippets({
+                    yaml: snippetsCompletionWithinMap,
+                    position: [13, 8],
+                    start: [13, 8],
+                    end: [13, 8]
+                })
+
+                assert.deepEqual(suggestedSnippets, expectedSnippets)
+            })
+
+            test('Shows state snippets when cursor placed within States object of Parallel state', async () => {
+                const expectedSnippets = stateSnippets.map(item => item.label)
+                const suggestedSnippets = await getSuggestedSnippets({
+                    yaml: snippetsCompletionWithinParallel,
+                    position: [13, 8],
+                    start: [13, 8],
+                    end: [13, 8]
+                })
+
+                assert.deepEqual(suggestedSnippets, expectedSnippets)
+            })
+
+            test('Shows the snippets in correct YAML format', async () => {
+                const { textDoc, jsonDoc } = toDocument(snippetsCompletionCase1, true)
+                const pos = Position.create(3, 2)
+                const ls = getYamlLanguageService({})
+                const res = await ls.doComplete(textDoc, pos, jsonDoc)
+
+                assert.ok(res?.items.find(item => item.insertText === passSnippetYaml))
+            })
+
         })
 
-        test('Does not show state snippets when cursor placed on first line after States prop with same indentation indendation', async () => {
-          const suggestedSnippets = await getSuggestedSnippets({
-            yaml: snippetsCompletionCase2,
-            position: [3, 0],
-            start: [3, 0],
-            end: [3, 0]
-          })
+        suite('Catch/Retry snippets', () => {
+            test('Shows error snippets when cursor placed within map state', async () => {
+                const expectedSnippets = ['Retry', 'Catch']
+                const suggestedSnippets = await getSuggestedSnippets({
+                    yaml: catchRetrySnippetsCompletionWithinMap,
+                    position: [6, 4],
+                    start: [6, 4],
+                    end: [6, 4]
+                })
 
-        assert.deepEqual(suggestedSnippets, [])
-      })
+                assert.deepEqual(suggestedSnippets, expectedSnippets)
+            })
 
-        test('Shows state snippets when cursor placed on line after state declaration with the indentation same as the previous state name ', async () => {
-          const expectedSnippets = stateSnippets.map(item => item.label)
-          const suggestedSnippets = await getSuggestedSnippets({
-            yaml: snippetsCompletionCase3,
-            position: [7, 2],
-            start: [7, 2],
-            end: [7, 2]
-          })
+            test('Shows error snippets when cursor placed within parallel state', async () => {
+                const expectedSnippets = ['Retry', 'Catch']
+                const suggestedSnippets = await getSuggestedSnippets({
+                    yaml: catchRetrySnippetsCompletionWithinParallel,
+                    position: [4, 4],
+                    start: [4, 4],
+                    end: [4, 4]
+                })
 
-          assert.deepEqual(suggestedSnippets, expectedSnippets)
-        })
+                assert.deepEqual(suggestedSnippets, expectedSnippets)
+            })
 
-        test('Does not show state snippets when cursor placed on line after state declaration with the indentation same as the nested state property name ', async () => {
-          const suggestedSnippets = await getSuggestedSnippets({
-            yaml: snippetsCompletionCase4,
-            position: [7, 4],
-            start: [7, 4],
-            end: [7, 4]
-          })
+            test('Shows error snippets when cursor placed within task state', async () => {
+                const expectedSnippets = ['Retry', 'Catch']
+                const suggestedSnippets = await getSuggestedSnippets({
+                    yaml: catchRetrySnippetsCompletionWithinTask,
+                    position: [6, 4],
+                    start: [6, 4],
+                    end: [6, 4]
+                })
 
-          assert.deepEqual(suggestedSnippets, [])
-        })
+                assert.deepEqual(suggestedSnippets, expectedSnippets)
+            })
 
-        test('Shows state snippets when cursor placed 2 lines below last declared state machine with same indentation level as its name', async () => {
-          const expectedSnippets = stateSnippets.map(item => item.label)
-          const suggestedSnippets = await getSuggestedSnippets({
-            yaml: snippetsCompletionCase5,
-            position: [14, 2],
-            start: [14, 2],
-            end: [14, 2]
-          })
+            test('Does not show error snippets outside of allowed states', async () => {
+                const notExpectedSnippets = ['Retry', 'Catch']
+                const suggestedSnippetsOtherState = await getSuggestedSnippets({
+                    yaml: catchRetrySnippetsCompletionWithinParallel,
+                    position: [17, 4],
+                    start: [17, 4],
+                    end: [17, 4]
+                })
 
-          assert.deepEqual(suggestedSnippets, expectedSnippets)
-        })
+                assert.equal(suggestedSnippetsOtherState?.filter(snippet => notExpectedSnippets.includes(snippet)).length, 0)
 
-        test('Shows state snippets when cursor placed within States object of Map state', async () => {
-          const expectedSnippets = stateSnippets.map(item => item.label)
-          const suggestedSnippets = await getSuggestedSnippets({
-            yaml: snippetsCompletionWithinMap,
-            position: [13, 8],
-            start: [13, 8],
-            end: [13, 8]
-          })
+                const suggestedSnippetsStatePropLevel = await getSuggestedSnippets({
+                    yaml: catchRetrySnippetsCompletionWithinParallel,
+                    position: [18, 4],
+                    start: [18, 4],
+                    end: [18, 4]
+                })
 
-          assert.deepEqual(suggestedSnippets, expectedSnippets)
-        })
-
-        test('Shows state snippets when cursor placed within States object of Parallel state', async () => {
-          const expectedSnippets = stateSnippets.map(item => item.label)
-          const suggestedSnippets = await getSuggestedSnippets({
-            yaml: snippetsCompletionWithinParallel,
-            position: [13, 8],
-            start: [13, 8],
-            end: [13, 8]
-          })
-
-          assert.deepEqual(suggestedSnippets, expectedSnippets)
-        })
-
-        test('Shows the snippets in correct YAML format', async () => {
-          const { textDoc, jsonDoc } = toDocument(snippetsCompletionCase1, true)
-          const pos = Position.create(3, 2)
-          const ls = getYamlLanguageService({})
-          const res = await ls.doComplete(textDoc, pos, jsonDoc)
-
-          assert.ok(res?.items.find(item => item.insertText === passSnippetYaml))
+                assert.equal(suggestedSnippetsStatePropLevel?.filter(snippet => notExpectedSnippets.includes(snippet)).length, 0)
+            })
         })
     })
 })
