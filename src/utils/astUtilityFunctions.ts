@@ -13,8 +13,10 @@ export interface ASTTree extends JSONDocument {
 export interface ASLOptions {
     ignoreColonOffset?: boolean
     shouldShowStateSnippets?: boolean
-    shouldShowRetrySnippet?: boolean
-    shouldShowCatchSnippet?: boolean
+    shouldShowErrorSnippets?: {
+        shouldShowRetrySnippet: boolean
+        shouldShowCatchSnippet: boolean
+    }
 }
 
 export interface CompleteStateNameOptions {

@@ -54,34 +54,45 @@ function doesStateSupportErrorHandling(node: ASTNode): boolean {
 }
 interface CompleteSnippetsOptions {
     shouldShowStateSnippets?: boolean,
-    shouldShowRetrySnippet?: boolean,
-    shouldShowCatchSnippet?: boolean
+    shouldShowErrorSnippets?: {
+        shouldShowRetrySnippet: boolean,
+        shouldShowCatchSnippet: boolean
+    }
 }
 
 export default function completeSnippets(node: ASTNode | undefined, offset: number, options?: CompleteSnippetsOptions): CompletionItem[] {
     if (node) {
-        const shouldShowErrorSnippets = options?.shouldShowCatchSnippet || options?.shouldShowRetrySnippet
-        // If the value of shouldShowStateSnippets is false prevent the snippets from being displayed
-        if (options?.shouldShowStateSnippets === undefined ? isChildOfStates(node) : options.shouldShowStateSnippets) {
+        const errorSnippetOptionsNotDefined = options?.shouldShowErrorSnippets === undefined
+
+        if (options?.shouldShowStateSnippets) {
             return stateSnippets
         }
 
-        if (shouldShowErrorSnippets === undefined ? (insideStateNode(node) && doesStateSupportErrorHandling(node)) : shouldShowErrorSnippets) {
-            const toShow: string[] = []
+        // If the value of shouldShowStateSnippets is false prevent the snippets from being displayed
+        if (options?.shouldShowStateSnippets === undefined && isChildOfStates(node)) {
+            return stateSnippets
+        }
 
-            if (options?.shouldShowCatchSnippet) {
-                toShow.push('Catch')
-            }
-
-            if (options?.shouldShowRetrySnippet) {
-                toShow.push('Retry')
-            }
-
-            if (toShow.length) {
-                return errorHandlingSnippets.filter(snippet => toShow.includes(snippet.label))
-            } else {
+        if (errorSnippetOptionsNotDefined) {
+            if (insideStateNode(node) && doesStateSupportErrorHandling(node)) {
                 return errorHandlingSnippets
             }
+
+            return []
+        }
+
+        const errorSnippetsToShow: string[] = []
+
+        if (options?.shouldShowErrorSnippets?.shouldShowCatchSnippet) {
+            errorSnippetsToShow.push('Catch')
+        }
+
+        if (options?.shouldShowErrorSnippets?.shouldShowRetrySnippet) {
+            errorSnippetsToShow.push('Retry')
+        }
+
+        if (errorSnippetsToShow.length) {
+            return errorHandlingSnippets.filter(snippet => errorSnippetsToShow.includes(snippet.label))
         }
     }
 

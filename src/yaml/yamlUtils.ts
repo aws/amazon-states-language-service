@@ -8,6 +8,9 @@ import { Position } from 'vscode-languageserver-types'
 import { ProcessYamlDocForCompletionOutput } from '../utils/astUtilityFunctions'
 
 const YAML_RESERVED_KEYWORDS = ['y', 'yes', 'n', 'no', 'true', 'false', 'on', 'off']
+const RETRY_CATCH_STATES = ['Task', 'Map', 'Parallel']
+const RETRY_CATCH_STATES_REGEX_STRING = `(${RETRY_CATCH_STATES.join(')|(')})`
+const CATCH_RETRY_STATE_REGEX = new RegExp(`['"]{0,1}Type['"]{0,1}\\s*:\\s*['"]{0,1}(${RETRY_CATCH_STATES_REGEX_STRING})['"]{0,1}`)
 
 /**
  * @typedef {Object} ProcessYamlDocForCompletionOutput
@@ -323,12 +326,7 @@ function getNumberOfLeftSpaces(text: string) {
     return numOfLeftSpaces
 }
 
-const RETRY_CATCH_STATES = ['Task', 'Map', 'Parallel']
-const RETRY_CATCH_STATES_REGEX_STRING = `(${RETRY_CATCH_STATES.join(')|(')})`
-const CATCH_RETRY_STATE_REGEX = new RegExp(`['"]{0,1}Type['"]{0,1}\\s*:\\s*['"]{0,1}(${RETRY_CATCH_STATES_REGEX_STRING})['"]{0,1}`)
-
 // tslint:disable:cyclomatic-complexity
-// Returns true if the given offest is in a position of immediate child of the "States" property. False otherwise.
 export function getOffsetData(document: TextDocument, offset: number) {
     let isDirectChildOfStates = false
     let isGrandChildOfStates = false
@@ -396,9 +394,6 @@ export function getOffsetData(document: TextDocument, offset: number) {
 
                 if (isCatchRetryState) {
                     isWithinCatchRetryState = true
-                    break
-                } else {
-                    continue
                 }
             }
         }
@@ -436,9 +431,6 @@ export function getOffsetData(document: TextDocument, offset: number) {
 
                 if (isCatchRetryState) {
                     isWithinCatchRetryState = true
-                    break
-                } else {
-                    continue
                 }
             }
         }
@@ -446,7 +438,7 @@ export function getOffsetData(document: TextDocument, offset: number) {
 
     return {
         isDirectChildOfStates,
-        isWithinCatchRetryState,
+        isWithinCatchRetryState: isWithinCatchRetryState && isGrandChildOfStates,
         hasCatchPropSibling,
         hasRetryPropSibling
     }

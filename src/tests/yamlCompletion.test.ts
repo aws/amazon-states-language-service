@@ -646,7 +646,7 @@ suite('ASL YAML context-aware completion', () => {
                 assert.deepEqual(suggestedSnippets, [])
             })
 
-            test('Shows state snippets when cursor placed on line after state declaration with the indentation same as the previous state name ', async () => {
+            test('Shows state snippets when cursor placed on line after state declaration with the indentation same as the previous state name', async () => {
                 const expectedSnippets = stateSnippets.map(item => item.label)
                 const suggestedSnippets = await getSuggestedSnippets({
                     yaml: snippetsCompletionCase3,

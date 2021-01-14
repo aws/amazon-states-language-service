@@ -35,7 +35,8 @@ import { YAMLDocDiagnostic } from 'yaml-language-server/out/server/src/languages
 import doCompleteAsl from '../completion/completeAsl'
 import { LANGUAGE_IDS } from '../constants/constants'
 import { YAML_PARSER_MESSAGES } from '../constants/diagnosticStrings'
-import { convertJsonSnippetToYaml, getOffsetData ,processYamlDocForCompletion } from './yamlUtils'
+import { ASLOptions } from '../utils/astUtilityFunctions'
+import { convertJsonSnippetToYaml, getOffsetData, processYamlDocForCompletion } from './yamlUtils'
 
 const CATCH_INSERT = 'Catch:\n\t- '
 const RETRY_INSERT = 'Retry:\n\t- '
@@ -136,7 +137,7 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
 
         const positionForDoComplete = {...tempPositionForCompletions} // Copy position to new object since doComplete modifies the position
         const yamlCompletions = await completer.doComplete(processedDocument, positionForDoComplete, false)
-        // yaml-language-server does not output corrrect completions for retry/catch
+        // yaml-language-server does not output correct completions for retry/catch
         // we need to overwrite the text
         yamlCompletions.items.forEach(item => {
             if (item.label === 'Catch') {
@@ -156,11 +157,13 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
 
         const { isDirectChildOfStates, isWithinCatchRetryState, hasCatchPropSibling, hasRetryPropSibling } = getOffsetData(document, offsetIntoOriginalDocument)
 
-        const aslOptions = {
+        const aslOptions: ASLOptions = {
             ignoreColonOffset: true,
             shouldShowStateSnippets: isDirectChildOfStates,
-            shouldShowRetrySnippet: isWithinCatchRetryState && !hasRetryPropSibling,
-            shouldShowCatchSnippet: isWithinCatchRetryState && !hasCatchPropSibling
+            shouldShowErrorSnippets: {
+                shouldShowRetrySnippet: isWithinCatchRetryState && !hasRetryPropSibling,
+                shouldShowCatchSnippet: isWithinCatchRetryState && !hasCatchPropSibling
+            }
         }
 
         const aslCompletions: CompletionList  = doCompleteAsl(processedDocument, tempPositionForCompletions, currentDoc, yamlCompletions, aslOptions)
