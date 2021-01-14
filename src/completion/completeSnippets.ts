@@ -55,8 +55,8 @@ function doesStateSupportErrorHandling(node: ASTNode): boolean {
 interface CompleteSnippetsOptions {
     shouldShowStateSnippets?: boolean,
     shouldShowErrorSnippets?: {
-        shouldShowRetrySnippet: boolean,
-        shouldShowCatchSnippet: boolean
+        retry: boolean,
+        catch: boolean
     }
 }
 
@@ -83,11 +83,11 @@ export default function completeSnippets(node: ASTNode | undefined, offset: numb
 
         const errorSnippetsToShow: string[] = []
 
-        if (options?.shouldShowErrorSnippets?.shouldShowCatchSnippet) {
+        if (options?.shouldShowErrorSnippets?.catch) {
             errorSnippetsToShow.push('Catch')
         }
 
-        if (options?.shouldShowErrorSnippets?.shouldShowRetrySnippet) {
+        if (options?.shouldShowErrorSnippets?.retry) {
             errorSnippetsToShow.push('Retry')
         }
 

@@ -20,7 +20,7 @@ const documentWithStates = `
 StartAt:
 
 States:
-  |
+\u0020\u0020
 `
 
 const document1 = `

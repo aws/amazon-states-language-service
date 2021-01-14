@@ -139,19 +139,19 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
         const yamlCompletions = await completer.doComplete(processedDocument, positionForDoComplete, false)
         // yaml-language-server does not output correct completions for retry/catch
         // we need to overwrite the text
+        function updateCompletionText(item: CompletionItem, text: string) {
+            item.insertText = text
+
+            if (item.textEdit) {
+                item.textEdit.newText = text
+            }
+        }
+
         yamlCompletions.items.forEach(item => {
             if (item.label === 'Catch') {
-                item.insertText = CATCH_INSERT
-
-                if (item.textEdit) {
-                    item.textEdit.newText = CATCH_INSERT
-                }
+                updateCompletionText(item, CATCH_INSERT)
             } else if (item.label === 'Retry') {
-                item.insertText = RETRY_INSERT
-
-                if (item.textEdit) {
-                    item.textEdit.newText = RETRY_INSERT
-                }
+                updateCompletionText(item, RETRY_INSERT)
             }
         })
 
@@ -161,8 +161,8 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
             ignoreColonOffset: true,
             shouldShowStateSnippets: isDirectChildOfStates,
             shouldShowErrorSnippets: {
-                shouldShowRetrySnippet: isWithinCatchRetryState && !hasRetryPropSibling,
-                shouldShowCatchSnippet: isWithinCatchRetryState && !hasCatchPropSibling
+                retry: isWithinCatchRetryState && !hasRetryPropSibling,
+                catch: isWithinCatchRetryState && !hasCatchPropSibling
             }
         }
 

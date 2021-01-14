@@ -14,8 +14,8 @@ export interface ASLOptions {
     ignoreColonOffset?: boolean
     shouldShowStateSnippets?: boolean
     shouldShowErrorSnippets?: {
-        shouldShowRetrySnippet: boolean
-        shouldShowCatchSnippet: boolean
+        retry: boolean
+        catch: boolean
     }
 }
 
