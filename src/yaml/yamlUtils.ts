@@ -8,6 +8,12 @@ import { Position } from 'vscode-languageserver-types'
 import { ProcessYamlDocForCompletionOutput } from '../utils/astUtilityFunctions'
 
 const YAML_RESERVED_KEYWORDS = ['y', 'yes', 'n', 'no', 'true', 'false', 'on', 'off']
+const RETRY_CATCH_STATES = ['Task', 'Map', 'Parallel']
+const RETRY_CATCH_STATES_REGEX_STRING = `(${RETRY_CATCH_STATES.join(')|(')})`
+const CATCH_RETRY_STATE_REGEX = new RegExp(`['"]{0,1}Type['"]{0,1}\\s*:\\s*['"]{0,1}(${RETRY_CATCH_STATES_REGEX_STRING})['"]{0,1}`)
+const STATES_PROP_STRING = 'States:'
+const CATCH_PROP_STRING = 'Catch:'
+const RETRY_PROP_STRING = 'Retry:'
 
 /**
  * @typedef {Object} ProcessYamlDocForCompletionOutput
@@ -307,4 +313,153 @@ export function convertJsonSnippetToYaml(snippetText: string) {
             }
         })
         .join('\n')
+}
+
+function getNumberOfLeftSpaces(text: string) {
+    return text.length - text.trimLeft().length
+}
+
+function getBackwardOffsetData(text: string, offset: number, initialNumberOfSpaces: number) {
+    let isDirectChildOfStates = false
+    let isGrandChildOfStates = false
+    let isWithinCatchRetryState = false;
+    let hasCatchPropSibling = false;
+    let hasRetryPropSibling = false;
+    let beginLineOffset = offset;
+    let levelsDown = 0;
+
+    for (let i = offset; i >= 0; i--) {
+        if (text[i] === '\n') {
+            const lineText = text.slice(i + 1, beginLineOffset)
+            const numberOfPrecedingSpaces = getNumberOfLeftSpaces(lineText)
+            const trimmedLine = lineText.trim()
+            beginLineOffset = i
+
+            // Ignore empty lines
+            if (trimmedLine.length === 0) {
+                continue
+            }
+
+            // If number of spaces lower than that of the cursor
+            // it is a parent property or a sibling of parent property
+            if (numberOfPrecedingSpaces < initialNumberOfSpaces) {
+                if (trimmedLine.startsWith(STATES_PROP_STRING)) {
+                    isDirectChildOfStates = levelsDown === 0;
+                    isGrandChildOfStates = levelsDown === 1;
+                    break
+                // If the indentation is one level lower increase the number in levelsDown variable
+                // and start checking if the offset is a "grandchild" of states.
+                } else if (levelsDown === 0) {
+                    levelsDown++
+                    continue
+                // When the levelDown is 1 it means there is no point of searching anymore.
+                // We know that the offset is neither child nor grandchild of states. We have all the needed information.
+                } else {
+                    break
+                }
+
+            // If number of spaces is higher than that of the cursor it means it is a child
+            // of the property or of its siblings
+            } else if (numberOfPrecedingSpaces > initialNumberOfSpaces) {
+                continue
+            } else if (levelsDown > 0) {
+                continue
+            }
+
+            hasCatchPropSibling = trimmedLine.startsWith(CATCH_PROP_STRING) || hasCatchPropSibling
+            hasRetryPropSibling = trimmedLine.startsWith(RETRY_PROP_STRING) || hasRetryPropSibling
+
+            const isCatchRetryState = CATCH_RETRY_STATE_REGEX.test(trimmedLine)
+
+            if (isCatchRetryState) {
+                isWithinCatchRetryState = true
+            }
+        }
+    }
+
+    return {
+        isDirectChildOfStates,
+        isGrandChildOfStates,
+        isWithinCatchRetryState,
+        hasCatchPropSibling,
+        hasRetryPropSibling
+    }
+}
+
+function getForwardOffsetData(text: string, offset: number, initialNumberOfSpaces: number) {
+    let isWithinCatchRetryState = false;
+    let hasCatchPropSibling = false;
+    let hasRetryPropSibling = false;
+    let beginLineOffset = offset;
+
+    // Iterate the text forwards from the offset
+    for (let i = offset; i <= text.length; i++) {
+        if (text[i] === '\n') {
+            const lineText = text.slice(beginLineOffset + 1, i)
+            const trimmedLine = lineText.trim()
+            const numberOfPrecedingSpaces = getNumberOfLeftSpaces(lineText)
+            beginLineOffset = i
+
+            // Ignore empty lines
+            if (trimmedLine.length === 0) {
+                continue
+            }
+
+            // If number of spaces lower than that of the cursor
+            // it is a parent property or a sibling of parent property
+            if (numberOfPrecedingSpaces < initialNumberOfSpaces) {
+                break
+            // If number of spaces is higher than that of the cursor it means it is a child
+            // of the property or of its siblings
+            } else if (numberOfPrecedingSpaces > initialNumberOfSpaces) {
+                continue
+            }
+
+            hasCatchPropSibling = trimmedLine.startsWith(CATCH_PROP_STRING) || hasCatchPropSibling
+            hasRetryPropSibling = trimmedLine.startsWith(RETRY_PROP_STRING) || hasRetryPropSibling
+
+            const isCatchRetryState = CATCH_RETRY_STATE_REGEX.test(trimmedLine)
+
+            if (isCatchRetryState) {
+                isWithinCatchRetryState = true
+            }
+        }
+    }
+
+    return {
+        isWithinCatchRetryState,
+        hasCatchPropSibling,
+        hasRetryPropSibling
+    }
+}
+
+export function getOffsetData(document: TextDocument, offset: number) {
+    const text = document.getText()
+    const indexOfLastNewLine = text.lastIndexOf('\n', offset - 1)
+    const indexOfNextNewLine = text.indexOf('\n', offset)
+    const cursorLine = text.substring(indexOfLastNewLine + 1, indexOfNextNewLine)
+    const hasCursorLineNonSpace = /\S/.test(cursorLine)
+    const numberOfSpacesCursorLine = getNumberOfLeftSpaces(text.substring(indexOfLastNewLine + 1, offset))
+    const initialNumberOfSpaces = numberOfSpacesCursorLine
+    let isDirectChildOfStates = false
+    let isWithinCatchRetryState = false
+    let hasCatchPropSibling = false
+    let hasRetryPropSibling = false
+
+    if (!hasCursorLineNonSpace && numberOfSpacesCursorLine > 0) {
+        const backwardOffsetData = getBackwardOffsetData(text, offset, initialNumberOfSpaces)
+        const forwardOffsetData = getForwardOffsetData(text, offset, initialNumberOfSpaces)
+
+        isDirectChildOfStates = backwardOffsetData.isDirectChildOfStates
+        isWithinCatchRetryState = (backwardOffsetData.isWithinCatchRetryState || forwardOffsetData.isWithinCatchRetryState) && backwardOffsetData.isGrandChildOfStates
+        hasCatchPropSibling = backwardOffsetData.hasCatchPropSibling || forwardOffsetData.hasCatchPropSibling
+        hasRetryPropSibling = backwardOffsetData.hasRetryPropSibling || forwardOffsetData.hasRetryPropSibling
+    }
+
+    return {
+        isDirectChildOfStates,
+        isWithinCatchRetryState,
+        hasCatchPropSibling,
+        hasRetryPropSibling
+    }
 }

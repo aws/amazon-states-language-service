@@ -52,16 +52,44 @@ function doesStateSupportErrorHandling(node: ASTNode): boolean {
 
     return ERROR_HANDLING_STATES.includes(typeNode?.valueNode?.value as string)
 }
+interface CompleteSnippetsOptions {
+    shouldShowStateSnippets?: boolean,
+    shouldShowErrorSnippets?: {
+        retry: boolean,
+        catch: boolean
+    }
+}
 
-export default function completeSnippets(node: ASTNode | undefined, offset: number, shouldShowStateSnippets?: boolean): CompletionItem[] {
+export default function completeSnippets(node: ASTNode | undefined, offset: number, options?: CompleteSnippetsOptions): CompletionItem[] {
     if (node) {
+        const errorSnippetOptionsNotDefined = options?.shouldShowErrorSnippets === undefined
         // If the value of shouldShowStateSnippets is false prevent the snippets from being displayed
-        if (shouldShowStateSnippets === undefined ? isChildOfStates(node) : shouldShowStateSnippets) {
+        const showStateSnippets = options?.shouldShowStateSnippets || (options?.shouldShowStateSnippets === undefined && isChildOfStates(node))
+
+        if (showStateSnippets) {
             return stateSnippets
         }
 
-        if (insideStateNode(node) && doesStateSupportErrorHandling(node)) {
-            return errorHandlingSnippets
+        if (errorSnippetOptionsNotDefined) {
+            if (insideStateNode(node) && doesStateSupportErrorHandling(node)) {
+                return errorHandlingSnippets
+            }
+
+            return []
+        }
+
+        const errorSnippetsToShow: string[] = []
+
+        if (options?.shouldShowErrorSnippets?.catch) {
+            errorSnippetsToShow.push('Catch')
+        }
+
+        if (options?.shouldShowErrorSnippets?.retry) {
+            errorSnippetsToShow.push('Retry')
+        }
+
+        if (errorSnippetsToShow.length) {
+            return errorHandlingSnippets.filter(snippet => errorSnippetsToShow.includes(snippet.label))
         }
     }
 
