@@ -63,13 +63,10 @@ interface CompleteSnippetsOptions {
 export default function completeSnippets(node: ASTNode | undefined, offset: number, options?: CompleteSnippetsOptions): CompletionItem[] {
     if (node) {
         const errorSnippetOptionsNotDefined = options?.shouldShowErrorSnippets === undefined
-
-        if (options?.shouldShowStateSnippets) {
-            return stateSnippets
-        }
-
         // If the value of shouldShowStateSnippets is false prevent the snippets from being displayed
-        if (options?.shouldShowStateSnippets === undefined && isChildOfStates(node)) {
+        const showStateSnippets = options?.shouldShowStateSnippets || (options?.shouldShowStateSnippets === undefined && isChildOfStates(node))
+
+        if (showStateSnippets) {
             return stateSnippets
         }
 

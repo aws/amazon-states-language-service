@@ -11,6 +11,9 @@ const YAML_RESERVED_KEYWORDS = ['y', 'yes', 'n', 'no', 'true', 'false', 'on', 'o
 const RETRY_CATCH_STATES = ['Task', 'Map', 'Parallel']
 const RETRY_CATCH_STATES_REGEX_STRING = `(${RETRY_CATCH_STATES.join(')|(')})`
 const CATCH_RETRY_STATE_REGEX = new RegExp(`['"]{0,1}Type['"]{0,1}\\s*:\\s*['"]{0,1}(${RETRY_CATCH_STATES_REGEX_STRING})['"]{0,1}`)
+const STATES_PROP_STRING = 'States:'
+const CATCH_PROP_STRING = 'Catch:'
+const RETRY_PROP_STRING = 'Retry:'
 
 /**
  * @typedef {Object} ProcessYamlDocForCompletionOutput
@@ -340,13 +343,17 @@ function getBackwardOffsetData(text: string, offset: number, initialNumberOfSpac
             // If number of spaces lower than that of the cursor
             // it is a parent property or a sibling of parent property
             if (numberOfPrecedingSpaces < initialNumberOfSpaces) {
-                if (trimmedLine.startsWith('States:')) {
+                if (trimmedLine.startsWith(STATES_PROP_STRING)) {
                     isDirectChildOfStates = levelsDown === 0;
                     isGrandChildOfStates = levelsDown === 1;
                     break
+                // If the indentation is one level lower increase the number in levelsDown variable
+                // and start checking if the offset is a "grandchild" of states.
                 } else if (levelsDown === 0) {
                     levelsDown++
                     continue
+                // When the levelDown is 1 it means there is no point of searching anymore.
+                // We know that the offset is neither child nor grandchild of states. We have all the needed information.
                 } else {
                     break
                 }
@@ -359,8 +366,8 @@ function getBackwardOffsetData(text: string, offset: number, initialNumberOfSpac
                 continue
             }
 
-            hasCatchPropSibling = trimmedLine.startsWith('Catch:') || hasCatchPropSibling
-            hasRetryPropSibling = trimmedLine.startsWith('Retry:') || hasRetryPropSibling
+            hasCatchPropSibling = trimmedLine.startsWith(CATCH_PROP_STRING) || hasCatchPropSibling
+            hasRetryPropSibling = trimmedLine.startsWith(RETRY_PROP_STRING) || hasRetryPropSibling
 
             const isCatchRetryState = CATCH_RETRY_STATE_REGEX.test(trimmedLine)
 
@@ -408,8 +415,8 @@ function getForwardOffsetData(text: string, offset: number, initialNumberOfSpace
                 continue
             }
 
-            hasCatchPropSibling = trimmedLine.startsWith('Catch:') || hasCatchPropSibling
-            hasRetryPropSibling = trimmedLine.startsWith('Retry:') || hasRetryPropSibling
+            hasCatchPropSibling = trimmedLine.startsWith(CATCH_PROP_STRING) || hasCatchPropSibling
+            hasRetryPropSibling = trimmedLine.startsWith(RETRY_PROP_STRING) || hasRetryPropSibling
 
             const isCatchRetryState = CATCH_RETRY_STATE_REGEX.test(trimmedLine)
 
