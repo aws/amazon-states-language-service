@@ -1,0 +1,11 @@
+# Reference: https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "pr/dependabot"
+    open-pull-requests-limit: 5
