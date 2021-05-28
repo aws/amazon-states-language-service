@@ -12,7 +12,7 @@
 		"url": "https://github.com/aws/amazon-states-language-service"
 	},
 	"license": "MIT",
-	"version": "1.6.4",
+	"version": "1.7.0",
 	"publisher": "aws",
 	"categories": [
 		"Programming Languages"
