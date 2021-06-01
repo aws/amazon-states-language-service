@@ -305,6 +305,7 @@ const topLevelLabels = [
 const stateSnippetLabels = [
     'Pass State',
     'Lambda Task State',
+    'EventBridge Task State',
     'SNS Task State',
     'Batch Task State',
     'ECS Task State',

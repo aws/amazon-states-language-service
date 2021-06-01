@@ -32,6 +32,29 @@
         "description": "Code snippet for a Lambda Task state.\n\nCalls the AWS Lambda Invoke API to invoke a function."
 	},
 	{
+        "name": "EventBridge Task State",
+        "body": [
+            "\"${1:Send an EventBridge custom event}\": {",
+            "\t\"Type\": \"Task\",",
+            "\t\"Resource\": \"arn:aws:states:::events:putEvents\",",
+            "\t\"Parameters\": {",
+            "\t\t\"Entries\": [",
+            "\t\t\t{",
+            "\t\t\t\t\"Detail\": {",
+            "\t\t\t\t\t\"Message\": \"${4:Hello from Step Functions!}\"",
+            "\t\t\t\t},",
+            "\t\t\t\t\"DetailType\": \"${5:MyDetailType}\",",
+            "\t\t\t\t\"EventBusName\": \"${6:MyEventBusName}\",",
+            "\t\t\t\t\"Source\": \"${7:MySource}\"",
+            "\t\t\t}",
+            "\t\t]",
+            "\t},",
+            "\t\"Next\": \"${2:NextState}\"",
+            "}"
+        ],
+        "description": "Code snippet for an EventBridge Task state.\n\nCalls the Amazon EventBridge PutEvents API to send a custom event to an event bus."
+	},
+	{
         "name": "SNS Task State",
         "body": [
             "\"${1:Send message to SNS}\": {",
