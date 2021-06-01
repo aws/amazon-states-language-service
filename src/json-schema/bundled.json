@@ -316,12 +316,13 @@
 												},
 												"IntervalSeconds": {
 													"$ref": "#/properties/TimeoutSeconds",
-													"description": "A positive integer representing the number of seconds before the first retry attempt. (Default: 1)"
+													"description": "A positive integer representing the number of seconds before the first retry attempt. (Default: 1, Maximum: 99999999)"
 												},
 												"MaxAttempts": {
 													"type": "integer",
-													"description": "A non-negative integer representing the maximum number of retry attempts. (Default: 3)",
-													"minimum": 0
+													"description": "A non-negative integer representing the maximum number of retry attempts. (Default: 3, Maximum: 99999999)",
+													"minimum": 0,
+													"maximum": 99999999
 												},
 												"BackoffRate": {
 													"type": "number",
