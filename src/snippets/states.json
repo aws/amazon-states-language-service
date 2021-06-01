@@ -52,7 +52,7 @@
             "\t\"Next\": \"${2:NextState}\"",
             "}"
         ],
-        "description": "Code snippet for an EventBridge Task state.\n\nCalls the Amazon EventBridge PutEvents API to send a custom event to an eventbus."
+        "description": "Code snippet for an EventBridge Task state.\n\nCalls the Amazon EventBridge PutEvents API to send a custom event to an event bus."
 	},
 	{
         "name": "SNS Task State",
