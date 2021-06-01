@@ -251,6 +251,8 @@
 											"arn:aws:states:::elasticmapreduce:setClusterTerminationProtection",
 											"arn:aws:states:::elasticmapreduce:terminateCluster",
 											"arn:aws:states:::elasticmapreduce:terminateCluster.sync",
+											"arn:aws:states:::events:putEvents",
+											"arn:aws:states:::events:putEvents.waitForTaskToken",
 											"arn:aws:states:::glue:startJobRun",
 											"arn:aws:states:::glue:startJobRun.sync",
 											"arn:aws:states:::lambda:invoke",
