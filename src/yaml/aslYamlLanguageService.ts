@@ -234,10 +234,7 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
         options: FormattingOptions
     ): TextEdit[] {
         try {
-            const text = document.getText()
-            const formatted = safeDump(safeLoad(text), { indent: options.tabSize })
-
-            return [TextEdit.replace(Range.create(Position.create(0, 0), document.positionAt(text.length)), formatted)]
+            return aslLanguageService.format(document, range, options);
         } catch (error) {
             return []
         }
