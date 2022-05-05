@@ -10,7 +10,7 @@ import {
   CompletionItemKind} from 'vscode-json-languageservice'
 import { errorHandlingSnippets, stateSnippets } from '../completion/completeSnippets'
 import { getLanguageService, Position, Range } from '../service'
-import { toDocument } from './utils/testUtilities'
+import { asTextEdit, toDocument } from './utils/testUtilities'
 
 const document1 = `
 {
@@ -248,7 +248,7 @@ async function testCompletions(options: TestCompletionOptions) {
     const rightPos = Position.create(...end)
 
     res?.items.forEach(item => {
-      assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
+      assert.deepEqual(asTextEdit(item.textEdit)?.range, Range.create(leftPos, rightPos))
     })
 
 }

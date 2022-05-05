@@ -186,14 +186,15 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
                         }
                     }
 
-                    currentTextEdit.range.start = startPositionForInsertion
-                    currentTextEdit.range.end = endPositionForInsertion
-
-                    // Completions that include both a key and a value should replace everything right of the cursor.
-                    if (completionItemCopy.kind === CompletionItemKind.Property) {
-                        currentTextEdit.range.end = {
-                            line: endPositionForInsertion.line,
-                            character: document.getText().length
+                    if (TextEdit.is(currentTextEdit)) {
+                        currentTextEdit.range.start = startPositionForInsertion
+                        currentTextEdit.range.end = endPositionForInsertion
+                        // Completions that include both a key and a value should replace everything right of the cursor.
+                        if (completionItemCopy.kind === CompletionItemKind.Property) {
+                            currentTextEdit.range.end = {
+                                line: endPositionForInsertion.line,
+                                character: document.getText().length
+                            }
                         }
                     }
                 }

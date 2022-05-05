@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { InsertReplaceEdit, TextEdit } from 'vscode-languageserver-types';
 import { FILE_EXTENSIONS, LANGUAGE_IDS } from '../../constants/constants';
 import { getLanguageService, JSONDocument, TextDocument } from '../../service'
 
@@ -14,4 +15,12 @@ export function toDocument(text: string, isYaml?: boolean): { textDoc: TextDocum
     const jsonDoc = ls.parseJSONDocument(textDoc) as JSONDocument;
 
     return { textDoc, jsonDoc };
+}
+
+export function asTextEdit(item: TextEdit | InsertReplaceEdit | undefined): TextEdit | undefined {
+    if (TextEdit.is(item)) {
+        return item;
+    }
+
+    return undefined;
 }
