@@ -833,6 +833,63 @@ export const documentInvalidParametersIntrinsicFunction = `
       Type: Succeed
 `
 
+export const documentParametersBoolean = `
+  StartAt: Pass
+  States:
+    Pass:
+      Type: Pass
+      Parameters: true
+      Next: Succeed state
+    Succeed state:
+      Type: Succeed
+`
+
+export const documentParametersString = `
+  StartAt: Pass
+  States:
+    Pass:
+      Type: Pass
+      Parameters: hello world
+      Next: Succeed state
+    Succeed state:
+      Type: Succeed
+`
+
+export const documentParametersNumber = `
+  StartAt: Pass
+  States:
+    Pass:
+      Type: Pass
+      Parameters: 123
+      Next: Succeed state
+    Succeed state:
+      Type: Succeed
+`
+
+export const documentParametersArray = `
+  StartAt: Pass
+  States:
+    Pass:
+      Type: Pass
+      Parameters:
+       - Item 1
+       - Item 2
+      Next: Succeed state
+    Succeed state:
+      Type: Succeed
+`
+
+export const documentParametersNull = `
+  StartAt: Pass
+  States:
+    Pass:
+      Type: Pass
+      Parameters: null
+      Next: Succeed state
+    Succeed state:
+      Type: Succeed
+`
+
 export const documentValidAslImprovements = `
   StartAt: Invoke Lambda function
   States:
