@@ -1586,7 +1586,27 @@ export const documentValidResultSelectorIntrinsicFunction = `
           "Input4.$": "States.Format($.template, $.firstName, $.lastName)    ",
           "Input5.$": "States.JsonToString($)    ",
           "Input6.$": "States.StringToJson($.escaped)    "
-        }
+        },
+        "prop3": {
+            "Array.$": "States.Array($.foo, $.baz.quz, $.boo)",
+            "Format.$": "States.Format('formatting {}', $.foo)",
+            "JsonToString.$": "States.JsonToString($.baz)",
+            "StringToJson.$": "States.StringToJson($.str)",
+            "ArrayContains.$": "States.ArrayContains($.boo, $.boo[0])",
+            "ArrayGetItem.$": "States.ArrayGetItem($.boo, 0)",
+            "ArrayLength.$": "States.ArrayLength($.boo)",
+            "ArrayPartition.$": "States.ArrayPartition($.boo, 1)",
+            "ArrayRange.$": "States.ArrayRange(1, 9, 2)",
+            "ArrayUnique.$": "States.ArrayUnique($.boo)",
+            "Base64Decode.$": "States.Base64Decode($.base)",
+            "Base64Encode.$": "States.Base64Encode($.foo)",
+            "Hash.$": "States.Hash($.foo, $.hash)",
+            "JsonMerge.$": "States.JsonMerge($.baz, $.bar, false)",
+            "MathAdd.$": "States.MathAdd($.boo[0], $.boo[1])",
+            "MathRandom.$": "States.MathRandom($.boo[0], $.boo[2])",
+            "StringSplit.$": "States.StringSplit($.bar.bub, $.o)",
+            "UUID.$": "States.UUID()"
+          }
       },
       "Parameters": {
         "FunctionName": "arn:aws:lambda:REGION:ACCOUNT_ID:function:FUNCTION_NAME"
