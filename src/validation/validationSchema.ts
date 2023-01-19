@@ -100,6 +100,15 @@ export default {
                 ResultPath: true,
                 Parameters: true,
                 ResultSelector: true,
+                ItemReader: true,
+                ItemSelector: true,
+                ItemBatcher: true,
+                ResultWriter: true,
+                ItemProcessor: true,
+                ToleratedFailurePercentage: true,
+                ToleratedFailurePercentagePath: true,
+                ToleratedFailureCount: true,
+                ToleratedFailureCountPath: true,
                 Retry: {
                     'Fn:ArrayOf': 'Retrier'
                 },
