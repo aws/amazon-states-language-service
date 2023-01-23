@@ -2283,9 +2283,10 @@
 														"type": "string",
 														"description": "A string that specifies the type of Amazon S3 data source.",
 														"minLength": 1,
-														"examples": [
+														"enum": [
 															"CSV",
-															"JSON"
+															"JSON",
+															"MANIFEST"
 														]
 													},
 													"CSVHeaders": {
@@ -2322,12 +2323,13 @@
 												"type": "string",
 												"description": "The Amazon S3 API action Step Functions must invoke depending on the specified dataset.",
 												"examples": [
-													"arn:aws:states:::s3:getObject"
+													"arn:aws:states:::s3:getObject",
+													"arn:aws:states:::s3:listObjectsV2"
 												]
 											},
 											"Parameters": {
 												"type": "object",
-												"description": "A JSON object that specifies the Amazon S3 bucket name and object key in which the dataset is stored.",
+												"description": "A JSON object that specifies the Amazon S3 bucket name and object key or prefix in which the dataset is stored.",
 												"properties": {
 													"Bucket": {
 														"type": "string",
@@ -2338,11 +2340,31 @@
 														"type": "string",
 														"description": "A string that specifies Amazon S3 object key in which the dataset is stored.",
 														"minLength": 1
+													},
+													"Bucket.$": {
+														"type": "string",
+														"description": "",
+														"minLength": 1
+													},
+													"Prefix.$": {
+														"type": "string",
+														"description": "",
+														"minLength": 1
 													}
 												},
-												"required": [
-													"Bucket",
-													"Key"
+												"oneOf": [
+													{
+														"required": [
+															"Bucket",
+															"Key"
+														]
+													},
+													{
+														"required": [
+															"Bucket.$",
+															"Prefix.$"
+														]
+													}
 												]
 											}
 										},
@@ -2435,10 +2457,6 @@
 														"enum": [
 															"DISTRIBUTED",
 															"INLINE"
-														],
-														"examples": [
-															"DISTRIBUTED",
-															"INLINE"
 														]
 													},
 													"ExecutionType": {
@@ -2446,10 +2464,6 @@
 														"description": "The execution type for the Map workflow.",
 														"minLength": 1,
 														"enum": [
-															"EXPRESS",
-															"STANDARD"
-														],
-														"examples": [
 															"EXPRESS",
 															"STANDARD"
 														]
