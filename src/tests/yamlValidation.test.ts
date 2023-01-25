@@ -33,6 +33,11 @@ import {
     documentNoTerminalState,
     documentParallelCatchTemplate,
     documentParallelCatchTemplateInvalidNext,
+    documentParametersArray,
+    documentParametersBoolean,
+    documentParametersNull,
+    documentParametersNumber,
+    documentParametersString,
     documentStartAtInvalid,
     documentStartAtNestedInvalid,
     documentStartAtValid,
@@ -595,6 +600,41 @@ suite('ASL YAML context-aware validation', () => {
         test('Does not show diagnostics for valid Intrinsic Functions', async () => {
             await testValidations({
                 json: documentValidParametersIntrinsicFunction,
+                diagnostics: [],
+            })
+        })
+
+        test('Does not show diagnostics for Parameters array', async () => {
+            await testValidations({
+                json: documentParametersArray,
+                diagnostics: [],
+            })
+        })
+
+        test('Does not show diagnostics for Parameters boolean', async () => {
+            await testValidations({
+                json: documentParametersBoolean,
+                diagnostics: [],
+            })
+        })
+
+        test('Does not show diagnostics for Parameters null', async () => {
+            await testValidations({
+                json: documentParametersNull,
+                diagnostics: [],
+            })
+        })
+
+        test('Does not show diagnostics for Parameters number', async () => {
+            await testValidations({
+                json: documentParametersNumber,
+                diagnostics: [],
+            })
+        })
+
+        test('Does not show diagnostics for Parameters string', async () => {
+            await testValidations({
+                json: documentParametersString,
                 diagnostics: [],
             })
         })

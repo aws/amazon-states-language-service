@@ -7,7 +7,16 @@
                     "type": "string",
                     "description": "The state's type.",
                     "minLength": 1,
-                    "enum": ["Pass", "Succeed", "Fail", "Task", "Choice", "Wait", "Parallel", "Map"]
+                    "enum": [
+                        "Pass",
+                        "Succeed",
+                        "Fail",
+                        "Task",
+                        "Choice",
+                        "Wait",
+                        "Parallel",
+                        "Map"
+                    ]
                 },
                 "Comment": {
                     "$ref": "#/definitions/comment"
@@ -135,7 +144,14 @@
             "pattern": "\\$.*"
         },
         "parameters": {
-            "type": "object"
+            "type": [
+                "number",
+                "string",
+                "boolean",
+                "object",
+                "array",
+                "null"
+            ]
         },
         "resultSelector": {
             "type": "object"

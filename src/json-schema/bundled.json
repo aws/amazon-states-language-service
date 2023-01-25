@@ -130,7 +130,14 @@
 									},
 									"Parameters": {
 										"description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions.",
-										"type": "object"
+										"type": [
+											"number",
+											"string",
+											"boolean",
+											"object",
+											"array",
+											"null"
+										]
 									}
 								}
 							}
