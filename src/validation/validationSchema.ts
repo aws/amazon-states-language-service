@@ -97,6 +97,7 @@ export default {
                 Iterator: true,
                 ItemsPath: true,
                 MaxConcurrency: true,
+                MaxConcurrencyPath: true,
                 ResultPath: true,
                 Parameters: true,
                 ResultSelector: true,
@@ -109,6 +110,7 @@ export default {
                 ToleratedFailurePercentagePath: true,
                 ToleratedFailureCount: true,
                 ToleratedFailureCountPath: true,
+                Label: true,
                 Retry: {
                     'Fn:ArrayOf': 'Retrier'
                 },

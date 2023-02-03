@@ -92,10 +92,7 @@
                                             "$ref": "common.json#/definitions/referencePath",
                                             "description": "A reference path to an integer that limits the number of data items passed to the Map state."
                                         }
-                                    },
-                                    "required": [
-                                        "InputType"
-                                    ]
+                                    }
                                 },
                                 "Resource": {
                                     "type": "string",
@@ -129,27 +126,9 @@
                                             "description": "",
                                             "minLength": 1
                                         }
-                                    },
-                                    "oneOf": [
-                                        {
-                                            "required": [
-                                                "Bucket",
-                                                "Key"
-                                            ]
-                                        },
-                                        {
-                                            "required": [
-                                                "Bucket.$",
-                                                "Prefix.$"
-                                            ]
-                                        }
-                                    ]
+                                    }
                                 }
-                            },
-                            "required": [
-                                "Resource",
-                                "Parameters"
-                            ]
+                            }
                         },
                         "ItemSelector": {
                             "type": "object",
@@ -208,17 +187,9 @@
                                             "description": "A string that specifies the Amazon S3 object prefix to export the results to.",
                                             "minLength": 1
                                         }
-                                    },
-                                    "required": [
-                                        "Bucket", 
-                                        "Prefix"
-                                    ]
+                                    }
                                 }
-                            },
-                            "required": [
-                                "Resource", 
-                                "Parameters"
-                            ]
+                            }
                         },
                         "ItemProcessor": {
                             "type": "object",
@@ -246,22 +217,14 @@
                                                 "STANDARD"
                                             ]
                                         }
-                                    },
-                                    "required": [
-                                        "Mode", 
-                                        "ExecutionType"
-                                    ]
+                                    }
                                 }    
-                            },                   
-                            "required": [
-                                "ProcessorConfig"
-                            ]
+                            }
                         },
-                        "ToleratedFailurePercentage": {
-                            "type": "integer",
-                            "description": "An integer that provides an upper bound on the percentage of items that may fail.",
-                            "minimum": 0,
-                            "maximum": 100
+                        "Label": {
+                            "type": "string",
+                            "description": "A string that uniquely identifies a Map state.",
+                            "minLength": 1
                         },
                         "ToleratedFailurePercentagePath": {
                             "$ref": "common.json#/definitions/referencePath",
@@ -279,6 +242,11 @@
                         "MaxConcurrency": {
                             "type": "integer",
                             "description": "Provides an upper bound on how many invocations of the Iterator may run in parallel.\n\nThe default value is 0, which places no limit on parallelism and iterations are invoked as concurrently as possible.",
+                            "minimum": 0
+                        },
+                        "MaxConcurrencyPath": {
+                            "$ref": "common.json#/definitions/referencePath",
+                            "description": "A reference path to an integer that provides an upper bound on how many invocations of the Iterator may run in parallel.",
                             "minimum": 0
                         },
                         "Retry": {
