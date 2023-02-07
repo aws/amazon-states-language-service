@@ -67,7 +67,7 @@ function processLineWithoutColon(document: TextDocument, cursorPosition: Positio
     if (trimmedLine.length === 0) {
         preText = docText.substring(0, currentLineEnd)
         insertedText = '"":\n'
-        postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
+        postText = docText.slice(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
         tempPositionForCompletions.character += 1
 
@@ -85,20 +85,20 @@ function processLineWithoutColon(document: TextDocument, cursorPosition: Positio
             tempPositionForCompletions.character = hyphenIndex + 3
             preText = docText.substring(0, lineOffsets[cursorPosition.line] + hyphenIndex)
             insertedText = "- '':\n"
-            postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
+            postText = docText.slice(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
         // There are non-space character after the hyphen, but no colon. Just insert colon at end of line.
         } else {
             preText = docText.substring(0, currentLineEnd)
             insertedText = (!currentLine.endsWith(' ') ? ' ' : '') + ':\n'
-            postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
+            postText = docText.slice(lineOffsets[cursorPosition.line + 1] || docTextLength)
         }
 
     // Non-empty line but missing colon, add colon to end of current line
     } else {
         preText = docText.substring(0, currentLineEnd)
         insertedText = ':\n'
-        postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
+        postText = docText.slice(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
         // Starting pos is first non-space character
         startPositionForInsertion.character = currentLine.indexOf(trimmedLine)
@@ -146,7 +146,7 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
             // Insert placeholder quotes and place cursor inside of them.
             preText = docText.substring(0, lineOffsets[cursorPosition.line] + colonIndex)
             insertedText = "''"
-            postText = docText.substr(lineOffsets[cursorPosition.line] + colonIndex)
+            postText = docText.slice(lineOffsets[cursorPosition.line] + colonIndex)
 
             startPositionForInsertion.character = colonIndex
             endPositionForInsertion.character = colonIndex
@@ -157,7 +157,7 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
             // Insert placeholder quotes and place cursor inside of them.
             preText = docText.substring(0, lineOffsets[cursorPosition.line] + colonIndex)
             insertedText = " ''"
-            postText = docText.substr(lineOffsets[cursorPosition.line] + colonIndex)
+            postText = docText.slice(lineOffsets[cursorPosition.line] + colonIndex)
 
             startPositionForInsertion.character = colonIndex
             endPositionForInsertion.character = colonIndex
@@ -201,7 +201,7 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
 
         preText = docText.substring(0, currentLineEnd - numTrailingSpacesToRemove)
         insertedText = (hasOnlyWhitespaceAfterColon ? ' ""' : '') + '\n'
-        postText = docText.substr(lineOffsets[cursorPosition.line + 1] || docTextLength)
+        postText = docText.slice(lineOffsets[cursorPosition.line + 1] || docTextLength)
 
         if (hasOnlyWhitespaceAfterColon) {
             // Move cursor inside of quotes
