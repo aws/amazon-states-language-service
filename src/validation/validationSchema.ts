@@ -25,6 +25,7 @@ export default {
             Properties: {
                 Resource: true,
                 Parameters: true,
+                Credentials: true,
                 ResultSelector: true,
                 ResultPath: true,
                 TimeoutSeconds: true,
