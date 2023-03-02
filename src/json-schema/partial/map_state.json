@@ -49,9 +49,204 @@
                                 "States"
                             ]
                         },
+                        "ItemReader": {
+                            "type": "object",
+                            "description": "Specifies the location of the dataset from which the Map state reads its input data.",
+                            "properties": {
+                                "ReaderConfig": {
+                                    "type": "object",
+                                    "description": "A JSON object that specifies where to read the items instead of from the effective input.",
+                                    "properties": {
+                                        "InputType": {
+                                            "type": "string",
+                                            "description": "A string that specifies the type of Amazon S3 data source.",
+                                            "minLength": 1,
+                                            "enum": [
+                                                "CSV",
+                                                "JSON",
+                                                "MANIFEST"
+                                            ]
+                                        },
+                                        "CSVHeaders": {
+                                            "type": "array",
+                                            "minItems": 1,
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "CSVHeaderLocation": {
+                                            "type": "string",
+                                            "description": "A string that specifies the location of the CSV column header.",
+                                            "minLength": 1,
+                                            "enum": [
+                                                "FIRST_ROW",
+                                                "GIVEN"
+                                            ]
+                                        },
+                                        "MaxItems": {
+                                            "type": "integer",
+                                            "description": "An integer that limits the number of data items passed to the Map state.",
+                                            "minimum": 0
+                                        },
+                                        "MaxItemsPath": {
+                                            "$ref": "common.json#/definitions/referencePath",
+                                            "description": "A reference path to an integer that limits the number of data items passed to the Map state."
+                                        }
+                                    }
+                                },
+                                "Resource": {
+                                    "type": "string",
+                                    "description": "The Amazon S3 API action Step Functions must invoke depending on the specified dataset.",
+                                    "examples": [
+                                        "arn:aws:states:::s3:getObject",
+                                        "arn:aws:states:::s3:listObjectsV2"
+                                    ]
+                                },
+                                "Parameters": {
+                                    "type": "object",
+                                    "description": "A JSON object that specifies the Amazon S3 bucket name and object key or prefix in which the dataset is stored.",
+                                    "properties": {
+                                        "Bucket": {
+                                            "type": "string",
+                                            "description": "A string that specifies the Amazon S3 bucket name in which the dataset is stored.",
+                                            "minLength": 1
+                                        },
+                                        "Key": {
+                                            "type": "string",
+                                            "description": "A string that specifies Amazon S3 object key in which the dataset is stored.",
+                                            "minLength": 1
+                                        },
+                                        "Bucket.$": {
+                                            "type": "string",
+                                            "description": "",
+                                            "minLength": 1
+                                        },
+                                        "Prefix.$": {
+                                            "type": "string",
+                                            "description": "",
+                                            "minLength": 1
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "ItemSelector": {
+                            "type": "object",
+                            "description": "A JSON object that overrides each single element of the item array."
+                        },
+                        "ItemBatcher": {
+                            "type": "object",
+                            "description": "A JSON object that specifies how to batch the items for the ItemProcessor.",
+                            "properties": {
+                                "BatchInput": {
+                                    "type": "object",
+                                    "description": "Specifies a fixed JSON input to include in each batch passed to each child workflow execution."
+                                },
+                                "MaxItemsPerBatch": {
+                                    "type": "integer",
+                                    "description": "An integer that limits the maximum number of items of each sub-array.",
+                                    "minimum": 1
+                                },
+                                "MaxItemsPerBatchPath": {
+                                    "$ref": "common.json#/definitions/referencePath",
+                                    "description": "A reference path to an integer that limits the maximum number of items of each sub-array."
+                                },
+                                "MaxInputBytesPerBatch": {
+                                    "type": "integer",
+                                    "description": "An integer that limits the maximum size in bytes of each sub-array.",
+                                    "minimum": 1
+                                },
+                                "MaxInputBytesPerBatchPath": {
+                                    "$ref": "common.json#/definitions/referencePath",
+                                    "description": "A reference path to an integer that limits the maximum size in bytes of each sub-array."
+                                }
+                            }
+                        },
+                        "ResultWriter": {
+                            "type": "object",
+                            "description": "A JSON object that specifies where to write the results instead of to the Map state's result.",
+                            "properties": {
+                                "Resource": {
+                                    "type": "string",
+                                    "description": "A string that specifies the Amazon S3 API action Step Functions must invoke depending on the specified dataset.",
+                                    "examples": [
+                                        "arn:aws:states:::s3:putObject"
+                                    ]
+                                },
+                                "Parameters": {
+                                    "type": "object",
+                                    "description": "A JSON object that specifies the Amazon S3 resource to export the results to.",
+                                    "properties": {
+                                        "Bucket": {
+                                            "type": "string",
+                                            "description": "A string that specifies the Amazon S3 bucket name to export the results to.",
+                                            "minLength": 1
+                                        },
+                                        "Prefix": {
+                                            "type": "string",
+                                            "description": "A string that specifies the Amazon S3 object prefix to export the results to.",
+                                            "minLength": 1
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "ItemProcessor": {
+                            "type": "object",
+                            "description": "A JSON object that defines a state machine which will process each item or batch of items of the array.",
+                            "properties": {
+                                "ProcessorConfig": {
+                                    "type": "object",
+                                    "description": "A JSON object that specifies the Map state processing mode and definition.",
+                                    "properties": {
+                                        "Mode": {
+                                            "type": "string",
+                                            "description": "The Map state processing mode.",
+                                            "minLength": 1,
+                                            "enum": [
+                                                "DISTRIBUTED",
+                                                "INLINE"
+                                            ]
+                                        },
+                                        "ExecutionType": {
+                                            "type": "string",
+                                            "description": "The execution type for the Map workflow.",
+                                            "minLength": 1,
+                                            "enum": [
+                                                "EXPRESS",
+                                                "STANDARD"
+                                            ]
+                                        }
+                                    }
+                                }    
+                            }
+                        },
+                        "Label": {
+                            "type": "string",
+                            "description": "A string that uniquely identifies a Map state.",
+                            "minLength": 1
+                        },
+                        "ToleratedFailurePercentagePath": {
+                            "$ref": "common.json#/definitions/referencePath",
+                            "description": "A reference path to an integer that provides an upper bound on the percentage of items that may fail."
+                        },
+                        "ToleratedFailureCount": {
+                            "type": "integer",
+                            "description": "An integer that provides an upper bound on how many items may fail.",
+                            "minimum": 0
+                        },
+                        "ToleratedFailureCountPath": {
+                            "$ref": "common.json#/definitions/referencePath",
+                            "description": "A reference path to an integer that provides an upper bound on how many items may fail."
+                        },
                         "MaxConcurrency": {
                             "type": "integer",
                             "description": "Provides an upper bound on how many invocations of the Iterator may run in parallel.\n\nThe default value is 0, which places no limit on parallelism and iterations are invoked as concurrently as possible.",
+                            "minimum": 0
+                        },
+                        "MaxConcurrencyPath": {
+                            "$ref": "common.json#/definitions/referencePath",
+                            "description": "A reference path to an integer that provides an upper bound on how many invocations of the Iterator may run in parallel.",
                             "minimum": 0
                         },
                         "Retry": {
@@ -62,10 +257,7 @@
                             "$ref": "common.json#/definitions/catch",
                             "description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
                         }
-                    },
-                    "required": [
-                        "Iterator"
-                    ]
+                    }
                 }
             ]
         }
