@@ -3,6 +3,35 @@
  * SPDX-License-Identifier: MIT
  */
 
+export const documentDistributedMapInvalidNextInNestedState = `
+{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "ResultPath": "$.array",
+          "MaxConcurrency": 2,
+          "Next": "Final State",
+          "ItemProcessor": {
+              "StartAt": "Pass",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "Result": "Done!",
+                      "Next": "StateThatDoesNotExist"
+                  }
+              }
+          }
+      },
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}
+`
+
 export const documentStartAtInvalid = `{
   "StartAt": "First",
   "States": {
