@@ -16,6 +16,7 @@ import {
     documentChoiceNoDefault,
     documentChoiceValidDefault,
     documentChoiceValidNext,
+    documentDistributedMapInvalidNextInNestedState,
     documentInvalidNext,
     documentInvalidNextNested,
     documentInvalidParametersIntrinsicFunction,
@@ -422,6 +423,24 @@ suite('ASL context-aware validation', () => {
                     },
                 ],
                 filterMessages: [MESSAGES.UNREACHABLE_STATE]
+            })
+        })
+
+        test('Shows diagnostics on invalid next property of a nested state withing DistributedMap', async () => {
+            await testValidations({
+                json: documentDistributedMapInvalidNextInNestedState,
+                diagnostics: [
+                    {
+                        message: MESSAGES.INVALID_NEXT,
+                        start: [16, 30],
+                        end: [16, 53],
+                    },
+                    {
+                        message: MESSAGES.NO_TERMINAL_STATE,
+                        start: [12, 14],
+                        end: [12, 22],
+                    },
+                ],
             })
         })
     })
