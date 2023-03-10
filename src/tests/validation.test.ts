@@ -665,6 +665,11 @@ suite('ASL context-aware validation', () => {
                         start: [15, 22],
                         end: [15, 42]
                     },
+                    {
+                        message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC,
+                        start: [16, 22],
+                        end: [16, 47]
+                    },
                 ]
             })
         })
