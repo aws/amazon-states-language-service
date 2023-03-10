@@ -1198,7 +1198,8 @@ export const documentValidParametersIntrinsicFunction = `
           "Input3.$": "States.StringToJson($.escaped)",
           "Input4.$": "States.Format($.template, $.firstName, $.lastName)    ",
           "Input5.$": "States.JsonToString($)    ",
-          "Input6.$": "States.StringToJson($.escaped)    "
+          "Input6.$": "States.StringToJson($.escaped)    ",
+          "Input7.$": "States.Format('one {}\\ntwo {}', $.firstName, 'literal')"
         }
       },
       "Next": "Succeed state"
@@ -1225,7 +1226,8 @@ export const documentInvalidParametersIntrinsicFunction = `
           "Input3.$": "States.StringToJson $.escaped)",
           "Input4.$": "States. ",
           "Input5.$": "JsonToString($)",
-          "Input6.$": "something else    "
+          "Input6.$": "something else    ",
+          "Input7.$": "States\\nJsonToString($)"
         }
       },
       "Next": "Succeed state"
