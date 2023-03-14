@@ -43,6 +43,69 @@ GitHub provides additional document on [forking a repository](https://help.githu
 ## Finding contributions to work on
 Looking at the existing issues is a great way to find something to contribute on. As our projects, by default, use the default GitHub issue labels (enhancement/bug/duplicate/help wanted/invalid/question/wontfix), looking at any 'help wanted' issues is a great place to start.
 
+## Getting Started
+### Setup
+To work on this project you need these environmental dependencies:
+-   [NodeJS and NPM](https://nodejs.org/) (latest version of both)
+-   [Git](https://git-scm.com/downloads)
+-   [AWS `git secrets`](https://github.com/awslabs/git-secrets)
+
+Then clone the repository and install the project dependencies with NPM:
+
+```
+git clone git@github.com:aws/amazon-states-language-service.git
+cd amazon-states-language-service
+npm install
+npm test
+```
+
+### Debug
+The [AWS Toolkit for Visual Studio
+Code](https://github.com/aws/aws-toolkit-vscode) extension uses the
+`amazon-states-language-service` language service to provide syntax validation &
+autocomplete for state machines.
+
+If you want to test or troubleshoot changes you are making to this service
+locally with the Visual Studio Code extension, this is how you link the two
+repos locally.
+
+1) In your `amazon-states-language-service` repo root, run:
+```
+# make current project directory available for linking
+npm link
+```
+
+2) In your `aws-toolkit-vscode` repo root, run:
+```
+# link current project to the local language service
+npm link amazon-states-language-service
+
+# optional. verify amazon-states-language-service dependency pointing to your 
+# local disk location rather than the live service
+npm ls amazon-states-language-service
+```
+
+### Run
+You can now run the `aws-toolkit-vscode` extension from Visual Studio Code while
+calling your local development version of `amazon-states-language-service`:
+
+1. Select the Run panel from the sidebar.
+2. From the dropdown at the top of the Run pane, choose `Extension`.
+3. Press `F5` to launch a new instance of Visual Studio Code with the extension
+   installed and the debugger attached.
+4. At this point `aws-toolkit-vscode` is using your local copy of the
+   `amazon-states-language-service` on disk.
+5. If you want to debug/step-through the attached service, in this same instance
+   of VS Code with `aws-toolkit-vscode` open and running, go to the dropdown at
+   the top of the `Run` pane and select `Attach to ASL Server`.
+
+If you want to reset your `aws-toolkit-vscode` repo to use the live
+`amazon-states-language` rather than the local development copy, navigate to
+the `aws-toolkit-vscode` repo and do this:
+
+```console
+npm unlink amazon-states-language
+```
 
 ## Code of Conduct
 This project has adopted the [Amazon Open Source Code of Conduct](https://aws.github.io/code-of-conduct).
