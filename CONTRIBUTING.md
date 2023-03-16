@@ -48,7 +48,6 @@ Looking at the existing issues is a great way to find something to contribute on
 To work on this project you need these environmental dependencies:
 -   [NodeJS and NPM](https://nodejs.org/) (latest version of both)
 -   [Git](https://git-scm.com/downloads)
--   [AWS `git secrets`](https://github.com/awslabs/git-secrets)
 
 Then clone the repository and install the project dependencies with NPM:
 
@@ -59,7 +58,7 @@ npm install
 npm test
 ```
 
-### Debug
+### Link with AWS Toolkit for VS Code
 The [AWS Toolkit for Visual Studio
 Code](https://github.com/aws/aws-toolkit-vscode) extension uses the
 `amazon-states-language-service` language service to provide syntax validation &
@@ -69,19 +68,26 @@ If you want to test or troubleshoot changes you are making to this service
 locally with the Visual Studio Code extension, this is how you link the two
 repos locally.
 
-1) In your `amazon-states-language-service` repo root, run:
+1) In your `amazon-states-language-service` repo root run:
 ```
-# make current project directory available for linking
 npm link
 ```
 
-2) In your `aws-toolkit-vscode` repo root, run:
-```
-# link current project to the local language service
-npm link amazon-states-language-service
+This command makes the current project directory available for linking.
 
-# optional. verify amazon-states-language-service dependency pointing to your 
-# local disk location rather than the live service
+
+2) In your `aws-toolkit-vscode` repo root, run this:
+```
+npm link amazon-states-language-service
+```
+
+This command links the current project to the local language service.
+
+Optionally, if you want to verify that the `amazon-states-language-service`
+dependency points to your local disk location rather than the live service, you
+can check with this command:
+
+```
 npm ls amazon-states-language-service
 ```
 
