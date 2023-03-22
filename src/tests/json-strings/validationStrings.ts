@@ -933,7 +933,10 @@ export const documentInvalidPropertiesState = `{
           "Resource": "arn:aws:lambda:us-east-1:111111111111:function:FUNCTION_NAME",
           "Next": "ChoiceState",
           "SomethingInvalid1": "dddd",
-          "SomethingInvalid2": "eeee"
+          "SomethingInvalid2": "eeee",
+          "Credentials": {
+              "RoleArn": "arn:aws:iam::111122223333:role/LambdaRole"
+          }
       },
       "ChoiceState": {
           "Type": "Choice",
