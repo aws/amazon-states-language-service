@@ -7,7 +7,7 @@ import * as assert from 'assert'
 import { CompletionItemKind, InsertTextFormat } from 'vscode-json-languageservice'
 import { stateSnippets } from '../completion/completeSnippets'
 import { getYamlLanguageService, Position, Range } from '../service'
-import { toDocument } from './utils/testUtilities'
+import { asTextEdit, toDocument } from './utils/testUtilities'
 
 const emptyDocument = ''
 
@@ -378,7 +378,7 @@ async function testCompletions(options: TestCompletionOptions) {
     const rightPos = Position.create(...end)
 
     res?.items.forEach(item => {
-        assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
+        assert.deepEqual(asTextEdit(item.textEdit)?.range, Range.create(leftPos, rightPos))
     })
 }
 
@@ -415,7 +415,7 @@ async function testPropertyCompletions(options: TestPropertyCompletionOptions) {
     const leftPos = Position.create(position[0], 0)
     const rightPos = Position.create(position[0], yaml.length)
     res?.items.forEach(item => {
-        assert.deepEqual(item.textEdit?.range, Range.create(leftPos, rightPos))
+        assert.deepEqual(asTextEdit(item.textEdit)?.range, Range.create(leftPos, rightPos))
     })
 }
 
