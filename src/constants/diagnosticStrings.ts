@@ -11,7 +11,7 @@ export const MESSAGES = {
     UNREACHABLE_STATE: 'The state cannot be reached. It must be referenced by at least one other state.',
     NO_TERMINAL_STATE: 'No terminal state. The state machine must have at least one terminal state (a state in which the "End" property is set to true).',
     INVALID_PROPERTY_NAME: 'Field is not supported.',
-    MUTUALLY_EXCLUSIVE_CHOICE_PROPERTIES: 'Each Choice Rule can only have one comparison operator.',
+    MUTUALLY_EXCLUSIVE_CHOICE_PROPERTIES: 'Each Choice Rule can only have one comparison operator.'
 } as const
 
 export const YAML_PARSER_MESSAGES = {

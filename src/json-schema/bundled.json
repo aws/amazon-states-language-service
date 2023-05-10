@@ -2440,8 +2440,20 @@
 														]
 													}
 												}
+											},
+											"StartAt": {
+												"type": "string",
+												"description": "A string that must exactly match (is case sensitive) the name of one of the state objects.",
+												"minLength": 1
+											},
+											"States": {
+												"$ref": "#/properties/States"
 											}
-										}
+										},
+										"required": [
+											"StartAt",
+											"States"
+										]
 									},
 									"Label": {
 										"type": "string",

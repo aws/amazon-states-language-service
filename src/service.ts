@@ -22,7 +22,7 @@ import {
 
 import completeAsl from './completion/completeAsl'
 import { LANGUAGE_IDS } from './constants/constants';
-import validateStates from './validation/validateStates'
+import validateStates, { RootType } from './validation/validateStates'
 import { getLanguageService as getAslYamlLanguageService } from './yaml/aslYamlLanguageService'
 
 export * from 'vscode-json-languageservice'
@@ -66,7 +66,7 @@ export const getLanguageService = function( params: ASLLanguageServiceParams): L
         const rootNode = (jsonDocument as ASTTree).root
 
         if (rootNode && isObjectNode(rootNode)) {
-            const aslDiagnostics = validateStates(rootNode, document, true, params.aslOptions)
+            const aslDiagnostics = validateStates(rootNode, document, RootType.Root, params.aslOptions)
 
             return diagnostics.concat(aslDiagnostics)
         }

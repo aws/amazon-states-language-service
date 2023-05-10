@@ -206,9 +206,15 @@ export default {
         States: true
     },
     // State machines nested within Map and Parallel states
-    NestedRoot: {
+    NestedParallelRoot: {
         Comment: true,
         StartAt: true,
         States: true
+    },
+    NestedMapRoot: {
+        Comment: true,
+        StartAt: true,
+        States: true,
+        ProcessorConfig: true
     }
 }
