@@ -1683,3 +1683,59 @@ export const documentInvalidResultSelectorIntrinsicFunction = `
   }
 }
 `
+export const documentMapProcessorConfig = `
+{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "ResultPath": "$.array",
+          "MaxConcurrency": 2,
+          "Next": "Final State",
+          "ItemProcessor": {
+              "StartAt": "Pass",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "End": true
+                  }
+              },
+              "ProcessorConfig": {
+                "ExecutionType": "EXPRESS",
+                "Mode": "DISTRIBUTED"
+              }
+          }
+      },
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}
+`
+
+export const documentMapInvalidItemProcessorConfig = `
+{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "ResultPath": "$.array",
+          "MaxConcurrency": 2,
+          "Next": "Final State",
+          "ItemProcessor": {
+              "ProcessorConfig": {
+                "ExecutionType": "EXPRESS",
+                "Mode": "DISTRIBUTED"
+              }
+          }
+      },
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}
+`

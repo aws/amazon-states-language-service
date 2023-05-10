@@ -30,6 +30,8 @@ import {
     documentInvalidResultSelectorJsonPath,
     documentMapCatchTemplate,
     documentMapCatchTemplateInvalidNext,
+    documentMapInvalidItemProcessorConfig,
+    documentMapProcessorConfig,
     documentNestedNoTerminalState,
     documentNestedUnreachableState,
     documentNoTerminalState,
@@ -197,6 +199,33 @@ suite('ASL context-aware validation', () => {
                 filterMessages: [MESSAGES.UNREACHABLE_STATE, MESSAGES.NO_TERMINAL_STATE]
             })
         })
+    })
+
+    suite('Map State', () => {
+
+        test('Doesn\'t show diagnostics for valid processor config', async () => {
+            await testValidations({
+                json: documentMapProcessorConfig,
+                diagnostics: []
+            })
+        })
+
+        test('Shows diagnostics on ItemProcessor that does not have required states', async () => {
+            await testValidations({
+                json: documentMapInvalidItemProcessorConfig,
+                diagnostics: [  {
+                    message: 'Missing property "StartAt".',
+                    start: [10, 10],
+                    end: [10, 25]
+                },
+                {
+                    message: 'Missing property "States".',
+                    start: [10, 10],
+                    end: [10, 25]
+                },]
+            })
+        })
+
     })
 
     suite('Next', () => {

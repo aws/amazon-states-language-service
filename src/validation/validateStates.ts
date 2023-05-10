@@ -29,6 +29,12 @@ import schema from './validationSchema'
 
 const INTRINSIC_FUNC_REGEX = /^States\.(?:(JsonToString|Format|StringToJson|Array|ArrayContains|ArrayGetItem|ArrayLength|ArrayPartition|ArrayRange|ArrayUnique|Base64Decode|Base64Encode|Hash|JsonMerge|MathAdd|MathRandom|StringSplit)\(.+\)|(UUID)\(\))$/s
 
+export const enum RootType {
+    Root = 0,
+    Map = 1,
+    Parallel = 2
+}
+
 function stateNameExistsInPropNode(
     nextPropNode: PropertyASTNode,
     stateNames: string[],
@@ -112,13 +118,17 @@ function validateArrayNext(arrayPropName: string, oneStateValueNode: ObjectASTNo
     return { diagnostics, reachedStates }
 }
 
-export default function validateStates(rootNode: ObjectASTNode, document: TextDocument, isRoot?: Boolean, options?: ASLOptions): Diagnostic[] {
+export default function validateStates(rootNode: ObjectASTNode, document: TextDocument, rootType: RootType, options?: ASLOptions): Diagnostic[] {
     const statesNode = findPropChildByName(rootNode, 'States')
     const startAtNode = findPropChildByName(rootNode, 'StartAt')
 
     // Different schemas for root and root of nested state machine
-    const rootSchema = isRoot ? schema.Root : schema.NestedRoot
-
+    let rootSchema : Object = schema.Root
+    if (rootType === RootType.Map) {
+        rootSchema = schema.NestedMapRoot
+    } else if (rootType === RootType.Parallel) {
+        rootSchema = schema.NestedParallelRoot
+    }
     let diagnostics: Diagnostic[] = []
 
     // Check root property names against the schema
@@ -214,7 +224,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
 
                             if (iteratorPropNode && iteratorPropNode.valueNode && isObjectNode(iteratorPropNode.valueNode)) {
                                 // append the result of recursive validation to the list of diagnostics
-                                diagnostics = [...diagnostics, ...validateStates(iteratorPropNode.valueNode, document, undefined, options)]
+                                diagnostics = [...diagnostics, ...validateStates(iteratorPropNode.valueNode, document, RootType.Map, options)]
                             }
 
                             break
@@ -228,7 +238,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                                 branchesPropNode.valueNode.children.forEach(branchItem => {
                                     if (isObjectNode(branchItem)) {
                                         // append the result of recursive validation to the list of diagnostics
-                                        diagnostics = [...diagnostics, ...validateStates(branchItem, document, undefined, options)]
+                                        diagnostics = [...diagnostics, ...validateStates(branchItem, document, RootType.Parallel, options)]
                                     }
                                 })
                             }
