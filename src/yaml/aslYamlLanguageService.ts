@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { safeDump, safeLoad } from 'js-yaml'
 import {
     CompletionItemKind,
     Diagnostic,
@@ -29,6 +28,7 @@ import {
     YAMLDocument,
 } from 'yaml-language-server/out/server/src/languageservice/parser/yamlParser07'
 import { YAMLCompletion } from 'yaml-language-server/out/server/src/languageservice/services/yamlCompletion'
+import { YAMLFormatter } from 'yaml-language-server/out/server/src/languageservice/services/yamlFormatter'
 import { YAMLSchemaService } from 'yaml-language-server/out/server/src/languageservice/services/yamlSchemaService'
 import { matchOffsetToDocument } from 'yaml-language-server/out/server/src/languageservice/utils/arrUtils'
 import { YAMLDocDiagnostic } from 'yaml-language-server/out/server/src/languageservice/utils/parseUtils'
@@ -91,6 +91,7 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
     schemaService.getOrAddSchemaHandle(LANGUAGE_IDS.YAML, schema)
 
     const completer = new YAMLCompletion(schemaService)
+    const formatter = new YAMLFormatter()
 
     languageService.doValidation = async function(
         textDocument: TextDocument
@@ -186,14 +187,15 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
                         }
                     }
 
-                    currentTextEdit.range.start = startPositionForInsertion
-                    currentTextEdit.range.end = endPositionForInsertion
-
-                    // Completions that include both a key and a value should replace everything right of the cursor.
-                    if (completionItemCopy.kind === CompletionItemKind.Property) {
-                        currentTextEdit.range.end = {
-                            line: endPositionForInsertion.line,
-                            character: document.getText().length
+                    if (TextEdit.is(currentTextEdit)) {
+                        currentTextEdit.range.start = startPositionForInsertion
+                        currentTextEdit.range.end = endPositionForInsertion
+                        // Completions that include both a key and a value should replace everything right of the cursor.
+                        if (completionItemCopy.kind === CompletionItemKind.Property) {
+                            currentTextEdit.range.end = {
+                                line: endPositionForInsertion.line,
+                                character: document.getText().length
+                            }
                         }
                     }
                 }
@@ -234,10 +236,7 @@ export const getLanguageService = function(params: LanguageServiceParams, schema
         options: FormattingOptions
     ): TextEdit[] {
         try {
-            const text = document.getText()
-            const formatted = safeDump(safeLoad(text), { indent: options.tabSize })
-
-            return [TextEdit.replace(Range.create(Position.create(0, 0), document.positionAt(text.length)), formatted)]
+            return formatter.format(document, options);
         } catch (error) {
             return []
         }
