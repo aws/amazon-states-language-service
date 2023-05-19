@@ -7,7 +7,7 @@ import { ArrayASTNode, ASTNode, JSONDocument, LanguageServiceParams, ObjectASTNo
 import { Position } from 'vscode-languageserver-types'
 
 export interface ASTTree extends JSONDocument {
-    root?: ASTNode
+    root: ASTNode
 }
 
 export interface ASLOptions {
