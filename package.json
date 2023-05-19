@@ -26,7 +26,7 @@
 		"bundle-schema": "node ./scripts/transform.js"
 	},
 	"devDependencies": {
-		"@types/js-yaml": "^3.12.5",
+		"@types/js-yaml": "^4.0.5",
 		"@types/mocha": "^5.2.7",
 		"@types/node": "^12.11.7",
 		"json-schema-ref-parser": "^7.1.3",
@@ -37,7 +37,7 @@
 		"typescript": "^3.7.5"
 	},
 	"dependencies": {
-		"js-yaml": "^3.14.0",
+		"js-yaml": "^4.1.0",
 		"vscode-json-languageservice": "3.4.9",
 		"vscode-languageserver": "^6.1.1",
 		"vscode-languageserver-textdocument": "^1.0.0",
