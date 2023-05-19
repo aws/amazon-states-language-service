@@ -2,7 +2,7 @@
  * Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  * SPDX-License-Identifier: MIT
  */
-import { safeDump, safeLoad } from 'js-yaml'
+import { dump, load } from 'js-yaml'
 import { TextDocument } from 'vscode-languageserver-textdocument'
 import { Position } from 'vscode-languageserver-types'
 import { ProcessYamlDocForCompletionOutput } from '../utils/astUtilityFunctions'
@@ -287,7 +287,7 @@ export function isStateNameReservedYamlKeyword(stateName: string): boolean {
 
 export function convertJsonSnippetToYaml(snippetText: string) {
     // Convert to YAML with indendation of 1 space
-    return safeDump(safeLoad(snippetText), { indent: 1 })
+    return dump(load(snippetText), { indent: 1 })
         // Remove quotation marks
         .replace(/[']/g, '')
         .split('\n')
