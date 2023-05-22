@@ -34,7 +34,7 @@
 		"tslint": "^6.1.0",
 		"tslint-eslint-rules": "^5.4.0",
 		"tslint-no-circular-imports": "^0.7.0",
-		"typescript": "^3.7.5"
+		"typescript": "^5.0.4"
 	},
 	"dependencies": {
 		"js-yaml": "^4.1.0",
