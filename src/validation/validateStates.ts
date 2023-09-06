@@ -29,6 +29,9 @@ import schema from './validationSchema'
 
 const INTRINSIC_FUNC_REGEX = /^States\.(?:(JsonToString|Format|StringToJson|Array|ArrayContains|ArrayGetItem|ArrayLength|ArrayPartition|ArrayRange|ArrayUnique|Base64Decode|Base64Encode|Hash|JsonMerge|MathAdd|MathRandom|StringSplit)\(.+\)|(UUID)\(\))$/s
 
+// update src/constants/diagnosticStrings INVALID_JSON_PATH_OR_INTRINSIC_STRING_ONLY when you change this regex.
+const INTRINSIC_FUNC_REGEX_STRING_RETURN = /^States\.(?:(JsonToString|Format|ArrayGetItem|Base64Decode|Base64Encode|Hash)\(.+\)|(UUID)\(\))$/s
+
 export const enum RootType {
     Root = 0,
     Map = 1,
@@ -62,8 +65,81 @@ function isIntrinsicFunction(text: string): boolean {
     return INTRINSIC_FUNC_REGEX.test(intrinsicText)
 }
 
+/**
+ * Evaluate whether input is an Intrinsic Function that returns string.
+ * Intrinsic functions with return types other than string will return False.
+ * @param text Input string.
+ * @returns True if text is an Intrinsic Function that returns a string.
+ */
+function isIntrinsicFunctionWithStringReturn(text: string): boolean {
+    const intrinsicText = text.trimEnd()
+
+    return INTRINSIC_FUNC_REGEX_STRING_RETURN.test(intrinsicText)
+}
+
 function isJsonPath(text: string) {
     return text.startsWith('$')
+}
+
+/**
+ * Validate that the field is a JsonPath or Intrinsic Function.
+ * Only allows intrinsic functions that return strings.
+ * @param pathField The field to evaluate.
+ * @param document The document to evaluate.
+ * @returns A diagnostics array of any validation issues.
+ */
+function validatePathField(pathField: PropertyASTNode, document: TextDocument): Diagnostic[] {
+    const diagnostics: Diagnostic[] = []
+    const valueNode = pathField.valueNode
+    const propValue = valueNode && valueNode.value
+
+    if (typeof propValue !== 'string' || !(isJsonPath(propValue) || isIntrinsicFunctionWithStringReturn(propValue))) {
+        const { length, offset } = pathField
+        const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
+
+        diagnostics.push(Diagnostic.create(range, MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC_STRING_ONLY, DiagnosticSeverity.Error))
+    }
+
+    return diagnostics
+}
+
+/**
+ * Validates a *Path style field.
+ *
+ * A path-style field has two different input fields: MyField and MyFieldPath.
+ * These fields are mutually exclusive - you cannot specify both at the same
+ * time.
+ * The base field ("MyField") takes a static string input.
+ * The path-field ("MyFieldPath") lets you use JsonPath or Intrinsic Functions
+ * to give a value to the base field ("MyField").
+ *
+ * @param stateNode The node to evaluate
+ * @param propertyName The base property name ("MyField")
+ * @param document The document to evaluate
+ * @returns A diagnostics array of any validation issues.
+ */
+function validateExclusivePathTypeField(stateNode: ObjectASTNode,
+    propertyName: string,
+    document: TextDocument): Diagnostic[] {
+    let diagnostics: Diagnostic[] = []
+
+    const pathFieldName = `${propertyName}Path`
+    const pathNode = findPropChildByName(stateNode, pathFieldName)
+
+    if (pathNode) {
+        const validatePathFieldDiagnostics = validatePathField(pathNode, document)
+        diagnostics = diagnostics.concat(validatePathFieldDiagnostics)
+
+        // Myfield and MyfieldPath are mutually exclusive
+        if (findPropChildByName(stateNode, propertyName)) {
+            const { length, offset } = pathNode
+            const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
+            const errorMessage = `You cannot set both ${propertyName} and ${pathFieldName} at the same time.`
+            diagnostics.push(Diagnostic.create(range, errorMessage, DiagnosticSeverity.Error))
+        }
+    }
+
+    return diagnostics
 }
 
 function validateParameters(parametersPropNode: PropertyASTNode, document: TextDocument): Diagnostic[] {
@@ -123,7 +199,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
     const startAtNode = findPropChildByName(rootNode, 'StartAt')
 
     // Different schemas for root and root of nested state machine
-    let rootSchema : Object = schema.Root
+    let rootSchema: Object = schema.Root
     if (rootType === RootType.Map) {
         rootSchema = schema.NestedMapRoot
     } else if (rootType === RootType.Parallel) {
@@ -190,7 +266,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
 
                     // mark the value of Next property as reached state
                     if (typeof nextNodeValue === 'string') {
-                       reachedStates[nextNodeValue] = true
+                        reachedStates[nextNodeValue] = true
                     }
 
                     // Validate Parameters for given state types
@@ -217,7 +293,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         }
                     }
 
-                    switch(stateType) {
+                    switch (stateType) {
                         // if the type of the state is "Map" recursively run validateStates for its value node
                         case 'Map': {
                             const iteratorPropNode = findPropChildByName(oneStateValueNode, 'Iterator') || findPropChildByName(oneStateValueNode, 'ItemProcessor')
@@ -270,6 +346,13 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                         case 'Succeed':
                         case 'Fail': {
                             hasTerminalState = true
+
+                            const validateErrorFieldDiagnostics = validateExclusivePathTypeField(oneStateValueNode, 'Error', document)
+                            diagnostics = diagnostics.concat(validateErrorFieldDiagnostics)
+
+                            const validateCauseFieldDiagnostics = validateExclusivePathTypeField(oneStateValueNode, 'Cause', document)
+                            diagnostics = diagnostics.concat(validateCauseFieldDiagnostics)
+
                             break
                         }
                     }
@@ -287,7 +370,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
             // if it doesn't have a terminal state emit diagnostic
             // selecting the range of "States" property key node
             if (!hasTerminalState) {
-                const { length, offset } =  statesNode.keyNode
+                const { length, offset } = statesNode.keyNode
                 const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
 
                 diagnostics.push(Diagnostic.create(range, MESSAGES.NO_TERMINAL_STATE, DiagnosticSeverity.Error))
@@ -301,7 +384,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
                     return !reachedStates[stateName]
                 })
                 .forEach(unreachableStatePropNode => {
-                    const { length, offset } =  unreachableStatePropNode.keyNode
+                    const { length, offset } = unreachableStatePropNode.keyNode
                     const range = Range.create(document.positionAt(offset), document.positionAt(offset + length))
 
                     diagnostics.push(Diagnostic.create(range, MESSAGES.UNREACHABLE_STATE, DiagnosticSeverity.Error))

@@ -17,6 +17,24 @@ import {
     documentChoiceValidDefault,
     documentChoiceValidNext,
     documentDistributedMapInvalidNextInNestedState,
+    documentFailCauseAndCausePathInvalid,
+    documentFailCausePathJsonPathInvalid,
+    documentFailErrorAndCausePathValid,
+    documentFailErrorAndCauseValid,
+    documentFailErrorAndErrorPathInvalid,
+    documentFailErrorAndNoCauseValid,
+    documentFailErrorPathAndCausePathContextValid,
+    documentFailErrorPathAndCausePathIntrinsicInvalid,
+    documentFailErrorPathAndCausePathIntrinsicNestedValid,
+    documentFailErrorPathAndCausePathIntrinsicValid,
+    documentFailErrorPathAndCausePathJsonPathInvalid,
+    documentFailErrorPathAndCausePathValid,
+    documentFailErrorPathAndCauseValid,
+    documentFailErrorPathAndNoCauseValid,
+    documentFailErrorPathJsonPathInvalid,
+    documentFailNoErrorAndCausePathValid,
+    documentFailNoErrorAndCauseValid,
+    documentFailNoErrorAndNoCauseValid,
     documentInvalidNext,
     documentInvalidNextNested,
     documentInvalidParametersIntrinsicFunction,
@@ -44,6 +62,8 @@ import {
     documentTaskCatchTemplate,
     documentTaskCatchTemplateInvalidNext,
     documentTaskInvalidArn,
+    documentTaskRetryInvalid,
+    documentTaskRetryValid,
     documentTaskValidVariableSubstitution,
     documentUnreachableState,
     documentValidAslImprovements,
@@ -63,7 +83,8 @@ export interface TestValidationOptions {
     diagnostics: {
         message: string,
         start: [number, number],
-        end: [number, number]
+        end: [number, number],
+        code?: string | number | undefined
     }[],
     filterMessages?: string[]
 }
@@ -97,7 +118,8 @@ async function testValidations(options: TestValidationOptions) {
         const diagnostic = Diagnostic.create(
             Range.create(leftPos, rightPos),
             diagnostics[index].message,
-            DiagnosticSeverity.Error
+            DiagnosticSeverity.Error,
+            diagnostics[index].code
         )
 
         assert.deepStrictEqual(diagnostic, item)
@@ -213,7 +235,7 @@ suite('ASL context-aware validation', () => {
         test('Shows diagnostics on ItemProcessor that does not have required states', async () => {
             await testValidations({
                 json: documentMapInvalidItemProcessorConfig,
-                diagnostics: [  {
+                diagnostics: [{
                     message: 'Missing property "StartAt".',
                     start: [10, 10],
                     end: [10, 25]
@@ -793,5 +815,257 @@ suite('ASL context-aware validation', () => {
                 })
             })
         })
+    });
+
+    suite('Fail state', async () => {
+        suite('Valid Error, ErrorPath, Cause & CausePath combinations', async () => {
+            test('Fail state with Error and Cause valid', async () => {
+                await testValidations({
+                    json: documentFailErrorAndCauseValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Fail state with Error and no Cause valid', async () => {
+                await testValidations({
+                    json: documentFailErrorAndNoCauseValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Fail state with no Error and Cause valid', async () => {
+                await testValidations({
+                    json: documentFailNoErrorAndCauseValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Fail state with neither Error nor Cause valid', async () => {
+                await testValidations({
+                    json: documentFailNoErrorAndNoCauseValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Fail state with ErrorPath and CausePath valid', async () => {
+                await testValidations({
+                    json: documentFailErrorPathAndCausePathValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Fail state with ErrorPath and Cause valid', async () => {
+                await testValidations({
+                    json: documentFailErrorPathAndCauseValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Fail state with Error and CausePath valid', async () => {
+                await testValidations({
+                    json: documentFailErrorAndCausePathValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Fail state with ErrorPath and no Cause valid', async () => {
+                await testValidations({
+                    json: documentFailErrorPathAndNoCauseValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Fail state with no Error and CausePath valid', async () => {
+                await testValidations({
+                    json: documentFailNoErrorAndCausePathValid,
+                    diagnostics: []
+                })
+            })
+        });
+
+        suite('JsonPath, Context Object and Intrinsic Functions', async () => {
+            test('Fail state ErrorPath and CausePath Context object valid', async () => {
+                await testValidations({
+                    json: documentFailErrorPathAndCausePathContextValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Fail state ErrorPath and CausePath Intrinsic functions valid', async () => {
+                await testValidations({
+                    json: documentFailErrorPathAndCausePathIntrinsicValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Fail state ErrorPath and CausePath Intrinsic functions valid', async () => {
+                await testValidations({
+                    json: documentFailErrorPathAndCausePathIntrinsicNestedValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Fail state ErrorPath and CausePath Intrinsic functions invalid', async () => {
+                await testValidations({
+                    json: documentFailErrorPathAndCausePathIntrinsicInvalid,
+                    diagnostics: [
+                        {
+                            message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC_STRING_ONLY,
+                            start: [6, 10],
+                            end: [6, 65]
+                        },
+                        {
+                            message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC_STRING_ONLY,
+                            start: [7, 10],
+                            end: [7, 57]
+                        },
+                    ]
+                })
+            })
+
+            test('Fail state ErrorPath and CausePath JSONPath invalid', async () => {
+                await testValidations({
+                    json: documentFailErrorPathAndCausePathJsonPathInvalid,
+                    diagnostics: [
+                        {
+                            message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC_STRING_ONLY,
+                            start: [6, 10],
+                            end: [6, 30]
+                        },
+                        {
+                            message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC_STRING_ONLY,
+                            start: [7, 10],
+                            end: [7, 30]
+                        },
+                    ]
+                })
+            })
+
+            test('Fail state ErrorPath JSONPath invalid', async () => {
+                await testValidations({
+                    json: documentFailErrorPathJsonPathInvalid,
+                    diagnostics: [
+                        {
+                            message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC_STRING_ONLY,
+                            start: [6, 10],
+                            end: [6, 30]
+                        }
+                    ]
+                })
+            })
+
+            test('Fail state CausePath JSONPath invalid', async () => {
+                await testValidations({
+                    json: documentFailCausePathJsonPathInvalid,
+                    diagnostics: [
+                        {
+                            message: MESSAGES.INVALID_JSON_PATH_OR_INTRINSIC_STRING_ONLY,
+                            start: [7, 10],
+                            end: [7, 30]
+                        }
+                    ]
+                })
+            })
+
+        });
+
+        suite('Invalid Error, ErrorPath, Cause & CausePath combinations', async () => {
+            test('Fail state Error and ErrorPath combination invalid', async () => {
+                await testValidations({
+                    json: documentFailErrorAndErrorPathInvalid,
+                    diagnostics: [
+                        {
+                            message: 'You cannot set both Error and ErrorPath at the same time.',
+                            start: [7, 10],
+                            end: [7, 32]
+                        }
+                    ]
+                })
+            })
+
+            test('Fail state Cause and CausePath combination invalid', async () => {
+                await testValidations({
+                    json: documentFailCauseAndCausePathInvalid,
+                    diagnostics: [
+                        {
+                            message: 'You cannot set both Cause and CausePath at the same time.',
+                            start: [7, 10],
+                            end: [7, 32]
+                        }
+                    ]
+                })
+            })
+        });
+    });
+
+    suite('Retry', async () => {
+        suite('Task retry', async () => {
+            test('Task retry valid', async () => {
+                await testValidations({
+                    json: documentTaskRetryValid,
+                    diagnostics: []
+                })
+            })
+
+            test('Task retry invalid', async () => {
+                await testValidations({
+                    json: documentTaskRetryInvalid,
+                    diagnostics: [
+                        {
+                            message: 'Value is below the minimum of 0.',
+                            start: [10, 29],
+                            end: [10, 31]
+                        },
+                        {
+                            message: 'Incorrect type. Expected "integer".',
+                            start: [14, 33],
+                            end: [14, 36]
+                        },
+                        {
+                            message: 'Value is below the minimum of 1.',
+                            start: [18, 29],
+                            end: [18, 31]
+                        },
+                        {
+                            message: 'Incorrect type. Expected "integer".',
+                            start: [22, 29],
+                            end: [22, 33]
+                        },
+                        {
+                            message: 'Value is below the minimum of 1.',
+                            start: [26, 33],
+                            end: [26, 34]
+                        },
+                        {
+                            message: 'Incorrect type. Expected "integer".',
+                            start: [30, 33],
+                            end: [30, 36]
+                        },
+                        {
+                            message: 'Value is above the maximum of 31622400.',
+                            start: [34, 33],
+                            end: [34, 41]
+                        },
+                        {
+                            message: 'Value is not accepted. Valid values: "FULL", "NONE".',
+                            start: [38, 32],
+                            end: [38, 41],
+                            code: 1
+                        },
+                        {
+                            message: 'Value is below the minimum of 1.',
+                            start: [45, 33],
+                            end: [45, 35]
+                        },
+                        {
+                            message: 'Value is not accepted. Valid values: "FULL", "NONE".',
+                            start: [46, 32],
+                            end: [46, 38],
+                            code: 1
+                        },
+                    ]
+                })
+            })
+        });
     });
 })
