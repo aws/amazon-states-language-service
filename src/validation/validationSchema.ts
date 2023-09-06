@@ -72,10 +72,12 @@ export default {
         },
         Fail: {
             Properties: {
-                Cause: true,
                 Error: true,
+                ErrorPath: true,
+                Cause: true,
+                CausePath: true,
                 Comment: true,
-                Type:  true
+                Type: true
             }
         },
         Parallel: {
@@ -195,7 +197,9 @@ export default {
             IntervalSeconds: true,
             MaxAttempts: true,
             BackoffRate: true,
-            Comment: true
+            Comment: true,
+            MaxDelaySeconds: true,
+            JitterStrategy: true
         }
     },
     Root: {

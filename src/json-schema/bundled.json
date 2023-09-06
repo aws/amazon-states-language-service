@@ -211,6 +211,16 @@
 										"type": "string",
 										"description": "Provides a custom failure string that can be used for operational or diagnostic purposes.",
 										"minLength": 1
+									},
+									"ErrorPath": {
+										"type": "string",
+										"description": "Provides an error name that can be used for error handling (Retry/Catch), operational, or diagnostic purposes. Specified with JsonPath syntax or with Intrinsic Functions. The resulting value must be a string.",
+										"minLength": 1
+									},
+									"CausePath": {
+										"type": "string",
+										"description": "Provides a custom failure string that can be used for operational or diagnostic purposes. Specified with JsonPath syntax or with Intrinsic Functions. The resulting value must be a string.",
+										"minLength": 1
 									}
 								}
 							}
@@ -340,6 +350,21 @@
 												},
 												"Comment": {
 													"$ref": "#/properties/Comment"
+												},
+												"MaxDelaySeconds": {
+													"type": "integer",
+													"description": "A positive integer representing the maximum number of seconds to wait before a retry attempt. If not specified, the limit is the maximum duration a state machine can run. (Maximum: 31622400)",
+													"minimum": 1,
+													"maximum": 31622400
+												},
+												"JitterStrategy": {
+													"type": "string",
+													"description": "The Jitter Strategy to apply to the retry interval.",
+													"minLength": 1,
+													"enum": [
+														"FULL",
+														"NONE"
+													]
 												}
 											},
 											"required": [

@@ -25,6 +25,16 @@
                             "type": "string",
                             "description": "Provides a custom failure string that can be used for operational or diagnostic purposes.",
                             "minLength": 1
+                        },
+                        "ErrorPath": {
+                            "type": "string",
+                            "description": "Provides an error name that can be used for error handling (Retry/Catch), operational, or diagnostic purposes. Specified with JsonPath syntax or with Intrinsic Functions. The resulting value must be a string.",
+                            "minLength": 1
+                        },
+                        "CausePath": {
+                            "type": "string",
+                            "description": "Provides a custom failure string that can be used for operational or diagnostic purposes. Specified with JsonPath syntax or with Intrinsic Functions. The resulting value must be a string.",
+                            "minLength": 1
                         }
                     }
                 }

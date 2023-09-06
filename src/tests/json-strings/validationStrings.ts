@@ -1739,3 +1739,362 @@ export const documentMapInvalidItemProcessorConfig = `
   }
 }
 `
+
+export const documentFailErrorAndCauseValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "Error": "error-value",
+          "Cause": "cause-value"
+      }
+  }
+}
+`
+
+export const documentFailErrorAndNoCauseValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "Error": "error-value"
+      }
+  }
+}
+`
+
+export const documentFailNoErrorAndCauseValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "Cause": "cause-value"
+      }
+  }
+}
+`
+
+export const documentFailNoErrorAndNoCauseValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail"
+      }
+  }
+}
+`
+
+export const documentFailErrorPathAndCausePathValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "ErrorPath": "$.Error",
+          "CausePath": "$.Cause"
+      }
+  }
+}
+`
+
+export const documentFailErrorPathAndNoCauseValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "ErrorPath": "$.Error"
+      }
+  }
+}
+`
+
+export const documentFailNoErrorAndCausePathValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "CausePath": "$.Cause"
+      }
+  }
+}
+`
+
+export const documentFailErrorPathAndCauseValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "ErrorPath": "$.Error",
+          "Cause": "cause-value"
+      }
+  }
+}
+`
+
+export const documentFailErrorAndCausePathValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "Error": "error-value",
+          "CausePath": "$.Cause"
+      }
+  }
+}
+`
+
+export const documentFailErrorPathAndCausePathContextValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "ErrorPath": "$$.StateMachine.Name",
+          "CausePath": "$$.State.Name"
+      }
+  }
+}
+`
+
+export const documentFailErrorPathAndCausePathIntrinsicValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "ErrorPath": "States.UUID()",
+          "CausePath": "States.Format('this is the error: {}, and this is the cause: {}', $.Error, $.Cause)"
+      }
+  }
+}
+`
+
+export const documentFailErrorPathAndCausePathIntrinsicNestedValid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "ErrorPath": "States.JsonToString($.unescapedJson)",
+          "CausePath": "States.Format('this is the error: {}, and this is the cause: {}', States.ArrayGetItem($.inputArray, $.index), $.Cause)"
+      }
+  }
+}
+`
+
+export const documentFailErrorPathAndCausePathJsonPathInvalid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "ErrorPath": "Error",
+          "CausePath": "Cause"
+      }
+  }
+}
+`
+
+export const documentFailErrorPathJsonPathInvalid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "ErrorPath": "Error",
+          "CausePath": "$.Cause"
+      }
+  }
+}
+`
+
+export const documentFailCausePathJsonPathInvalid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "ErrorPath": "$.Error",
+          "CausePath": "Cause"
+      }
+  }
+}
+`
+
+export const documentFailErrorPathAndCausePathIntrinsicInvalid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "ErrorPath": "States.StringToJson($.escapedJsonString)",
+          "CausePath": "States.MathAdd($.value1, $.step)"
+      }
+  }
+}
+`
+
+export const documentFailErrorAndErrorPathInvalid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "Error": "Error",
+          "ErrorPath": "$.Error"
+      }
+  }
+}
+`
+
+export const documentFailCauseAndCausePathInvalid = `
+{
+  "StartAt": "fail",
+  "States": {
+      "fail": {
+          "Type": "Fail",
+          "Cause": "Cause",
+          "CausePath": "$.Cause"
+      }
+  }
+}
+`
+
+export const documentTaskRetryValid = `{
+  "Comment": "A Retry example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "HelloWorld",
+  "States": {
+      "HelloWorld": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:myFunction",
+          "Retry": [
+            {
+              "ErrorEquals": [ "States.Timeout" ],
+              "MaxAttempts": 0
+            },
+            {
+              "ErrorEquals": [ "A" ],
+              "IntervalSeconds": 123
+            },
+            {
+              "ErrorEquals": [ "B" ],
+              "BackoffRate": 1.5
+            },
+            {
+              "ErrorEquals": [ "C" ],
+              "MaxAttempts": 123
+            },
+            {
+              "ErrorEquals": [ "D" ],
+              "MaxDelaySeconds": 123
+            },
+            {
+              "ErrorEquals": [ "E" ],
+              "JitterStrategy": "FULL"
+            },
+            {
+              "ErrorEquals": [ "F" ],
+              "JitterStrategy": "NONE"
+            },
+            {
+              "ErrorEquals": [ "G" ],
+              "IntervalSeconds": 3,
+              "MaxAttempts": 2,
+              "BackoffRate": 1.5,
+              "MaxDelaySeconds": 4,
+              "JitterStrategy": "FULL"
+            },
+            {
+              "ErrorEquals": [ "H" ],
+              "MaxDelaySeconds": 4,
+              "JitterStrategy": "FULL"
+            },
+            {
+              "ErrorEquals": [ "I" ],
+              "MaxAttempts": 20,
+              "MaxDelaySeconds": 4,
+              "JitterStrategy": "FULL"
+            },
+            {
+              "ErrorEquals": [ "J" ],
+              "MaxAttempts": 20,
+              "MaxDelaySeconds": 4
+            },
+            {
+              "ErrorEquals": [ "K" ],
+              "MaxAttempts": 20,
+              "MaxDelaySeconds": 4
+            },
+            {
+              "ErrorEquals": [ "States.ALL" ]
+            }
+        ],
+          "End": true
+      }
+  }
+}`
+
+export const documentTaskRetryInvalid = `{
+  "Comment": "A Retry example with invalid inputs",
+  "StartAt": "HelloWorld",
+  "States": {
+      "HelloWorld": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:myFunction",
+          "Retry": [
+            {
+              "ErrorEquals": [ "States.Timeout" ],
+              "MaxAttempts": -1
+            },
+            {
+              "ErrorEquals": [ "A" ],
+              "IntervalSeconds": 3.5
+            },
+            {
+              "ErrorEquals": [ "B" ],
+              "BackoffRate": -2
+            },
+            {
+              "ErrorEquals": [ "C" ],
+              "MaxAttempts": 99.5
+            },
+            {
+              "ErrorEquals": [ "E" ],
+              "MaxDelaySeconds": 0
+            },
+            {
+              "ErrorEquals": [ "D" ],
+              "MaxDelaySeconds": 3.5
+            },
+            {
+              "ErrorEquals": [ "E" ],
+              "MaxDelaySeconds": 31622401
+            },
+            {
+              "ErrorEquals": [ "F" ],
+              "JitterStrategy": "invalid"
+            },
+            {
+              "ErrorEquals": [ "G" ],
+              "IntervalSeconds": 3,
+              "MaxAttempts": 2,
+              "BackoffRate": 1.5,
+              "MaxDelaySeconds": -1,
+              "JitterStrategy": "full"
+            },
+            {
+              "ErrorEquals": [ "States.ALL" ]
+            }
+        ],
+          "End": true
+      }
+  }
+}`
