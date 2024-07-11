@@ -274,6 +274,8 @@
 											"arn:aws:states:::glue:startJobRun.sync",
 											"arn:aws:states:::lambda:invoke",
 											"arn:aws:states:::lambda:invoke.waitForTaskToken",
+											"arn:aws:states:::mediaconvert:createJob",
+											"arn:aws:states:::mediaconvert:createJob.sync",
 											"arn:aws:states:::sagemaker:createEndpoint",
 											"arn:aws:states:::sagemaker:createEndpointConfig",
 											"arn:aws:states:::sagemaker:createHyperParameterTuningJob",

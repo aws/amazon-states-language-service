@@ -54,6 +54,24 @@
         ],
         "description": "Code snippet for an EventBridge Task state.\n\nCalls the Amazon EventBridge PutEvents API to send a custom event to an event bus."
 	},
+    {
+        "name": "MediaConvert Task State",
+        "body": [
+            "\"${1:Create a MediaConvert Transcoding Job}\": {",
+            "\t\"Type\": \"Task\",",
+            "\t\"Resource\": \"arn:aws:states:::mediaconvert:createJob\",",
+            "\t\"Parameters\": {",
+            "\t\t\"Role\": \"${3:arn:aws:iam::ACCOUNT_ID:role/MyServiceRole}\",",
+            "\t\t\"Settings\": {",
+            "\t\t\t\"Inputs\": [],",
+            "\t\t\t\"OutputGroups\": []",
+            "\t\t}",
+            "\t},",
+            "\t\"Next\": \"${2:NextState}\"",
+            "}"
+        ],
+        "description": "Code snippet for an MediaConvert Create Job Task state.\n\nCalls the AWS MediaConvert CreateJob API to create a Transcoding Job."
+	},
 	{
         "name": "SNS Task State",
         "body": [
