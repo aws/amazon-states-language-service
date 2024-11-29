@@ -15,6 +15,9 @@
                             "enum": [
                                 "Succeed"
                             ]
+                        },
+                        "Output": {
+                            "$ref": "common.json#/definitions/output"
                         }
                     }
                 }

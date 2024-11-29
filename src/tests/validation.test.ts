@@ -16,6 +16,8 @@ import {
     documentChoiceNoDefault,
     documentChoiceValidDefault,
     documentChoiceValidNext,
+    documentChoiceWaitJSONata,
+    documentChoiceWithAssign,
     documentDistributedMapInvalidNextInNestedState,
     documentFailCauseAndCausePathInvalid,
     documentFailCausePathJsonPathInvalid,
@@ -35,6 +37,7 @@ import {
     documentFailNoErrorAndCausePathValid,
     documentFailNoErrorAndCauseValid,
     documentFailNoErrorAndNoCauseValid,
+    documentInvalidFailWithAssign,
     documentInvalidNext,
     documentInvalidNextNested,
     documentInvalidParametersIntrinsicFunction,
@@ -46,15 +49,21 @@ import {
     documentInvalidPropertiesState,
     documentInvalidResultSelectorIntrinsicFunction,
     documentInvalidResultSelectorJsonPath,
+    documentInvalidSuccessWithAssign,
     documentMapCatchTemplate,
     documentMapCatchTemplateInvalidNext,
     documentMapInvalidItemProcessorConfig,
+    documentMapJSONata,
     documentMapProcessorConfig,
+    documentMapWithAssign,
     documentNestedNoTerminalState,
     documentNestedUnreachableState,
     documentNoTerminalState,
     documentParallelCatchTemplate,
     documentParallelCatchTemplateInvalidNext,
+    documentParallelPassSuccessJSONata,
+    documentParallelWithAssign,
+    documentPassWithAssign,
     documentStartAtInvalid,
     documentStartAtNestedInvalid,
     documentStartAtValid,
@@ -62,9 +71,12 @@ import {
     documentTaskCatchTemplate,
     documentTaskCatchTemplateInvalidNext,
     documentTaskInvalidArn,
+    documentTaskJSONata,
+    documentTaskJSONataInvalid,
     documentTaskRetryInvalid,
     documentTaskRetryValid,
     documentTaskValidVariableSubstitution,
+    documentTaskWithAssign,
     documentUnreachableState,
     documentValidAslImprovements,
     documentValidNext,
@@ -1067,5 +1079,138 @@ suite('ASL context-aware validation', () => {
                 })
             })
         });
+    });
+
+    suite('Test validation with JSONata fields', async () => {
+        test('does not show diagnostic error on valid states', async () => {
+            const validJSONataStates = [
+                documentTaskJSONata,
+                documentMapJSONata,
+                documentParallelPassSuccessJSONata,
+                documentChoiceWaitJSONata,
+            ]
+
+            validJSONataStates.forEach(async (definition) => {
+                await testValidations({
+                    json: definition,
+                    diagnostics: []
+                })
+            })
+        })
+
+        test('does show diagnostic error on invalid Task state', async () => {
+            await testValidations({
+                json: documentTaskJSONataInvalid,
+                diagnostics: [{
+                    message: 'Value is not accepted. Valid values: \"JSONata\", \"JSONPath\".',
+                    start: [5, 23],
+                    end: [5, 33],
+                    code: 1
+                }, {
+                    message: 'Incorrect type. Expected one of integer, JSONata expression.',
+                    start: [11, 24],
+                    end: [11, 29]
+                },
+                {
+                    message: 'Incorrect type. Expected one of integer, JSONata expression.',
+                    start: [12, 26],
+                    end: [12, 30],
+                },
+                {
+                    message: 'Incorrect type. Expected one of object, JSONata expression.',
+                    start: [9, 19],
+                    end: [9, 22]
+                },
+                ]
+            })
+        })
+    });
+
+    suite('Assign property', async () => {
+        test('Should be valid for all state types', async () => {
+            const testCases = [
+                documentTaskWithAssign,
+                documentMapWithAssign,
+                documentChoiceWithAssign,
+                documentParallelWithAssign,
+                documentPassWithAssign
+            ]
+            for (const jsonForTestCase of testCases) {
+                await testValidations({
+                    json: jsonForTestCase,
+                    diagnostics: []
+                })
+            }
+        })
+
+        test('Should be valid in choice state when it is added at top level', async () => {
+            /* tslint:disable:no-unsafe-any */
+            const asl = JSON.parse(documentChoiceWithAssign)
+            asl.States.Choice.Assign = {}
+            await testValidations({
+                json: JSON.stringify(asl, undefined, 2),
+                diagnostics: []
+            })
+        })
+
+        test('Should be invalid when used in Success or Fail', async () => {
+            await testValidations({
+                json: documentInvalidSuccessWithAssign,
+                diagnostics: [{
+                    message: MESSAGES.INVALID_PROPERTY_NAME,
+                    start: [6, 10],
+                    end: [6, 18]
+                }]
+            })
+            await testValidations({
+                json: documentInvalidFailWithAssign,
+                diagnostics: [{
+                    message: MESSAGES.INVALID_PROPERTY_NAME,
+                    start: [6, 10],
+                    end: [6, 18]
+                }]
+            })
+        })
+
+        test('Should be valid if value is undefined', async () => {
+            /* tslint:disable:no-unsafe-any */
+            const asl = JSON.parse(documentTaskWithAssign)
+            asl.States.HelloWorld.Assign = undefined
+            await testValidations({
+                json: JSON.stringify(asl, undefined, 2),
+                diagnostics: []
+            })
+        })
+
+        test('Should be invalid for all non-object types', async () => {
+            const errorMessage = 'Incorrect type. Expected \"object\".'
+            /* tslint:disable:no-null-keyword */
+            const assignCases = [null, 'NO', 1234, true]
+            for (const assignCase of assignCases) {
+                /* tslint:disable:no-unsafe-any */
+                const asl = JSON.parse(documentTaskWithAssign)
+                asl.States.HelloWorld.Assign = assignCase
+                await testValidations({
+                    json: JSON.stringify(asl, undefined, 2),
+                    diagnostics: [{
+                        message: errorMessage,
+                        start: [7, 16],
+                        end: [7, 20]
+                    }]
+                })
+            }
+
+            /* tslint:disable:no-unsafe-any */
+            const aslWithArrayForAssign = JSON.parse(documentTaskWithAssign)
+            aslWithArrayForAssign.States.HelloWorld.Assign = ['']
+            await testValidations({
+                json: JSON.stringify(aslWithArrayForAssign, undefined, 2),
+                diagnostics: [{
+                    message: errorMessage,
+                    start: [7, 16],
+                    end: [9, 7]
+                }]
+            })
+        })
     });
 })

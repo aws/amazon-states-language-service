@@ -84,8 +84,16 @@
                                             ]
                                         },
                                         "MaxItems": {
-                                            "type": "integer",
-                                            "description": "An integer that limits the number of data items passed to the Map state.",
+                                            "oneOf": [
+                                                {
+                                                    "type": "integer",
+                                                    "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                                                },
+                                                {
+                                                    "$ref": "common.json#/definitions/jsonata"
+                                                }
+                                            ],
+                                            "description": "An integer or JSONata expression that limits the number of data items passed to the Map state.",
                                             "minimum": 0
                                         },
                                         "MaxItemsPath": {
@@ -101,6 +109,22 @@
                                         "arn:aws:states:::s3:getObject",
                                         "arn:aws:states:::s3:listObjectsV2"
                                     ]
+                                },
+                                "Arguments": {
+                                    "$ref": "common.json#/definitions/arguments",
+                                    "description": "A JSON object or JSONata expression that specifies the Amazon S3 bucket name and object key or prefix in which the dataset is stored.",
+                                    "properties": {
+                                        "Bucket": {
+                                            "type": "string",
+                                            "description": "A string that specifies the Amazon S3 bucket name in which the dataset is stored.",
+                                            "minLength": 1
+                                        },
+                                        "Key": {
+                                            "type": "string",
+                                            "description": "A string that specifies Amazon S3 object key in which the dataset is stored.",
+                                            "minLength": 1
+                                        }
+                                    }
                                 },
                                 "Parameters": {
                                     "type": "object",
@@ -131,20 +155,42 @@
                             }
                         },
                         "ItemSelector": {
-                            "type": "object",
-                            "description": "A JSON object that overrides each single element of the item array."
+                            "type": [
+                                "number",
+                                "string",
+                                "boolean",
+                                "object",
+                                "array",
+                                "null"
+                            ],
+                            "description": "A JSON object or value that overrides each single element of the item array."
                         },
                         "ItemBatcher": {
                             "type": "object",
                             "description": "A JSON object that specifies how to batch the items for the ItemProcessor.",
                             "properties": {
                                 "BatchInput": {
-                                    "type": "object",
+                                    "type": [
+                                        "number",
+                                        "string",
+                                        "boolean",
+                                        "object",
+                                        "array",
+                                        "null"
+                                    ],
                                     "description": "Specifies a fixed JSON input to include in each batch passed to each child workflow execution."
                                 },
                                 "MaxItemsPerBatch": {
-                                    "type": "integer",
-                                    "description": "An integer that limits the maximum number of items of each sub-array.",
+                                    "oneOf": [
+                                        {
+                                            "type": "integer",
+                                            "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                                        },
+                                        {
+                                            "$ref": "common.json#/definitions/jsonata"
+                                        }
+                                    ],
+                                    "description": "An integer or JSONata expression that limits the maximum number of items of each sub-array.",
                                     "minimum": 1
                                 },
                                 "MaxItemsPerBatchPath": {
@@ -152,8 +198,16 @@
                                     "description": "A reference path to an integer that limits the maximum number of items of each sub-array."
                                 },
                                 "MaxInputBytesPerBatch": {
-                                    "type": "integer",
-                                    "description": "An integer that limits the maximum size in bytes of each sub-array.",
+                                    "oneOf": [
+                                        {
+                                            "type": "integer",
+                                            "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                                        },
+                                        {
+                                            "$ref": "common.json#/definitions/jsonata"
+                                        }
+                                    ],
+                                    "description": "An integer or JSONata expression that limits the maximum size in bytes of each sub-array.",
                                     "minimum": 1
                                 },
                                 "MaxInputBytesPerBatchPath": {
@@ -172,6 +226,22 @@
                                     "examples": [
                                         "arn:aws:states:::s3:putObject"
                                     ]
+                                },
+                                "Arguments": {
+                                    "$ref": "common.json#/definitions/arguments",
+                                    "description": "A JSON object that specifies the Amazon S3 resource to export the results to.",
+                                    "properties": {
+                                        "Bucket": {
+                                            "type": "string",
+                                            "description": "A string that specifies the Amazon S3 bucket name to export the results to.",
+                                            "minLength": 1
+                                        },
+                                        "Prefix": {
+                                            "type": "string",
+                                            "description": "A string that specifies the Amazon S3 object prefix to export the results to.",
+                                            "minLength": 1
+                                        }
+                                    }
                                 },
                                 "Parameters": {
                                     "type": "object",
@@ -238,13 +308,35 @@
                             "description": "A string that uniquely identifies a Map state.",
                             "minLength": 1
                         },
+                        "ToleratedFailurePercentage": {
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                                },
+                                {
+                                    "$ref": "common.json#/definitions/jsonata"
+                                }
+                            ],
+                            "description": "An integer or JSONata expression that provides an upper bound on the percentage of items that may fail.",
+                            "minimum": 0,
+                            "maximum": 100
+                        },
                         "ToleratedFailurePercentagePath": {
                             "$ref": "common.json#/definitions/referencePath",
                             "description": "A reference path to an integer that provides an upper bound on the percentage of items that may fail."
                         },
                         "ToleratedFailureCount": {
-                            "type": "integer",
-                            "description": "An integer that provides an upper bound on how many items may fail.",
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                                },
+                                {
+                                    "$ref": "common.json#/definitions/jsonata"
+                                }
+                            ],
+                            "description": "An integer or JSONata expression that provides an upper bound on how many items may fail.",
                             "minimum": 0
                         },
                         "ToleratedFailureCountPath": {
@@ -252,7 +344,15 @@
                             "description": "A reference path to an integer that provides an upper bound on how many items may fail."
                         },
                         "MaxConcurrency": {
-                            "type": "integer",
+                            "oneOf": [
+                                {
+                                    "type": "integer",
+                                    "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                                },
+                                {
+                                    "$ref": "common.json#/definitions/jsonata"
+                                }
+                            ],
                             "description": "Provides an upper bound on how many invocations of the Iterator may run in parallel.\n\nThe default value is 0, which places no limit on parallelism and iterations are invoked as concurrently as possible.",
                             "minimum": 0
                         },
@@ -268,6 +368,21 @@
                         "Catch": {
                             "$ref": "common.json#/definitions/catch",
                             "description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
+                        },
+                        "Items": {
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "errorMessage": "Incorrect type. Expected one of array, JSONata expression."
+                                },
+                                {
+                                    "$ref": "common.json#/definitions/jsonata"
+                                }
+                            ],
+                            "description": "An array or JSONata expression identifying where in the state input the array field is found."
+                        },
+                        "Output": {
+                            "$ref": "common.json#/definitions/output"
                         }
                     }
                 }

@@ -20,11 +20,27 @@
                             ]
                         },
                         "Seconds": {
-                            "$ref": "common.json#/definitions/seconds",
+                            "oneOf": [
+                                {
+                                    "$ref": "common.json#/definitions/seconds",
+                                    "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                                },
+                                {
+                                    "$ref": "common.json#/definitions/jsonata"
+                                }
+                            ],
                             "description": "A time, in seconds, to wait before beginning the state specified in the \"Next\" field."
                         },
                         "Timestamp": {
-                            "$ref": "common.json#/definitions/timestamp",
+                            "oneOf": [
+                                {
+                                    "$ref": "common.json#/definitions/timestamp",
+                                    "errorMessage": "Incorrect type. Expected one of timestamp, JSONata expression."
+                                },
+                                {
+                                    "$ref": "common.json#/definitions/jsonata"
+                                }
+                            ],
                             "description": "An absolute time to wait until beginning the state specified in the \"Next\" field.\n\nTimestamps must conform to the RFC3339 profile of ISO 8601, with the further restrictions that an uppercase T must separate the date and time portions, and an uppercase Z must denote that a numeric time zone offset is not present, for example, 2016-08-18T17:33:00Z."
                         },
                         "SecondsPath": {
@@ -34,6 +50,9 @@
                         "TimestampPath": {
                             "$ref": "common.json#/definitions/referencePath",
                             "description": "An absolute time to wait until beginning the state specified in the \"Next\" field, specified using a path from the state's input data."
+                        },
+                        "Output": {
+                            "$ref": "common.json#/definitions/output"
                         }
                     },
                     "oneOf": [
