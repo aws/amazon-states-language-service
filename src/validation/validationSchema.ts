@@ -10,19 +10,23 @@ export default {
         Comment: true,
         InputPath: true,
         OutputPath: true,
+        QueryLanguage: true,
         Type: true
     },
     StateTypes: {
         Pass: {
             Properties: {
+                Assign: true,
                 Result: true,
                 ResultPath: true,
-                Parameters: true
+                Parameters: true,
+                Output: true,
             },
             hasCommonProperties: true
         },
         Task: {
             Properties: {
+                Assign: true,
                 Resource: true,
                 Parameters: true,
                 Credentials: true,
@@ -37,7 +41,9 @@ export default {
                 },
                 Catch: {
                     'Fn:ArrayOf': 'Catcher'
-                }
+                },
+                Arguments: true,
+                Output: true
             },
             hasCommonProperties: true
         },
@@ -46,28 +52,35 @@ export default {
                 Comment: true,
                 InputPath: true,
                 OutputPath: true,
+                QueryLanguage: true,
                 Type: true,
                 Choices: {
                     'Fn:ArrayOf': 'ChoiceRule'
                 },
+                Output: true,
+                Assign: true,
                 Default: true,
             }
         },
         Wait: {
             Properties: {
+                Assign: true,
                 Seconds: true,
                 Timestamp: true,
                 SecondsPath: true,
-                TimestampPath: true
+                TimestampPath: true,
+                Output: true,
             },
             hasCommonProperties: true
         },
         Succeed: {
             Properties: {
+                QueryLanguage: true,
                 Type: true,
                 Comment: true,
                 InputPath: true,
                 OutputPath: true,
+                Output: true,
             }
         },
         Fail: {
@@ -77,15 +90,20 @@ export default {
                 Cause: true,
                 CausePath: true,
                 Comment: true,
+                QueryLanguage: true,
                 Type: true
             }
         },
         Parallel: {
             Properties: {
+                QueryLanguage: true,
+                Assign: true,
                 Branches: true,
                 ResultPath: true,
                 Parameters: true,
                 ResultSelector: true,
+                Arguments: true,
+                Output: true,
                 Retry: {
                     'Fn:ArrayOf': 'Retrier'
                 },
@@ -97,11 +115,15 @@ export default {
         },
         Map: {
             Properties: {
+                QueryLanguage: true,
+                Assign: true,
                 Iterator: true,
                 ItemsPath: true,
+                Items: true,
                 MaxConcurrency: true,
                 MaxConcurrencyPath: true,
                 ResultPath: true,
+                Output: true,
                 Parameters: true,
                 ResultSelector: true,
                 ItemReader: true,
@@ -177,20 +199,26 @@ export default {
         },
         ChoiceRule: {
             'Fn:OneOf': 'ComparisonOperators',
+            Assign: true,
             Variable: true,
+            Condition: true,
+            Output: true,
             Next: true,
             Comment: true
         },
         NestedChoiceRule: {
             'Fn:OneOf': 'ComparisonOperators',
+            Assign: true,
             Variable: true,
             Comment: true
         },
         Catcher: {
             ErrorEquals: true,
             ResultPath: true,
+            Output: true,
             Next: true,
-            Comment: true
+            Comment: true,
+            Assign: true,
         },
         Retrier: {
             ErrorEquals: true,
@@ -207,17 +235,20 @@ export default {
         StartAt: true,
         TimeoutSeconds: true,
         Version: true,
+        QueryLanguage: true,
         States: true
     },
     // State machines nested within Map and Parallel states
     NestedParallelRoot: {
         Comment: true,
         StartAt: true,
+        QueryLanguage: true,
         States: true
     },
     NestedMapRoot: {
         Comment: true,
         StartAt: true,
+        QueryLanguage: true,
         States: true,
         ProcessorConfig: true
     }

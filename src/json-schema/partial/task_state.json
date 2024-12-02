@@ -80,16 +80,32 @@
                             "description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
                         },
                         "TimeoutSeconds": {
-                            "$ref": "common.json#/definitions/seconds",
-                            "description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error name. Must be a positive, non-zero integer. If not provided, the default value is 99999999. The count begins after the task has been started, for example, when ActivityStarted or LambdaFunctionStarted are logged in the Execution event history."
+                            "oneOf": [
+                                {
+                                    "$ref": "common.json#/definitions/seconds",
+                                    "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                                },
+                                {
+                                    "$ref": "common.json#/definitions/jsonata"
+                                }
+                            ],
+                            "description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error name. Must be a positive, non-zero integer, or a jsonata expression. If not provided, the default value is 99999999. The count begins after the task has been started, for example, when ActivityStarted or LambdaFunctionStarted are logged in the Execution event history."
                         },
                         "TimeoutSecondsPath": {
                             "$ref": "common.json#/definitions/path",
                             "description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error. Specified using JsonPath syntax, to select the value from the state's input data."
                         },
                         "HeartbeatSeconds": {
-                            "$ref": "common.json#/definitions/seconds",
-                            "description": "If more time than the specified seconds elapses between heartbeats from the task, this state fails with a States.Timeout error name. Must be a positive, non-zero integer less than the number of seconds specified in the TimeoutSeconds field. If not provided, the default value is 99999999. For Activities, the count begins when GetActivityTask receives a token and ActivityStarted is logged in the Execution event history."
+                            "oneOf": [
+                                {
+                                    "$ref": "common.json#/definitions/seconds",
+                                    "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                                },
+                                {
+                                    "$ref": "common.json#/definitions/jsonata"
+                                }
+                            ],
+                            "description": "If more time than the specified seconds elapses between heartbeats from the task, this state fails with a States.Timeout error name. Must be a positive, non-zero integer less than the number of seconds specified in the TimeoutSeconds field, or a jsonata expression. If not provided, the default value is 99999999. For Activities, the count begins when GetActivityTask receives a token and ActivityStarted is logged in the Execution event history."
                         },
                         "HeartbeatSecondsPath": {
                             "$ref": "common.json#/definitions/path",
@@ -102,6 +118,16 @@
                         "Catch": {
                             "$ref": "common.json#/definitions/catch",
                             "description": "An array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
+                        },
+                        "Arguments": {
+                            "$ref": "common.json#/definitions/arguments"
+                        },
+                        "Output": {
+                            "$ref": "common.json#/definitions/output"
+                        },
+                        "Assign": {
+                            "$ref": "common.json#/definitions/assign",
+                            "description": "An object to define the variables to be assigned."
                         }
                     },
                     "required": [

@@ -18,6 +18,9 @@
                         "Map"
                     ]
                 },
+                "QueryLanguage": {
+                    "$ref": "#/definitions/queryLanguage"
+                },
                 "Comment": {
                     "$ref": "#/definitions/comment"
                 }
@@ -89,6 +92,15 @@
                 }
             }
         },
+        "queryLanguage": {
+            "type": "string",
+            "description": "ASL mode configuration. Specify either JSONata or JSONPath.",
+            "minLength": 1,
+            "enum": [
+                "JSONata",
+                "JSONPath"
+            ]
+        },
         "comment": {
             "type": "string",
             "description": "A human-readable comment or description.",
@@ -142,6 +154,10 @@
         "path": {
             "type": "string",
             "pattern": "\\$.*"
+        },
+        "jsonata": {
+            "type": "string",
+            "pattern": "^{%(.*)%}$"
         },
         "parameters": {
             "type": [
@@ -231,8 +247,14 @@
                             }
                         ]
                     },
+                    "Output": {
+                        "$ref": "#/definitions/output"
+                    },
                     "Comment": {
                         "$ref": "#/definitions/comment"
+                    },
+                    "Assign": {
+                        "$ref": "#/definitions/assign"
                     }
                 },
                 "required": [
@@ -240,6 +262,33 @@
                     "Next"
                 ]
             }
+        },
+        "arguments": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "errorMessage": "Incorrect type. Expected one of object, JSONata expression."
+                },
+                {
+                    "$ref": "common.json#/definitions/jsonata"
+                }
+            ],
+            "description": "An object or JSONata expression to define the Argument of this task state."
+        },
+        "output": {
+            "type": [
+                "number",
+                "string",
+                "boolean",
+                "object",
+                "array",
+                "null"
+            ],
+            "description": "A value to define the Output configuration of this task state."
+        },
+        "assign": {
+            "type": "object",
+            "description": "An object to define the variables to be assigned."
         }
     }
 }

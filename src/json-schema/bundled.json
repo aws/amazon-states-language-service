@@ -50,6 +50,9 @@
 											"Map"
 										]
 									},
+									"QueryLanguage": {
+										"$ref": "#/properties/QueryLanguage"
+									},
 									"Comment": {
 										"$ref": "#/properties/Comment"
 									}
@@ -138,6 +141,17 @@
 											"array",
 											"null"
 										]
+									},
+									"Output": {
+										"type": [
+											"number",
+											"string",
+											"boolean",
+											"object",
+											"array",
+											"null"
+										],
+										"description": "A value to define the Output configuration of this task state."
 									}
 								}
 							}
@@ -181,6 +195,9 @@
 										"enum": [
 											"Succeed"
 										]
+									},
+									"Output": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Output"
 									}
 								}
 							}
@@ -306,19 +323,35 @@
 										"type": "object"
 									},
 									"TimeoutSeconds": {
-										"$ref": "#/properties/TimeoutSeconds",
-										"description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error name. Must be a positive, non-zero integer. If not provided, the default value is 99999999. The count begins after the task has been started, for example, when ActivityStarted or LambdaFunctionStarted are logged in the Execution event history."
+										"oneOf": [
+											{
+												"$ref": "#/properties/TimeoutSeconds",
+												"errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+											},
+											{
+												"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+											}
+										],
+										"description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error name. Must be a positive, non-zero integer, or a jsonata expression. If not provided, the default value is 99999999. The count begins after the task has been started, for example, when ActivityStarted or LambdaFunctionStarted are logged in the Execution event history."
 									},
 									"TimeoutSecondsPath": {
-										"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath",
+										"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath",
 										"description": "If the task runs longer than the specified seconds, this state fails with a States.Timeout error. Specified using JsonPath syntax, to select the value from the state's input data."
 									},
 									"HeartbeatSeconds": {
-										"$ref": "#/properties/TimeoutSeconds",
-										"description": "If more time than the specified seconds elapses between heartbeats from the task, this state fails with a States.Timeout error name. Must be a positive, non-zero integer less than the number of seconds specified in the TimeoutSeconds field. If not provided, the default value is 99999999. For Activities, the count begins when GetActivityTask receives a token and ActivityStarted is logged in the Execution event history."
+										"oneOf": [
+											{
+												"$ref": "#/properties/TimeoutSeconds",
+												"errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+											},
+											{
+												"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+											}
+										],
+										"description": "If more time than the specified seconds elapses between heartbeats from the task, this state fails with a States.Timeout error name. Must be a positive, non-zero integer less than the number of seconds specified in the TimeoutSeconds field, or a jsonata expression. If not provided, the default value is 99999999. For Activities, the count begins when GetActivityTask receives a token and ActivityStarted is logged in the Execution event history."
 									},
 									"HeartbeatSecondsPath": {
-										"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath",
+										"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath",
 										"description": "If more time than the specified seconds elapses between heartbeats from the task, this state fails with a States.Timeout error. Specified using JsonPath syntax, to select the value from the state's input data."
 									},
 									"Retry": {
@@ -400,8 +433,14 @@
 														}
 													]
 												},
+												"Output": {
+													"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Output"
+												},
 												"Comment": {
 													"$ref": "#/properties/Comment"
+												},
+												"Assign": {
+													"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Assign"
 												}
 											},
 											"required": [
@@ -409,6 +448,25 @@
 												"Next"
 											]
 										}
+									},
+									"Arguments": {
+										"oneOf": [
+											{
+												"type": "object",
+												"errorMessage": "Incorrect type. Expected one of object, JSONata expression."
+											},
+											{
+												"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+											}
+										],
+										"description": "An object or JSONata expression to define the Argument of this task state."
+									},
+									"Output": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Output"
+									},
+									"Assign": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Assign",
+										"description": "An object to define the variables to be assigned."
 									}
 								},
 								"required": [
@@ -440,6 +498,38 @@
 										"items": {
 											"oneOf": [
 												{
+													"errorMessage": "Incorrect type. Expected a valid choice state condition.",
+													"type": "object",
+													"properties": {
+														"Condition": {
+															"oneOf": [
+																{
+																	"type": "boolean",
+																	"errorMessage": "Incorrect type. Expected one of boolean, JSONata expression."
+																},
+																{
+																	"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+																}
+															]
+														},
+														"Assign": {
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Assign"
+														},
+														"Next": {
+															"type": "string",
+															"description": "The state to transition to if there is an exact match between the input value and the comparison operator for this Choice Rule.",
+															"minLength": 1
+														},
+														"Comment": {
+															"$ref": "#/properties/Comment"
+														}
+													},
+													"required": [
+														"Condition",
+														"Next"
+													]
+												},
+												{
 													"type": "object",
 													"properties": {
 														"StringEquals": {
@@ -451,9 +541,7 @@
 															"minLength": 1
 														},
 														"Next": {
-															"type": "string",
-															"description": "The state to transition to if there is an exact match between the input value and the comparison operator for this Choice Rule.",
-															"minLength": 1
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
 														},
 														"Comment": {
 															"$ref": "#/properties/Comment"
@@ -472,7 +560,7 @@
 															"type": "string"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -494,7 +582,7 @@
 															"type": "string"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -516,7 +604,7 @@
 															"type": "string"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -538,7 +626,7 @@
 															"type": "string"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -560,7 +648,7 @@
 															"type": "number"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -582,7 +670,7 @@
 															"type": "number"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -604,7 +692,7 @@
 															"type": "number"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -626,7 +714,7 @@
 															"type": "number"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -648,7 +736,7 @@
 															"type": "number"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -670,7 +758,7 @@
 															"type": "boolean"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -693,7 +781,7 @@
 															"format": "date-time"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -712,10 +800,10 @@
 													"type": "object",
 													"properties": {
 														"TimestampGreaterThan": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/11/properties/TimestampEquals"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/12/properties/TimestampEquals"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -734,10 +822,10 @@
 													"type": "object",
 													"properties": {
 														"TimestampGreaterThanEquals": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/11/properties/TimestampEquals"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/12/properties/TimestampEquals"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -756,10 +844,10 @@
 													"type": "object",
 													"properties": {
 														"TimestampLessThan": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/11/properties/TimestampEquals"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/12/properties/TimestampEquals"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -778,10 +866,10 @@
 													"type": "object",
 													"properties": {
 														"TimestampLessThanEquals": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/11/properties/TimestampEquals"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/12/properties/TimestampEquals"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -800,7 +888,7 @@
 													"type": "object",
 													"properties": {
 														"And": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/17/properties/Or"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/18/properties/Or"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -821,7 +909,7 @@
 															"type": "array",
 															"minItems": 1,
 															"items": {
-																"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/18/properties/Not"
+																"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/Not"
 															}
 														},
 														"Next": {
@@ -848,7 +936,7 @@
 																			"type": "string"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -866,7 +954,7 @@
 																			"type": "string"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -884,7 +972,7 @@
 																			"type": "string"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -902,7 +990,7 @@
 																			"type": "string"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -920,7 +1008,7 @@
 																			"type": "string"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -938,7 +1026,7 @@
 																			"type": "number"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -956,7 +1044,7 @@
 																			"type": "number"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -974,7 +1062,7 @@
 																			"type": "number"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -992,7 +1080,7 @@
 																			"type": "number"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1010,7 +1098,7 @@
 																			"type": "number"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1043,7 +1131,7 @@
 																	"type": "object",
 																	"properties": {
 																		"TimestampEquals": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/11/properties/TimestampEquals"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/12/properties/TimestampEquals"
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
@@ -1061,7 +1149,7 @@
 																	"type": "object",
 																	"properties": {
 																		"TimestampLessThan": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/11/properties/TimestampEquals"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/12/properties/TimestampEquals"
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
@@ -1079,7 +1167,7 @@
 																	"type": "object",
 																	"properties": {
 																		"TimestampGreaterThan": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/11/properties/TimestampEquals"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/12/properties/TimestampEquals"
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
@@ -1097,7 +1185,7 @@
 																	"type": "object",
 																	"properties": {
 																		"TimestampLessThanEquals": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/11/properties/TimestampEquals"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/12/properties/TimestampEquals"
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
@@ -1115,7 +1203,7 @@
 																	"type": "object",
 																	"properties": {
 																		"TimestampGreaterThanEquals": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/11/properties/TimestampEquals"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/12/properties/TimestampEquals"
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
@@ -1133,7 +1221,7 @@
 																	"type": "object",
 																	"properties": {
 																		"And": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/17/properties/Or"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/18/properties/Or"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1147,7 +1235,7 @@
 																	"type": "object",
 																	"properties": {
 																		"Or": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/17/properties/Or"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/18/properties/Or"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1161,7 +1249,7 @@
 																	"type": "object",
 																	"properties": {
 																		"Not": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/18/properties/Not"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/Not"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1175,10 +1263,10 @@
 																	"type": "object",
 																	"properties": {
 																		"StringEqualsPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1193,10 +1281,10 @@
 																	"type": "object",
 																	"properties": {
 																		"StringLessThanPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1211,10 +1299,10 @@
 																	"type": "object",
 																	"properties": {
 																		"StringGreaterThanPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1229,10 +1317,10 @@
 																	"type": "object",
 																	"properties": {
 																		"StringLessThanEqualsPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1247,10 +1335,10 @@
 																	"type": "object",
 																	"properties": {
 																		"StringGreaterThanEqualsPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1265,10 +1353,10 @@
 																	"type": "object",
 																	"properties": {
 																		"NumericEqualsPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1283,10 +1371,10 @@
 																	"type": "object",
 																	"properties": {
 																		"NumericLessThanPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1301,10 +1389,10 @@
 																	"type": "object",
 																	"properties": {
 																		"NumericGreaterThanPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1319,10 +1407,10 @@
 																	"type": "object",
 																	"properties": {
 																		"NumericLessThanEqualsPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1337,10 +1425,10 @@
 																	"type": "object",
 																	"properties": {
 																		"NumericGreaterThanEqualsPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 																		},
 																		"Comment": {
 																			"$ref": "#/properties/Comment"
@@ -1355,7 +1443,7 @@
 																	"type": "object",
 																	"properties": {
 																		"BooleanEqualsPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
@@ -1373,7 +1461,7 @@
 																	"type": "object",
 																	"properties": {
 																		"TimestampEqualsPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
@@ -1391,7 +1479,7 @@
 																	"type": "object",
 																	"properties": {
 																		"TimestampLessThanPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
@@ -1409,7 +1497,7 @@
 																	"type": "object",
 																	"properties": {
 																		"TimestampGreaterThanPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
@@ -1427,7 +1515,7 @@
 																	"type": "object",
 																	"properties": {
 																		"TimestampLessThanEqualsPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
@@ -1445,7 +1533,7 @@
 																	"type": "object",
 																	"properties": {
 																		"TimestampGreaterThanEqualsPath": {
-																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+																			"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 																		},
 																		"Variable": {
 																			"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0"
@@ -1607,7 +1695,7 @@
 															"pattern": "\\$.*"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1626,10 +1714,10 @@
 													"type": "object",
 													"properties": {
 														"StringGreaterThanPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1648,10 +1736,10 @@
 													"type": "object",
 													"properties": {
 														"StringGreaterThanEqualsPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1670,10 +1758,10 @@
 													"type": "object",
 													"properties": {
 														"StringLessThanPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1692,10 +1780,10 @@
 													"type": "object",
 													"properties": {
 														"StringLessThanEqualsPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1714,10 +1802,10 @@
 													"type": "object",
 													"properties": {
 														"NumericEqualsPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1736,10 +1824,10 @@
 													"type": "object",
 													"properties": {
 														"NumericGreaterThanPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1758,10 +1846,10 @@
 													"type": "object",
 													"properties": {
 														"NumericGreaterThanEqualsPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1780,10 +1868,10 @@
 													"type": "object",
 													"properties": {
 														"NumericLessThanPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1802,10 +1890,10 @@
 													"type": "object",
 													"properties": {
 														"NumericLessThanEqualsPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1824,10 +1912,10 @@
 													"type": "object",
 													"properties": {
 														"BooleanEqualsPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1846,10 +1934,10 @@
 													"type": "object",
 													"properties": {
 														"TimestampEqualsPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1868,10 +1956,10 @@
 													"type": "object",
 													"properties": {
 														"TimestampGreaterThanPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1890,10 +1978,10 @@
 													"type": "object",
 													"properties": {
 														"TimestampGreaterThanEqualsPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1912,10 +2000,10 @@
 													"type": "object",
 													"properties": {
 														"TimestampLessThanPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -1934,10 +2022,10 @@
 													"type": "object",
 													"properties": {
 														"TimestampLessThanEqualsPath": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/19/properties/StringEqualsPath"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/20/properties/StringEqualsPath"
 														},
 														"Variable": {
-															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Variable"
+															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/1/properties/Variable"
 														},
 														"Next": {
 															"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/0/properties/Next"
@@ -2113,6 +2201,13 @@
 									"Default": {
 										"type": "string",
 										"description": "The name of the state to transition to if none of the Choice Rules match."
+									},
+									"Output": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Output"
+									},
+									"Assign": {
+										"type": "object",
+										"description": "An object to define the variables to be assigned."
 									}
 								},
 								"required": [
@@ -2141,11 +2236,27 @@
 										]
 									},
 									"Seconds": {
-										"$ref": "#/properties/TimeoutSeconds",
+										"oneOf": [
+											{
+												"$ref": "#/properties/TimeoutSeconds",
+												"errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+											},
+											{
+												"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+											}
+										],
 										"description": "A time, in seconds, to wait before beginning the state specified in the \"Next\" field."
 									},
 									"Timestamp": {
-										"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/11/properties/TimestampEquals",
+										"oneOf": [
+											{
+												"$ref": "#/properties/States/additionalProperties/oneOf/4/allOf/2/properties/Choices/items/oneOf/12/properties/TimestampEquals",
+												"errorMessage": "Incorrect type. Expected one of timestamp, JSONata expression."
+											},
+											{
+												"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+											}
+										],
 										"description": "An absolute time to wait until beginning the state specified in the \"Next\" field.\n\nTimestamps must conform to the RFC3339 profile of ISO 8601, with the further restrictions that an uppercase T must separate the date and time portions, and an uppercase Z must denote that a numeric time zone offset is not present, for example, 2016-08-18T17:33:00Z."
 									},
 									"SecondsPath": {
@@ -2155,6 +2266,9 @@
 									"TimestampPath": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0",
 										"description": "An absolute time to wait until beginning the state specified in the \"Next\" field, specified using a path from the state's input data."
+									},
+									"Output": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Output"
 									}
 								},
 								"oneOf": [
@@ -2241,6 +2355,12 @@
 									"Catch": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/Catch",
 										"description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
+									},
+									"Arguments": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/Arguments"
+									},
+									"Output": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Output"
 									}
 								},
 								"required": [
@@ -2333,8 +2453,16 @@
 														]
 													},
 													"MaxItems": {
-														"type": "integer",
-														"description": "An integer that limits the number of data items passed to the Map state.",
+														"oneOf": [
+															{
+																"type": "integer",
+																"errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+															},
+															{
+																"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+															}
+														],
+														"description": "An integer or JSONata expression that limits the number of data items passed to the Map state.",
 														"minimum": 0
 													},
 													"MaxItemsPath": {
@@ -2350,6 +2478,22 @@
 													"arn:aws:states:::s3:getObject",
 													"arn:aws:states:::s3:listObjectsV2"
 												]
+											},
+											"Arguments": {
+												"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/Arguments",
+												"description": "A JSON object or JSONata expression that specifies the Amazon S3 bucket name and object key or prefix in which the dataset is stored.",
+												"properties": {
+													"Bucket": {
+														"type": "string",
+														"description": "A string that specifies the Amazon S3 bucket name in which the dataset is stored.",
+														"minLength": 1
+													},
+													"Key": {
+														"type": "string",
+														"description": "A string that specifies Amazon S3 object key in which the dataset is stored.",
+														"minLength": 1
+													}
+												}
 											},
 											"Parameters": {
 												"type": "object",
@@ -2380,20 +2524,42 @@
 										}
 									},
 									"ItemSelector": {
-										"type": "object",
-										"description": "A JSON object that overrides each single element of the item array."
+										"type": [
+											"number",
+											"string",
+											"boolean",
+											"object",
+											"array",
+											"null"
+										],
+										"description": "A JSON object or value that overrides each single element of the item array."
 									},
 									"ItemBatcher": {
 										"type": "object",
 										"description": "A JSON object that specifies how to batch the items for the ItemProcessor.",
 										"properties": {
 											"BatchInput": {
-												"type": "object",
+												"type": [
+													"number",
+													"string",
+													"boolean",
+													"object",
+													"array",
+													"null"
+												],
 												"description": "Specifies a fixed JSON input to include in each batch passed to each child workflow execution."
 											},
 											"MaxItemsPerBatch": {
-												"type": "integer",
-												"description": "An integer that limits the maximum number of items of each sub-array.",
+												"oneOf": [
+													{
+														"type": "integer",
+														"errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+													},
+													{
+														"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+													}
+												],
+												"description": "An integer or JSONata expression that limits the maximum number of items of each sub-array.",
 												"minimum": 1
 											},
 											"MaxItemsPerBatchPath": {
@@ -2401,8 +2567,16 @@
 												"description": "A reference path to an integer that limits the maximum number of items of each sub-array."
 											},
 											"MaxInputBytesPerBatch": {
-												"type": "integer",
-												"description": "An integer that limits the maximum size in bytes of each sub-array.",
+												"oneOf": [
+													{
+														"type": "integer",
+														"errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+													},
+													{
+														"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+													}
+												],
+												"description": "An integer or JSONata expression that limits the maximum size in bytes of each sub-array.",
 												"minimum": 1
 											},
 											"MaxInputBytesPerBatchPath": {
@@ -2421,6 +2595,22 @@
 												"examples": [
 													"arn:aws:states:::s3:putObject"
 												]
+											},
+											"Arguments": {
+												"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/Arguments",
+												"description": "A JSON object that specifies the Amazon S3 resource to export the results to.",
+												"properties": {
+													"Bucket": {
+														"type": "string",
+														"description": "A string that specifies the Amazon S3 bucket name to export the results to.",
+														"minLength": 1
+													},
+													"Prefix": {
+														"type": "string",
+														"description": "A string that specifies the Amazon S3 object prefix to export the results to.",
+														"minLength": 1
+													}
+												}
 											},
 											"Parameters": {
 												"type": "object",
@@ -2487,13 +2677,35 @@
 										"description": "A string that uniquely identifies a Map state.",
 										"minLength": 1
 									},
+									"ToleratedFailurePercentage": {
+										"oneOf": [
+											{
+												"type": "integer",
+												"errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+											},
+											{
+												"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+											}
+										],
+										"description": "An integer or JSONata expression that provides an upper bound on the percentage of items that may fail.",
+										"minimum": 0,
+										"maximum": 100
+									},
 									"ToleratedFailurePercentagePath": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/1/properties/ResultPath/oneOf/0",
 										"description": "A reference path to an integer that provides an upper bound on the percentage of items that may fail."
 									},
 									"ToleratedFailureCount": {
-										"type": "integer",
-										"description": "An integer that provides an upper bound on how many items may fail.",
+										"oneOf": [
+											{
+												"type": "integer",
+												"errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+											},
+											{
+												"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+											}
+										],
+										"description": "An integer or JSONata expression that provides an upper bound on how many items may fail.",
 										"minimum": 0
 									},
 									"ToleratedFailureCountPath": {
@@ -2501,7 +2713,15 @@
 										"description": "A reference path to an integer that provides an upper bound on how many items may fail."
 									},
 									"MaxConcurrency": {
-										"type": "integer",
+										"oneOf": [
+											{
+												"type": "integer",
+												"errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+											},
+											{
+												"$ref": "#/properties/States/additionalProperties/oneOf/7/allOf/3/properties/Items/oneOf/1"
+											}
+										],
 										"description": "Provides an upper bound on how many invocations of the Iterator may run in parallel.\n\nThe default value is 0, which places no limit on parallelism and iterations are invoked as concurrently as possible.",
 										"minimum": 0
 									},
@@ -2517,6 +2737,22 @@
 									"Catch": {
 										"$ref": "#/properties/States/additionalProperties/oneOf/3/allOf/3/properties/Catch",
 										"description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
+									},
+									"Items": {
+										"oneOf": [
+											{
+												"type": "array",
+												"errorMessage": "Incorrect type. Expected one of array, JSONata expression."
+											},
+											{
+												"type": "string",
+												"pattern": "^{%(.*)%}$"
+											}
+										],
+										"description": "An array or JSONata expression identifying where in the state input the array field is found."
+									},
+									"Output": {
+										"$ref": "#/properties/States/additionalProperties/oneOf/0/allOf/3/properties/Output"
 									}
 								}
 							}
@@ -2524,6 +2760,15 @@
 					}
 				]
 			}
+		},
+		"QueryLanguage": {
+			"type": "string",
+			"description": "ASL mode configuration. Specify either JSONata or JSONPath.",
+			"minLength": 1,
+			"enum": [
+				"JSONata",
+				"JSONPath"
+			]
 		}
 	},
 	"required": [

@@ -301,6 +301,7 @@ const topLevelLabels = [
     'TimeoutSeconds',
     'StartAt',
     'States',
+    'QueryLanguage'
 ]
 const stateSnippetLabels = [
     'Pass State',

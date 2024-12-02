@@ -23,6 +23,10 @@
                             "items": {
                                 "oneOf": [
                                     {
+                                        "$ref": "#/definitions/jsonataCondition",
+                                        "errorMessage": "Incorrect type. Expected a valid choice state condition."
+                                    },
+                                    {
                                         "$ref": "#/definitions/topStringEquals"
                                     },
                                     {
@@ -155,6 +159,12 @@
                         "Default": {
                             "type": "string",
                             "description": "The name of the state to transition to if none of the Choice Rules match."
+                        },
+                        "Output": {
+                            "$ref": "common.json#/definitions/output"
+                        },
+                        "Assign": {
+                            "$ref": "common.json#/definitions/assign"
                         }
                     },
                     "required": [
@@ -172,6 +182,35 @@
             "type": "string",
             "description": "The state to transition to if there is an exact match between the input value and the comparison operator for this Choice Rule.",
             "minLength": 1
+        },
+        "jsonataCondition": {
+            "type": "object",
+            "properties": {
+                "Condition": {
+                    "oneOf": [
+                        {
+                            "type": "boolean",
+                            "errorMessage": "Incorrect type. Expected one of boolean, JSONata expression."
+                        },
+                        {
+                            "$ref": "common.json#/definitions/jsonata"
+                        }
+                    ]
+                },
+                "Assign": {
+                    "$ref": "common.json#/definitions/assign"
+                },
+                "Next": {
+                    "$ref": "#/definitions/next"
+                },
+                "Comment": {
+                    "$ref": "common.json#/definitions/comment"
+                }
+            },
+            "required": [
+                "Condition",
+                "Next"
+            ]
         },
         "topStringEquals": {
             "type": "object",

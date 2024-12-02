@@ -55,6 +55,12 @@
                         "Catch": {
                             "$ref": "common.json#/definitions/catch",
                             "description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
+                        },
+                        "Arguments": {
+                            "$ref": "common.json#/definitions/arguments"
+                        },
+                        "Output": {
+                            "$ref": "common.json#/definitions/output"
                         }
                     },
                     "required": [

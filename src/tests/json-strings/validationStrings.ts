@@ -2098,3 +2098,318 @@ export const documentTaskRetryInvalid = `{
       }
   }
 }`
+
+export const documentTaskJSONata = `{
+  "Comment": "A Catch example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "Lambda Invoke",
+  "States": {
+    "Lambda Invoke": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Output": "{% $states.result.Payload %}",
+      "Arguments": {
+        "FunctionName": "{% $states.function %}",
+        "Payload": "{% $states.input %}"
+      },
+      "End": true,
+      "TimeoutSeconds": "{% $states.input.timeout %}",
+      "HeartbeatSeconds": "{% $states.input.heartbeat %}",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Output": "{% $states.result.Payload %}",
+          "Next": "Lambda Invoke"
+        }
+      ]
+    }
+  },
+  "QueryLanguage": "JSONata"
+}`
+
+export const documentTaskJSONataInvalid = `{
+  "Comment": "A Catch example of the Amazon States Language using an AWS Lambda Function",
+  "StartAt": "Lambda Invoke",
+  "States": {
+    "Lambda Invoke": {
+      "QueryLanguage": "notValid",
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Output": "{% $states.result.Payload %}",
+      "Arguments": 123,
+      "End": true,
+      "TimeoutSeconds": false,
+      "HeartbeatSeconds": true,
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Output": "{% $states.result.Payload %}",
+          "Next": "Lambda Invoke"
+        }
+      ]
+    }
+  }
+}`
+
+export const documentMapJSONata = `{
+  "QueryLanguage": "JSONPath",
+  "Comment": "A description of my state machine",
+  "StartAt": "Map",
+  "States": {
+    "Map": {
+      "Type": "Map",
+      "Items": "{% $states %}",
+      "ItemProcessor": {
+        "ProcessorConfig": {
+          "Mode": "DISTRIBUTED",
+          "ExecutionType": "STANDARD"
+        },
+        "StartAt": "Pass",
+        "States": {
+          "Pass": {
+            "Type": "Pass",
+            "End": true
+          }
+        }
+      },
+      "End": true,
+      "Label": "Map",
+      "MaxConcurrency": "{% $states %}",
+      "ItemReader": {
+        "Resource": "arn:aws:states:::s3:listObjectsV2",
+        "Arguments": {
+          "Bucket": "{% $states %}",
+          "Prefix": "{% $states %}"
+        },
+        "ReaderConfig": {
+          "MaxItems": "{% $states %}"
+        }
+      },
+      "ItemBatcher": {
+        "MaxItemsPerBatch": "{% $states %}",
+        "MaxInputBytesPerBatch": "{% $states %}",
+        "BatchInput": "{% $states %}"
+      },
+      "ToleratedFailurePercentage": "{% $states %}",
+      "QueryLanguage": "JSONata",
+      "ItemSelector": "{% $states %}",
+      "ResultWriter": {
+        "Arguments": "{% $states %}"
+      }
+    }
+  }
+}`
+
+export const documentParallelPassSuccessJSONata = `{
+  "QueryLanguage": "JSONata",
+  "Comment": "A description of my state machine",
+  "StartAt": "Parallel",
+  "States": {
+    "Parallel": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "Pass",
+          "States": {
+            "Pass": {
+              "Type": "Pass",
+              "End": true,
+              "Output": {
+                "Placeholder": "{% $states %}"
+              }
+            }
+          }
+        },
+        {
+          "StartAt": "Success",
+          "States": {
+            "Success": {
+              "Type": "Succeed",
+              "Output": "{% $states %}"
+            }
+          }
+        }
+      ],
+      "End": true,
+      "Arguments": "{% $states %}",
+      "Output": "{% $states %}"
+    }
+  }
+}`
+
+export const documentChoiceWaitJSONata = `{
+  "QueryLanguage": "JSONata",
+  "Comment": "A description of my state machine",
+  "StartAt": "Choice",
+  "States": {
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Next": "Pass",
+          "Condition": "{% $states %}",
+          "Output": "{% $states %}"
+        }
+      ],
+      "Default": "Wait",
+      "Output": "{% $states %}"
+    },
+    "Wait": {
+      "Type": "Wait",
+      "Timestamp": "{% $states %}",
+      "End": true
+    },
+    "Pass": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}`
+
+export const documentTaskWithAssign = `{
+  "Comment": "An example of the Amazon States Language using a Task state with Assign field",
+  "StartAt": "HelloWorld",
+  "States": {
+      "HelloWorld": {
+          "Type": "Task",
+          "Resource": "arn:aws:lambda:us-east-1:111111111111:function:myFunction",
+          "Assign": {},
+          "Catch": [
+            {
+              "ErrorEquals": [
+                "States.ALL"
+              ],
+              "Next": "HelloWorld",
+              "Assign": {}
+            }
+          ],
+          "End": true
+      }
+  }
+}`
+
+export const documentMapWithAssign = `{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "ResultPath": "$.array",
+          "MaxConcurrency": 2,
+          "Next": "Final State",
+          "ItemProcessor": {
+              "StartAt": "Pass",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "Result": "Done!",
+                      "End": true
+                  }
+              }
+          },
+          "Assign": {}
+      },
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}`
+
+export const documentChoiceWithAssign = `{
+  "Comment": "An example of the Amazon States Language using a Choice state with Assign field in the rule",
+  "StartAt": "Choice",
+  "States": {
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+          {
+              "Not": {
+                  "Variable": "$",
+                  "IsPresent": true
+              },
+              "Assign": {},
+              "Next": "Pass"
+          }
+      ],
+      "Default": "Pass"
+    },
+    "Pass": {
+      "Type": "Pass",
+      "End": true,
+      "Assign": {}
+    }
+  }
+}`
+
+export const documentParallelWithAssign = `{
+  "Comment": "An example of the Amazon States Language using a Parallel state with Assign field",
+  "StartAt": "Parallel",
+  "States": {
+    "Parallel": {
+      "Type": "Parallel",
+      "Assign": {},
+      "End": true,
+      "Branches": [
+        {
+          "StartAt": "Pass",
+          "States": {
+            "Pass": {
+              "Type": "Pass",
+              "End": true
+            }
+          }
+        }
+      ]
+    }
+  }
+}`
+
+export const documentWaitWithAssign = `{
+  "Comment": "An example of the Amazon States Language using a Wait state with Assign field",
+  "StartAt": "HelloWorld",
+  "States": {
+      "HelloWorld": {
+          "Type": "Wait",
+          "Assign": {},
+          "End": true
+      }
+  }
+}`
+
+export const documentPassWithAssign = `{
+  "Comment": "An example of the Amazon States Language using a Pass state with Assign field",
+  "StartAt": "HelloWorld",
+  "States": {
+      "HelloWorld": {
+          "Type": "Pass",
+          "Assign": {},
+          "End": true
+      }
+  }
+}`
+
+export const documentInvalidSuccessWithAssign = `{
+  "Comment": "An example of the Amazon States Language using a Success state with Assign field",
+  "StartAt": "HelloWorld",
+  "States": {
+      "HelloWorld": {
+          "Type": "Succeed",
+          "Assign": {}
+      }
+  }
+}`
+
+export const documentInvalidFailWithAssign = `{
+  "Comment": "An example of the Amazon States Language using a Fail state with Assign field",
+  "StartAt": "HelloWorld",
+  "States": {
+      "HelloWorld": {
+          "Type": "Fail",
+          "Assign": {}
+      }
+  }
+}`

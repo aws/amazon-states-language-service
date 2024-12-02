@@ -22,6 +22,9 @@
         },
         "States": {
             "$ref": "states.json#/definitions/states"
+        },
+        "QueryLanguage": {
+            "$ref": "common.json#/definitions/queryLanguage"
         }
     },
     "required": [
