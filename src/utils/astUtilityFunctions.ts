@@ -106,7 +106,7 @@ export function findClosestAncestorStateNode(node: ASTNode): PropertyASTNode | u
 }
 
 /** Extracts the list of state names from given property node named "States" */
-export function getListOfStateNamesFromStateNode(node: PropertyASTNode, ignoreColonOffset: boolean = false): string[] {
+export function getListOfStateNamesFromStateNode(node: PropertyASTNode, ignoreColonOffset = false): string[] {
     const nodeName = node.keyNode.value
 
     if (nodeName === 'States') {

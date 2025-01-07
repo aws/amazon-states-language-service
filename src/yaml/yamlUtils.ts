@@ -43,7 +43,7 @@ export function processYamlDocForCompletion(document: TextDocument, position: Po
 
 function processLineWithoutColon(document: TextDocument, cursorPosition: Position, currentLine: string, currentLineEnd: number): ProcessYamlDocForCompletionOutput {
     let modifiedDocText: string
-    let shouldPrependSpace: boolean = false
+    let shouldPrependSpace = false
 
     const tempPositionForCompletions: Position = { ...cursorPosition }
     const startPositionForInsertion: Position = { ...cursorPosition }
@@ -120,7 +120,7 @@ function processLineWithColon(document: TextDocument, cursorPosition: Position, 
     const docTextLength = docText.length
 
     let modifiedDocText: string = docText
-    let shouldPrependSpace: boolean = false
+    let shouldPrependSpace = false
 
     const tempPositionForCompletions: Position = { ...cursorPosition }
     const startPositionForInsertion: Position = { ...cursorPosition }

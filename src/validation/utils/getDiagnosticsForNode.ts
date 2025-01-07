@@ -26,7 +26,7 @@ const referenceTypes = schema.ReferenceTypes
 
 interface SchemaObject { [property: string]: SchemaObject | boolean | string }
 
-function isObject(obj: any): obj is Object {
+function isObject(obj: any): obj is object {
     return obj === Object(obj);
 }
 
