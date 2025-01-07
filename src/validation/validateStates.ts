@@ -199,7 +199,7 @@ export default function validateStates(rootNode: ObjectASTNode, document: TextDo
     const startAtNode = findPropChildByName(rootNode, 'StartAt')
 
     // Different schemas for root and root of nested state machine
-    let rootSchema: Object = schema.Root
+    let rootSchema: object = schema.Root
     if (rootType === RootType.Map) {
         rootSchema = schema.NestedMapRoot
     } else if (rootType === RootType.Parallel) {

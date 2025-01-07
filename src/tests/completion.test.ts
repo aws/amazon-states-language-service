@@ -253,7 +253,7 @@ async function testCompletions(options: TestCompletionOptions) {
 
 }
 
-function getArrayIntersection(arrayOne: String[] | undefined, arrayTwo: String[] | undefined): String[] {
+function getArrayIntersection(arrayOne: string[] | undefined, arrayTwo: string[] | undefined): string[] {
   if ((arrayOne === undefined) || (arrayTwo === undefined)) {
     return []
   }
