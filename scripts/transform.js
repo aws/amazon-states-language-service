@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-const $RefParser = require('json-schema-ref-parser');
+const $RefParser = require('@apidevtools/json-schema-ref-parser');
 const path = require('path');
 const fs = require('fs');
 const util = require('util');
@@ -14,7 +14,6 @@ const SCHEMA_PATH = '../src/json-schema/';
 const BUNDLED_FILE_NAME = 'bundled.json';
 
 async function parseSchema() {
-	const parser = new $RefParser()
 
 	try {
 		const bundled = await $RefParser.bundle(path.resolve(__dirname, SCHEMA_PATH, 'partial/base.json'));

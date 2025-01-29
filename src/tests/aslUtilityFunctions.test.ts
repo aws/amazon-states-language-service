@@ -6,7 +6,14 @@
 import assert from 'assert'
 import { ASTNode } from 'vscode-json-languageservice'
 import { getLanguageService, PropertyASTNode, TextDocument } from '../service'
-import { ASTTree, findClosestAncestorStateNode ,findNodeAtLocation, getListOfStateNamesFromStateNode, insideStateNode, isChildOfStates } from '../utils/astUtilityFunctions'
+import {
+  ASTTree,
+  findClosestAncestorStateNode,
+  findNodeAtLocation,
+  getListOfStateNamesFromStateNode,
+  insideStateNode,
+  isChildOfStates,
+} from '../utils/astUtilityFunctions'
 
 const document = `
 {
@@ -59,124 +66,113 @@ const documentInvalid = `
       "Invalid:
 `
 
-function toDocument(text: string): { textDoc: TextDocument, jsonDoc: ASTTree } {
-    const textDoc = TextDocument.create('foo://bar/file.asl', 'json', 0, text);
+function toDocument(text: string): { textDoc: TextDocument; jsonDoc: ASTTree } {
+  const textDoc = TextDocument.create('foo://bar/file.asl', 'json', 0, text)
 
-    const ls = getLanguageService({});
-    // tslint:disable-next-line: no-inferred-empty-object-type
-    const jsonDoc = ls.parseJSONDocument(textDoc) as ASTTree;
+  const ls = getLanguageService({})
+  // tslint:disable-next-line: no-inferred-empty-object-type
+  const jsonDoc = ls.parseJSONDocument(textDoc) as ASTTree
 
-    return { textDoc, jsonDoc };
+  return { textDoc, jsonDoc }
 }
 
-suite('Utility functions for extracting data from AST Tree', () => {
-    test('getListOfStateNamesFromStateNode - retrieves list of states from state node', async () => {
-        const { jsonDoc } = toDocument(document)
-        const stateNode = jsonDoc.root!.children![1] as PropertyASTNode
-        const stateNames = getListOfStateNamesFromStateNode(stateNode)
+describe('Utility functions for extracting data from AST Tree', () => {
+  test('getListOfStateNamesFromStateNode - retrieves list of states from state node', async () => {
+    const { jsonDoc } = toDocument(document)
+    const stateNode = jsonDoc.root!.children![1] as PropertyASTNode
+    const stateNames = getListOfStateNamesFromStateNode(stateNode)
 
-        const expectedStateNames = [
-            'FirstState',
-            'ChoiceState',
-            'FirstMatchState',
-            'SecondMatchState',
-            'DefaultState',
-            'NextState',
-            'MapState1'
-        ]
+    const expectedStateNames = [
+      'FirstState',
+      'ChoiceState',
+      'FirstMatchState',
+      'SecondMatchState',
+      'DefaultState',
+      'NextState',
+      'MapState1',
+    ]
 
-        assert.strictEqual(stateNames?.length, expectedStateNames.length)
-        assert.deepEqual(stateNames, expectedStateNames)
-    })
+    assert.strictEqual(stateNames?.length, expectedStateNames.length)
+    assert.deepEqual(stateNames, expectedStateNames)
+  })
 
-    test('getListOfStateNamesFromStateNode - throws an error when property named "States" is not provided', async () => {
-        const { jsonDoc } = toDocument(document)
-        const stateNode = jsonDoc.root!.children![0] as PropertyASTNode
+  test('getListOfStateNamesFromStateNode - throws an error when property named "States" is not provided', async () => {
+    const { jsonDoc } = toDocument(document)
+    const stateNode = jsonDoc.root!.children![0] as PropertyASTNode
 
-        assert.throws(
-            () => getListOfStateNamesFromStateNode(stateNode),
-            { message: 'Not a state name property node' }
-        )
-    })
+    assert.throws(() => getListOfStateNamesFromStateNode(stateNode), { message: 'Not a state name property node' })
+  })
 
-    test('getListOfStateNamesFromStateNode - retrieves only valid states', () => {
-        const { jsonDoc } = toDocument(documentInvalid)
-        const stateNode = jsonDoc.root!.children![0] as PropertyASTNode
-        const stateNames = getListOfStateNamesFromStateNode(stateNode)
+  test('getListOfStateNamesFromStateNode - retrieves only valid states', () => {
+    const { jsonDoc } = toDocument(documentInvalid)
+    const stateNode = jsonDoc.root!.children![0] as PropertyASTNode
+    const stateNames = getListOfStateNamesFromStateNode(stateNode)
 
-        const expectedStateNames = [
-            'FirstState',
-            'SecondState'
-        ]
+    const expectedStateNames = ['FirstState', 'SecondState']
 
-        assert.strictEqual(stateNames?.length, expectedStateNames.length)
-        assert.deepEqual(stateNames, expectedStateNames)
-    })
+    assert.strictEqual(stateNames?.length, expectedStateNames.length)
+    assert.deepEqual(stateNames, expectedStateNames)
+  })
 
-    test('findNodeAtLocation - finds a correct node at a given location', () => {
-       const { jsonDoc } = toDocument(document)
-       const location = document.indexOf('MapState2') + 1
+  test('findNodeAtLocation - finds a correct node at a given location', () => {
+    const { jsonDoc } = toDocument(document)
+    const location = document.indexOf('MapState2') + 1
 
-       const node = findNodeAtLocation(jsonDoc.root!, location)
+    const node = findNodeAtLocation(jsonDoc.root!, location)
 
-       assert.ok(!!node)
+    assert.ok(!!node)
 
-       const nodeText = document.slice(node!.offset, node!.offset + node!.length)
+    const nodeText = document.slice(node!.offset, node!.offset + node!.length)
 
-       assert.strictEqual(nodeText, '"MapState2"')
-    })
+    assert.strictEqual(nodeText, '"MapState2"')
+  })
 
-    test('findClosestAncestorStateNode - finds the closest ancestor property node called "States"', () => {
-       const { jsonDoc } = toDocument(document)
-       const location = document.indexOf('State4') + 1
+  test('findClosestAncestorStateNode - finds the closest ancestor property node called "States"', () => {
+    const { jsonDoc } = toDocument(document)
+    const location = document.indexOf('State4') + 1
 
-       const node = findNodeAtLocation(jsonDoc.root!, location)
-       const statesNode = findClosestAncestorStateNode(node!)
+    const node = findNodeAtLocation(jsonDoc.root!, location)
+    const statesNode = findClosestAncestorStateNode(node!)
 
-       assert(!!statesNode)
-       const nodeText = statesNode!.keyNode.value
+    assert(!!statesNode)
+    const nodeText = statesNode!.keyNode.value
 
-       assert.strictEqual(nodeText, 'States')
+    assert.strictEqual(nodeText, 'States')
 
-       const stateNames = getListOfStateNamesFromStateNode(statesNode!)
+    const stateNames = getListOfStateNamesFromStateNode(statesNode!)
 
-       assert.deepEqual(stateNames, [
-          'State1',
-          'State2',
-          'State3',
-          'State4'
-       ]);
-    });
+    assert.deepEqual(stateNames, ['State1', 'State2', 'State3', 'State4'])
+  })
 
-    test('isChildOfStates - should return True if the location is a child node of a "States" node', () => {
-        const { jsonDoc } = toDocument(document)
-        const location = document.indexOf('MapState1') - 2
+  test('isChildOfStates - should return True if the location is a child node of a "States" node', () => {
+    const { jsonDoc } = toDocument(document)
+    const location = document.indexOf('MapState1') - 2
 
-        const node = findNodeAtLocation(jsonDoc.root!, location)
-        assert.strictEqual(isChildOfStates(node as ASTNode), true)
-    })
+    const node = findNodeAtLocation(jsonDoc.root!, location)
+    assert.strictEqual(isChildOfStates(node as ASTNode), true)
+  })
 
-    test('isChildOfStates - should return False if the location is not a child node of a "States" node', () => {
-        const { jsonDoc } = toDocument(document)
-        const location = document.indexOf('SecondMatchState')
+  test('isChildOfStates - should return False if the location is not a child node of a "States" node', () => {
+    const { jsonDoc } = toDocument(document)
+    const location = document.indexOf('SecondMatchState')
 
-        const node = findNodeAtLocation(jsonDoc.root!, location)
-        assert.strictEqual(isChildOfStates(node as ASTNode), false)
-    })
+    const node = findNodeAtLocation(jsonDoc.root!, location)
+    assert.strictEqual(isChildOfStates(node as ASTNode), false)
+  })
 
-    test('insideStateNode - should return True if the location is inside a State node', () => {
-        const { jsonDoc } = toDocument(document)
-        const location = document.indexOf('SecondMatchState') + 1
+  test('insideStateNode - should return True if the location is inside a State node', () => {
+    const { jsonDoc } = toDocument(document)
+    const location = document.indexOf('SecondMatchState') + 1
 
-        const node = findNodeAtLocation(jsonDoc.root!, location)
-        assert.strictEqual(insideStateNode(node as ASTNode), true)
-    })
+    const node = findNodeAtLocation(jsonDoc.root!, location)
+    assert.strictEqual(insideStateNode(node as ASTNode), true)
+  })
 
-    test('insideStateNode - should return True if the location is a child node of a "States" node', () => {
-        const { jsonDoc } = toDocument(document)
-        const location = document.indexOf('MapState1') - 2
+  test('insideStateNode - should return True if the location is a child node of a "States" node', () => {
+    const { jsonDoc } = toDocument(document)
+    const location = document.indexOf('MapState1') - 2
 
-        const node = findNodeAtLocation(jsonDoc.root!, location)
-        assert.strictEqual(insideStateNode(node as ASTNode), false)
-    })
+    const node = findNodeAtLocation(jsonDoc.root!, location)
+    assert.strictEqual(insideStateNode(node as ASTNode), false)
+  })
 })

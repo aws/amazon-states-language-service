@@ -1,3 +1,7 @@
+/*!
+ * Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: MIT
+ */
 
 module.exports = {
 	extends: [
@@ -6,14 +10,25 @@ module.exports = {
 	  'plugin:@typescript-eslint/recommended',
 	],
 	plugins: ['@typescript-eslint'],
-   
+  
 	rules: {
-	  "@typescript-eslint/return-await": 'off',
-	  "@typescript-eslint/no-inferrable-types": 'warn',
-	  "@typescript-eslint/no-explicit-any": 'warn',
+	  '@typescript-eslint/no-explicit-any': 'off',
 	  'no-console': 'warn',
-	  'prefer-const': 'warn',
-	  'no-useless-escape': 'warn'
+	  '@typescript-eslint/no-unused-vars': [
+		'warn',
+		{
+		  caughtErrors: 'none',
+		  argsIgnorePattern: '^_',
+		},
+	  ],
+	  '@typescript-eslint/no-unused-expressions': [
+		'error',
+		{
+		  allowShortCircuit: true,
+		  allowTernary: true,
+		},
+	  ],
 	},
-	ignorePatterns: ['*.js', '*.d.ts', 'node_modules/'],
-}
+	ignorePatterns: ['*.js', '*.d.ts', 'node_modules/', 'src/tests/yaml-strings', 'src/tests/json-strings'],
+  }
+  

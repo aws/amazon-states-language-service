@@ -4,92 +4,90 @@
  */
 
 import {
-    Diagnostic,
-    DiagnosticSeverity,
-    getLanguageService as getLanguageServiceVscode,
-    JSONSchema,
-    LanguageService,
-    LanguageServiceParams
-} from 'vscode-json-languageservice';
+  Diagnostic,
+  DiagnosticSeverity,
+  getLanguageService as getLanguageServiceVscode,
+  JSONSchema,
+  LanguageService,
+  LanguageServiceParams,
+} from 'vscode-json-languageservice'
 
-import aslSchema from './json-schema/bundled.json';
+import aslSchema from './json-schema/bundled.json'
 
-import {
-    ASLOptions,
-    ASTTree,
-    isObjectNode
-} from './utils/astUtilityFunctions'
+import { ASLOptions, ASTTree, isObjectNode } from './utils/astUtilityFunctions'
 
 import completeAsl from './completion/completeAsl'
-import { LANGUAGE_IDS } from './constants/constants';
+import { LANGUAGE_IDS } from './constants/constants'
 import validateStates, { RootType } from './validation/validateStates'
 import { getLanguageService as getAslYamlLanguageService } from './yaml/aslYamlLanguageService'
 
 export * from 'vscode-json-languageservice'
 
-interface ASLLanguageServiceParams extends LanguageServiceParams { aslOptions?: ASLOptions }
+interface ASLLanguageServiceParams extends LanguageServiceParams {
+  aslOptions?: ASLOptions
+}
 
 export const ASL_SCHEMA = aslSchema as JSONSchema
 export const doCompleteAsl = completeAsl
 
-export const getLanguageService = function( params: ASLLanguageServiceParams): LanguageService {
-    const builtInParams = {}
+export const getLanguageService = function (params: ASLLanguageServiceParams): LanguageService {
+  const builtInParams = {}
 
-    const languageService = getLanguageServiceVscode({ ...params, ...builtInParams })
-    const doValidation = languageService.doValidation.bind(languageService) as typeof languageService.doValidation
-    const doComplete = languageService.doComplete.bind(languageService) as typeof languageService.doComplete
+  const languageService = getLanguageServiceVscode({ ...params, ...builtInParams })
+  const doValidation = languageService.doValidation.bind(languageService) as typeof languageService.doValidation
+  const doComplete = languageService.doComplete.bind(languageService) as typeof languageService.doComplete
 
-    languageService.configure({
-        validate: true,
-        allowComments: false,
-        schemas: [
-            {
-                uri: LANGUAGE_IDS.JSON,
-                fileMatch: ['*'],
-                schema: aslSchema as JSONSchema
-            }
-        ]
-    })
+  languageService.configure({
+    validate: true,
+    allowComments: false,
+    schemas: [
+      {
+        uri: LANGUAGE_IDS.JSON,
+        fileMatch: ['*'],
+        schema: aslSchema as JSONSchema,
+      },
+    ],
+  })
 
-    languageService.doValidation = async function(document, jsonDocument, documentSettings) {
-        // vscode-json-languageservice will always set severity as warning for JSONSchema validation
-        // there is no option to configure this behavior so severity needs to be overwritten as error
-        const diagnostics = (await doValidation(document, jsonDocument, documentSettings)).map(diagnostic => {
-            // Non JSON Schema validation will have source: 'asl'
-            if (diagnostic.source !== LANGUAGE_IDS.JSON) {
-                return { ...diagnostic, severity: DiagnosticSeverity.Error }
-            }
+  languageService.doValidation = async function (document, jsonDocument, documentSettings) {
+    // vscode-json-languageservice will always set severity as warning for JSONSchema validation
+    // there is no option to configure this behavior so severity needs to be overwritten as error
+    const diagnostics = (await doValidation(document, jsonDocument, documentSettings)).map((diagnostic) => {
+      // Non JSON Schema validation will have source: 'asl'
+      if (diagnostic.source !== LANGUAGE_IDS.JSON) {
+        return { ...diagnostic, severity: DiagnosticSeverity.Error }
+      }
 
-            return diagnostic
-        }) as Diagnostic[]
+      return diagnostic
+    }) as Diagnostic[]
 
-        const rootNode = (jsonDocument as ASTTree).root
+    const rootNode = (jsonDocument as ASTTree).root
 
-        if (rootNode && isObjectNode(rootNode)) {
-            const aslDiagnostics = validateStates(rootNode, document, RootType.Root, params.aslOptions)
+    if (rootNode && isObjectNode(rootNode)) {
+      const aslDiagnostics = validateStates(rootNode, document, RootType.Root, params.aslOptions)
 
-            return diagnostics.concat(aslDiagnostics)
-        }
-
-        return diagnostics
+      return diagnostics.concat(aslDiagnostics)
     }
 
-    languageService.doComplete = async function(document, position, doc) {
-        const jsonCompletions = await doComplete(document, position, doc);
+    return diagnostics
+  }
 
-        return completeAsl(document, position, doc, jsonCompletions, params.aslOptions);
-    }
+  languageService.doComplete = async function (document, position, doc) {
+    const jsonCompletions = await doComplete(document, position, doc)
 
-    return languageService
+    return completeAsl(document, position, doc, jsonCompletions, params.aslOptions)
+  }
+
+  return languageService
 }
 
-export const getYamlLanguageService = function( params: ASLLanguageServiceParams): LanguageService {
-    const aslLanguageService: LanguageService = getLanguageService({
-        ...params,
-        aslOptions: {
-            ignoreColonOffset: true,
-        },
-    })
+export const getYamlLanguageService = function (params: ASLLanguageServiceParams): LanguageService {
+  const aslLanguageService: LanguageService = getLanguageService({
+    ...params,
+    aslOptions: {
+      ignoreColonOffset: true,
+    },
+  })
 
-    return getAslYamlLanguageService(params, ASL_SCHEMA, aslLanguageService);
+  return getAslYamlLanguageService(params, ASL_SCHEMA, aslLanguageService)
 }

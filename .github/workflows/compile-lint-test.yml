@@ -2,18 +2,20 @@ name: compile-lint-test
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [16.x]
+        # To avoid compatibility problems, pin the CI node.js version to node version used by VSCode Electron
+        # so integration testing will not rely on a later version of node than exists in the default VS Code execution env.
+        # Full table with details here: https://github.com/ewanharris/vscode-versions
+        node-version: [20.x]
 
     steps:
       - uses: actions/checkout@v3
