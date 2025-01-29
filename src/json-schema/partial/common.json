@@ -1,294 +1,254 @@
 {
-    "definitions": {
-        "basics": {
-            "type": "object",
-            "properties": {
-                "Type": {
-                    "type": "string",
-                    "description": "The state's type.",
-                    "minLength": 1,
-                    "enum": [
-                        "Pass",
-                        "Succeed",
-                        "Fail",
-                        "Task",
-                        "Choice",
-                        "Wait",
-                        "Parallel",
-                        "Map"
-                    ]
-                },
-                "QueryLanguage": {
-                    "$ref": "#/definitions/queryLanguage"
-                },
-                "Comment": {
-                    "$ref": "#/definitions/comment"
-                }
+  "definitions": {
+    "basics": {
+      "type": "object",
+      "properties": {
+        "Type": {
+          "type": "string",
+          "description": "The state's type.",
+          "minLength": 1,
+          "enum": ["Pass", "Succeed", "Fail", "Task", "Choice", "Wait", "Parallel", "Map"]
+        },
+        "QueryLanguage": {
+          "$ref": "#/definitions/queryLanguage"
+        },
+        "Comment": {
+          "$ref": "#/definitions/comment"
+        }
+      },
+      "required": ["Type"]
+    },
+    "inputOutputResult": {
+      "properties": {
+        "InputPath": {
+          "description": "A path that selects a portion of the state's input to be passed to the state's task for processing. If omitted, it has the value $ which designates the entire input.",
+          "oneOf": [
+            {
+              "type": "string"
             },
-            "required": [
-                "Type"
-            ]
-        },
-        "inputOutputResult": {
-            "properties": {
-                "InputPath": {
-                    "description": "A path that selects a portion of the state's input to be passed to the state's task for processing. If omitted, it has the value $ which designates the entire input.",
-                    "oneOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ]
-                },
-                "ResultPath": {
-                    "description": "A path that specifies where to place the Result, relative to the raw input. If the raw input has a field at the location addressed by the ResultPath value then in the output that field is discarded and overwritten by the state's result. Otherwise, a new field is created in the state output, with intervening fields constructed as necessary.",
-                    "oneOf": [
-                        {
-                            "$ref": "#/definitions/referencePath"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ]
-                },
-                "OutputPath": {
-                    "description": "A path that selects a portion of the state's input to be passed to the state's output. If omitted, it has the value $ which designates the entire input.",
-                    "oneOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ]
-                }
+            {
+              "type": "null"
             }
+          ]
         },
-        "inputOutput": {
-            "properties": {
-                "InputPath": {
-                    "description": "A path that selects a portion of the state's input to be passed to the state's task for processing. If omitted, it has the value $ which designates the entire input.",
-                    "oneOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ]
-                },
-                "OutputPath": {
-                    "description": "A path that selects a portion of the state's input to be passed to the state's output. If omitted, it has the value $ which designates the entire input.",
-                    "oneOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ]
-                }
+        "ResultPath": {
+          "description": "A path that specifies where to place the Result, relative to the raw input. If the raw input has a field at the location addressed by the ResultPath value then in the output that field is discarded and overwritten by the state's result. Otherwise, a new field is created in the state output, with intervening fields constructed as necessary.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/referencePath"
+            },
+            {
+              "type": "null"
             }
+          ]
         },
-        "queryLanguage": {
-            "type": "string",
-            "description": "ASL mode configuration. Specify either JSONata or JSONPath.",
-            "minLength": 1,
-            "enum": [
-                "JSONata",
-                "JSONPath"
-            ]
-        },
-        "comment": {
-            "type": "string",
-            "description": "A human-readable comment or description.",
-            "minLength": 1
-        },
-        "endOrTransition": {
-            "oneOf": [
-                {
-                    "required": [
-                        "Next"
-                    ]
-                },
-                {
-                    "required": [
-                        "End"
-                    ]
-                }
-            ],
-            "properties": {
-                "Next": {
-                    "type": "string",
-                    "description": "The name of the next state that is run when the current state finishes.",
-                    "minLength": 1
-                },
-                "End": {
-                    "type": "boolean",
-                    "description": "Designates this state as a terminal state (ends the execution) if set to true. There can be any number of terminal states per state machine."
-                }
+        "OutputPath": {
+          "description": "A path that selects a portion of the state's input to be passed to the state's output. If omitted, it has the value $ which designates the entire input.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
             }
-        },
-        "referencePath": {
-            "type": "string",
-            "minLength": 1
-        },
-        "timestamp": {
-            "type": "string",
-            "format": "date-time"
-        },
-        "errors": {
-            "type": "array",
-            "minItems": 1,
-            "items": {
-                "type": "string"
+          ]
+        }
+      }
+    },
+    "inputOutput": {
+      "properties": {
+        "InputPath": {
+          "description": "A path that selects a portion of the state's input to be passed to the state's task for processing. If omitted, it has the value $ which designates the entire input.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
             }
+          ]
         },
-        "seconds": {
+        "OutputPath": {
+          "description": "A path that selects a portion of the state's input to be passed to the state's output. If omitted, it has the value $ which designates the entire input.",
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "queryLanguage": {
+      "type": "string",
+      "description": "ASL mode configuration. Specify either JSONata or JSONPath.",
+      "minLength": 1,
+      "enum": ["JSONata", "JSONPath"]
+    },
+    "comment": {
+      "type": "string",
+      "description": "A human-readable comment or description.",
+      "minLength": 1
+    },
+    "endOrTransition": {
+      "oneOf": [
+        {
+          "required": ["Next"]
+        },
+        {
+          "required": ["End"]
+        }
+      ],
+      "properties": {
+        "Next": {
+          "type": "string",
+          "description": "The name of the next state that is run when the current state finishes.",
+          "minLength": 1
+        },
+        "End": {
+          "type": "boolean",
+          "description": "Designates this state as a terminal state (ends the execution) if set to true. There can be any number of terminal states per state machine."
+        }
+      }
+    },
+    "referencePath": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "errors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "seconds": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 99999999
+    },
+    "path": {
+      "type": "string",
+      "pattern": "\\$.*"
+    },
+    "jsonata": {
+      "type": "string",
+      "pattern": "^{%(.*)%}$"
+    },
+    "parameters": {
+      "type": ["number", "string", "boolean", "object", "array", "null"]
+    },
+    "resultSelector": {
+      "type": "object"
+    },
+    "retry": {
+      "type": "array",
+      "description": "An array of objects, called Retriers, that define a retry policy if the state encounters runtime errors.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ErrorEquals": {
+            "$ref": "#/definitions/errors",
+            "description": "A non-empty array of Error Names. The retry policy for this Retrier is implemented if the reported error matches one of the Error Names."
+          },
+          "IntervalSeconds": {
+            "$ref": "#/definitions/seconds",
+            "description": "A positive integer representing the number of seconds before the first retry attempt. (Default: 1, Maximum: 99999999)"
+          },
+          "MaxAttempts": {
             "type": "integer",
+            "description": "A non-negative integer representing the maximum number of retry attempts. (Default: 3, Maximum: 99999999)",
             "minimum": 0,
             "maximum": 99999999
-        },
-        "path": {
+          },
+          "BackoffRate": {
+            "type": "number",
+            "description": "A number (>= 1) which is the multiplier that increases the retry interval on each attempt. (Default: 2.0)",
+            "minimum": 1.0
+          },
+          "Comment": {
+            "$ref": "#/definitions/comment"
+          },
+          "MaxDelaySeconds": {
+            "type": "integer",
+            "description": "A positive integer representing the maximum number of seconds to wait before a retry attempt. If not specified, the limit is the maximum duration a state machine can run. (Maximum: 31622400)",
+            "minimum": 1,
+            "maximum": 31622400
+          },
+          "JitterStrategy": {
             "type": "string",
-            "pattern": "\\$.*"
+            "description": "The Jitter Strategy to apply to the retry interval.",
+            "minLength": 1,
+            "enum": ["FULL", "NONE"]
+          }
         },
-        "jsonata": {
+        "required": ["ErrorEquals"]
+      }
+    },
+    "catch": {
+      "type": "array",
+      "description": "An array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ErrorEquals": {
+            "$ref": "#/definitions/errors",
+            "description": "A non-empty array of Error Names. The state machine transitions to this Catcher's fallback state if the reported error matches one of the Error Names."
+          },
+          "Next": {
             "type": "string",
-            "pattern": "^{%(.*)%}$"
-        },
-        "parameters": {
-            "type": [
-                "number",
-                "string",
-                "boolean",
-                "object",
-                "array",
-                "null"
-            ]
-        },
-        "resultSelector": {
-            "type": "object"
-        },
-        "retry": {
-            "type": "array",
-            "description": "An array of objects, called Retriers, that define a retry policy if the state encounters runtime errors.",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "ErrorEquals": {
-                        "$ref": "#/definitions/errors",
-                        "description": "A non-empty array of Error Names. The retry policy for this Retrier is implemented if the reported error matches one of the Error Names."
-                    },
-                    "IntervalSeconds": {
-                        "$ref": "#/definitions/seconds",
-                        "description": "A positive integer representing the number of seconds before the first retry attempt. (Default: 1, Maximum: 99999999)"
-                    },
-                    "MaxAttempts": {
-                        "type": "integer",
-                        "description": "A non-negative integer representing the maximum number of retry attempts. (Default: 3, Maximum: 99999999)",
-                        "minimum": 0,
-                        "maximum": 99999999
-                    },
-                    "BackoffRate": {
-                        "type": "number",
-                        "description": "A number (>= 1) which is the multiplier that increases the retry interval on each attempt. (Default: 2.0)",
-                        "minimum": 1.0
-                    },
-                    "Comment": {
-                        "$ref": "#/definitions/comment"
-                    },
-                    "MaxDelaySeconds": {
-                        "type": "integer",
-                        "description": "A positive integer representing the maximum number of seconds to wait before a retry attempt. If not specified, the limit is the maximum duration a state machine can run. (Maximum: 31622400)",
-                        "minimum": 1,
-                        "maximum": 31622400
-                    },
-                    "JitterStrategy": {
-                        "type": "string",
-                        "description": "The Jitter Strategy to apply to the retry interval.",
-                        "minLength": 1,
-                        "enum": [
-                            "FULL",
-                            "NONE"
-                        ]
-                    }
-                },
-                "required": [
-                    "ErrorEquals"
-                ]
-            }
-        },
-        "catch": {
-            "type": "array",
-            "description": "An array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined.",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "ErrorEquals": {
-                        "$ref": "#/definitions/errors",
-                        "description": "A non-empty array of Error Names. The state machine transitions to this Catcher's fallback state if the reported error matches one of the Error Names."
-                    },
-                    "Next": {
-                        "type": "string",
-                        "description": "The state to transition to on Error Name match.",
-                        "minLength": 1
-                    },
-                    "ResultPath": {
-                        "oneOf": [
-                            {
-                                "$ref": "#/definitions/referencePath",
-                                "description": "A path that specifies where to place the Result, relative to the raw input. If the raw input has a field at the location addressed by the ResultPath value then in the output that field is discarded and overwritten by the state's result. Otherwise, a new field is created in the state output, with intervening fields constructed as necessary."
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ]
-                    },
-                    "Output": {
-                        "$ref": "#/definitions/output"
-                    },
-                    "Comment": {
-                        "$ref": "#/definitions/comment"
-                    },
-                    "Assign": {
-                        "$ref": "#/definitions/assign"
-                    }
-                },
-                "required": [
-                    "ErrorEquals",
-                    "Next"
-                ]
-            }
-        },
-        "arguments": {
+            "description": "The state to transition to on Error Name match.",
+            "minLength": 1
+          },
+          "ResultPath": {
             "oneOf": [
-                {
-                    "type": "object",
-                    "errorMessage": "Incorrect type. Expected one of object, JSONata expression."
-                },
-                {
-                    "$ref": "common.json#/definitions/jsonata"
-                }
-            ],
-            "description": "An object or JSONata expression to define the Argument of this task state."
+              {
+                "$ref": "#/definitions/referencePath",
+                "description": "A path that specifies where to place the Result, relative to the raw input. If the raw input has a field at the location addressed by the ResultPath value then in the output that field is discarded and overwritten by the state's result. Otherwise, a new field is created in the state output, with intervening fields constructed as necessary."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "Output": {
+            "$ref": "#/definitions/output"
+          },
+          "Comment": {
+            "$ref": "#/definitions/comment"
+          },
+          "Assign": {
+            "$ref": "#/definitions/assign"
+          }
         },
-        "output": {
-            "type": [
-                "number",
-                "string",
-                "boolean",
-                "object",
-                "array",
-                "null"
-            ],
-            "description": "A value to define the Output configuration of this task state."
+        "required": ["ErrorEquals", "Next"]
+      }
+    },
+    "arguments": {
+      "oneOf": [
+        {
+          "type": "object",
+          "errorMessage": "Incorrect type. Expected one of object, JSONata expression."
         },
-        "assign": {
-            "type": "object",
-            "description": "An object to define the variables to be assigned."
+        {
+          "$ref": "common.json#/definitions/jsonata"
         }
+      ],
+      "description": "An object or JSONata expression to define the Argument of this task state."
+    },
+    "output": {
+      "type": ["number", "string", "boolean", "object", "array", "null"],
+      "description": "A value to define the Output configuration of this task state."
+    },
+    "assign": {
+      "type": "object",
+      "description": "An object to define the variables to be assigned."
     }
+  }
 }

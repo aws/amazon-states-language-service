@@ -1,392 +1,352 @@
 {
-    "definitions": {
-        "mapState": {
-            "description": "The Map state can be used to run a set of steps for each element of an input array. While the Parallel state executes multiple branches of steps using the same input, a Map state will execute the same steps for multiple entries of an array in the state input.",
-            "allOf": [
-                {
-                    "$ref": "common.json#/definitions/basics"
+  "definitions": {
+    "mapState": {
+      "description": "The Map state can be used to run a set of steps for each element of an input array. While the Parallel state executes multiple branches of steps using the same input, a Map state will execute the same steps for multiple entries of an array in the state input.",
+      "allOf": [
+        {
+          "$ref": "common.json#/definitions/basics"
+        },
+        {
+          "$ref": "common.json#/definitions/inputOutputResult"
+        },
+        {
+          "$ref": "common.json#/definitions/endOrTransition"
+        },
+        {
+          "properties": {
+            "Type": {
+              "enum": ["Map"]
+            },
+            "Parameters": {
+              "$ref": "common.json#/definitions/parameters",
+              "description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions."
+            },
+            "ResultSelector": {
+              "$ref": "common.json#/definitions/resultSelector",
+              "description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
+            },
+            "ItemsPath": {
+              "$ref": "common.json#/definitions/referencePath",
+              "description": "Reference path identifying where in the effective input the array field is found."
+            },
+            "Iterator": {
+              "type": "object",
+              "description": "A state machine which will process each element of the array.",
+              "properties": {
+                "StartAt": {
+                  "type": "string",
+                  "description": "A string that must exactly match (is case sensitive) the name of one of the state objects.",
+                  "minLength": 1
                 },
-                {
-                    "$ref": "common.json#/definitions/inputOutputResult"
-                },
-                {
-                    "$ref": "common.json#/definitions/endOrTransition"
-                },
-                {
-                    "properties": {
-                        "Type": {
-                            "enum": [
-                                "Map"
-                            ]
-                        },
-                        "Parameters": {
-                            "$ref": "common.json#/definitions/parameters",
-                            "description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions."
-                        },
-                        "ResultSelector": {
-                            "$ref": "common.json#/definitions/resultSelector",
-                            "description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
-                        },
-                        "ItemsPath": {
-                            "$ref": "common.json#/definitions/referencePath",
-                            "description": "Reference path identifying where in the effective input the array field is found."
-                        },
-                        "Iterator": {
-                            "type": "object",
-                            "description": "A state machine which will process each element of the array.",
-                            "properties": {
-                                "StartAt": {
-                                    "type": "string",
-                                    "description": "A string that must exactly match (is case sensitive) the name of one of the state objects.",
-                                    "minLength": 1
-                                },
-                                "States": {
-                                    "$ref": "states.json#/definitions/states"
-                                }
-                            },
-                            "required": [
-                                "StartAt",
-                                "States"
-                            ]
-                        },
-                        "ItemReader": {
-                            "type": "object",
-                            "description": "Specifies the location of the dataset from which the Map state reads its input data.",
-                            "properties": {
-                                "ReaderConfig": {
-                                    "type": "object",
-                                    "description": "A JSON object that specifies where to read the items instead of from the effective input.",
-                                    "properties": {
-                                        "InputType": {
-                                            "type": "string",
-                                            "description": "A string that specifies the type of Amazon S3 data source.",
-                                            "minLength": 1,
-                                            "enum": [
-                                                "CSV",
-                                                "JSON",
-                                                "MANIFEST"
-                                            ]
-                                        },
-                                        "CSVHeaders": {
-                                            "type": "array",
-                                            "minItems": 1,
-                                            "items": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "CSVHeaderLocation": {
-                                            "type": "string",
-                                            "description": "A string that specifies the location of the CSV column header.",
-                                            "minLength": 1,
-                                            "enum": [
-                                                "FIRST_ROW",
-                                                "GIVEN"
-                                            ]
-                                        },
-                                        "MaxItems": {
-                                            "oneOf": [
-                                                {
-                                                    "type": "integer",
-                                                    "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
-                                                },
-                                                {
-                                                    "$ref": "common.json#/definitions/jsonata"
-                                                }
-                                            ],
-                                            "description": "An integer or JSONata expression that limits the number of data items passed to the Map state.",
-                                            "minimum": 0
-                                        },
-                                        "MaxItemsPath": {
-                                            "$ref": "common.json#/definitions/referencePath",
-                                            "description": "A reference path to an integer that limits the number of data items passed to the Map state."
-                                        }
-                                    }
-                                },
-                                "Resource": {
-                                    "type": "string",
-                                    "description": "The Amazon S3 API action Step Functions must invoke depending on the specified dataset.",
-                                    "examples": [
-                                        "arn:aws:states:::s3:getObject",
-                                        "arn:aws:states:::s3:listObjectsV2"
-                                    ]
-                                },
-                                "Arguments": {
-                                    "$ref": "common.json#/definitions/arguments",
-                                    "description": "A JSON object or JSONata expression that specifies the Amazon S3 bucket name and object key or prefix in which the dataset is stored.",
-                                    "properties": {
-                                        "Bucket": {
-                                            "type": "string",
-                                            "description": "A string that specifies the Amazon S3 bucket name in which the dataset is stored.",
-                                            "minLength": 1
-                                        },
-                                        "Key": {
-                                            "type": "string",
-                                            "description": "A string that specifies Amazon S3 object key in which the dataset is stored.",
-                                            "minLength": 1
-                                        }
-                                    }
-                                },
-                                "Parameters": {
-                                    "type": "object",
-                                    "description": "A JSON object that specifies the Amazon S3 bucket name and object key or prefix in which the dataset is stored.",
-                                    "properties": {
-                                        "Bucket": {
-                                            "type": "string",
-                                            "description": "A string that specifies the Amazon S3 bucket name in which the dataset is stored.",
-                                            "minLength": 1
-                                        },
-                                        "Key": {
-                                            "type": "string",
-                                            "description": "A string that specifies Amazon S3 object key in which the dataset is stored.",
-                                            "minLength": 1
-                                        },
-                                        "Bucket.$": {
-                                            "type": "string",
-                                            "description": "",
-                                            "minLength": 1
-                                        },
-                                        "Prefix.$": {
-                                            "type": "string",
-                                            "description": "",
-                                            "minLength": 1
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "ItemSelector": {
-                            "type": [
-                                "number",
-                                "string",
-                                "boolean",
-                                "object",
-                                "array",
-                                "null"
-                            ],
-                            "description": "A JSON object or value that overrides each single element of the item array."
-                        },
-                        "ItemBatcher": {
-                            "type": "object",
-                            "description": "A JSON object that specifies how to batch the items for the ItemProcessor.",
-                            "properties": {
-                                "BatchInput": {
-                                    "type": [
-                                        "number",
-                                        "string",
-                                        "boolean",
-                                        "object",
-                                        "array",
-                                        "null"
-                                    ],
-                                    "description": "Specifies a fixed JSON input to include in each batch passed to each child workflow execution."
-                                },
-                                "MaxItemsPerBatch": {
-                                    "oneOf": [
-                                        {
-                                            "type": "integer",
-                                            "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
-                                        },
-                                        {
-                                            "$ref": "common.json#/definitions/jsonata"
-                                        }
-                                    ],
-                                    "description": "An integer or JSONata expression that limits the maximum number of items of each sub-array.",
-                                    "minimum": 1
-                                },
-                                "MaxItemsPerBatchPath": {
-                                    "$ref": "common.json#/definitions/referencePath",
-                                    "description": "A reference path to an integer that limits the maximum number of items of each sub-array."
-                                },
-                                "MaxInputBytesPerBatch": {
-                                    "oneOf": [
-                                        {
-                                            "type": "integer",
-                                            "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
-                                        },
-                                        {
-                                            "$ref": "common.json#/definitions/jsonata"
-                                        }
-                                    ],
-                                    "description": "An integer or JSONata expression that limits the maximum size in bytes of each sub-array.",
-                                    "minimum": 1
-                                },
-                                "MaxInputBytesPerBatchPath": {
-                                    "$ref": "common.json#/definitions/referencePath",
-                                    "description": "A reference path to an integer that limits the maximum size in bytes of each sub-array."
-                                }
-                            }
-                        },
-                        "ResultWriter": {
-                            "type": "object",
-                            "description": "A JSON object that specifies where to write the results instead of to the Map state's result.",
-                            "properties": {
-                                "Resource": {
-                                    "type": "string",
-                                    "description": "A string that specifies the Amazon S3 API action Step Functions must invoke depending on the specified dataset.",
-                                    "examples": [
-                                        "arn:aws:states:::s3:putObject"
-                                    ]
-                                },
-                                "Arguments": {
-                                    "$ref": "common.json#/definitions/arguments",
-                                    "description": "A JSON object that specifies the Amazon S3 resource to export the results to.",
-                                    "properties": {
-                                        "Bucket": {
-                                            "type": "string",
-                                            "description": "A string that specifies the Amazon S3 bucket name to export the results to.",
-                                            "minLength": 1
-                                        },
-                                        "Prefix": {
-                                            "type": "string",
-                                            "description": "A string that specifies the Amazon S3 object prefix to export the results to.",
-                                            "minLength": 1
-                                        }
-                                    }
-                                },
-                                "Parameters": {
-                                    "type": "object",
-                                    "description": "A JSON object that specifies the Amazon S3 resource to export the results to.",
-                                    "properties": {
-                                        "Bucket": {
-                                            "type": "string",
-                                            "description": "A string that specifies the Amazon S3 bucket name to export the results to.",
-                                            "minLength": 1
-                                        },
-                                        "Prefix": {
-                                            "type": "string",
-                                            "description": "A string that specifies the Amazon S3 object prefix to export the results to.",
-                                            "minLength": 1
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "ItemProcessor": {
-                            "type": "object",
-                            "description": "A JSON object that defines a state machine which will process each item or batch of items of the array.",
-                            "properties": {
-                                "ProcessorConfig": {
-                                    "type": "object",
-                                    "description": "A JSON object that specifies the Map state processing mode and definition.",
-                                    "properties": {
-                                        "Mode": {
-                                            "type": "string",
-                                            "description": "The Map state processing mode.",
-                                            "minLength": 1,
-                                            "enum": [
-                                                "DISTRIBUTED",
-                                                "INLINE"
-                                            ]
-                                        },
-                                        "ExecutionType": {
-                                            "type": "string",
-                                            "description": "The execution type for the Map workflow.",
-                                            "minLength": 1,
-                                            "enum": [
-                                                "EXPRESS",
-                                                "STANDARD"
-                                            ]
-                                        }
-                                    }
-                                },
-                                "StartAt": {
-                                    "type": "string",
-                                    "description": "A string that must exactly match (is case sensitive) the name of one of the state objects.",
-                                    "minLength": 1
-                                },
-                                "States": {
-                                    "$ref": "states.json#/definitions/states"
-                                } 
-                            },
-                            "required": [
-                                "StartAt",
-                                "States"
-                            ]
-                        },
-                        "Label": {
-                            "type": "string",
-                            "description": "A string that uniquely identifies a Map state.",
-                            "minLength": 1
-                        },
-                        "ToleratedFailurePercentage": {
-                            "oneOf": [
-                                {
-                                    "type": "integer",
-                                    "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
-                                },
-                                {
-                                    "$ref": "common.json#/definitions/jsonata"
-                                }
-                            ],
-                            "description": "An integer or JSONata expression that provides an upper bound on the percentage of items that may fail.",
-                            "minimum": 0,
-                            "maximum": 100
-                        },
-                        "ToleratedFailurePercentagePath": {
-                            "$ref": "common.json#/definitions/referencePath",
-                            "description": "A reference path to an integer that provides an upper bound on the percentage of items that may fail."
-                        },
-                        "ToleratedFailureCount": {
-                            "oneOf": [
-                                {
-                                    "type": "integer",
-                                    "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
-                                },
-                                {
-                                    "$ref": "common.json#/definitions/jsonata"
-                                }
-                            ],
-                            "description": "An integer or JSONata expression that provides an upper bound on how many items may fail.",
-                            "minimum": 0
-                        },
-                        "ToleratedFailureCountPath": {
-                            "$ref": "common.json#/definitions/referencePath",
-                            "description": "A reference path to an integer that provides an upper bound on how many items may fail."
-                        },
-                        "MaxConcurrency": {
-                            "oneOf": [
-                                {
-                                    "type": "integer",
-                                    "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
-                                },
-                                {
-                                    "$ref": "common.json#/definitions/jsonata"
-                                }
-                            ],
-                            "description": "Provides an upper bound on how many invocations of the Iterator may run in parallel.\n\nThe default value is 0, which places no limit on parallelism and iterations are invoked as concurrently as possible.",
-                            "minimum": 0
-                        },
-                        "MaxConcurrencyPath": {
-                            "$ref": "common.json#/definitions/referencePath",
-                            "description": "A reference path to an integer that provides an upper bound on how many invocations of the Iterator may run in parallel.",
-                            "minimum": 0
-                        },
-                        "Retry": {
-                            "$ref": "common.json#/definitions/retry",
-                            "description": "Contains an array of objects, called Retriers, that define a retry policy if the state encounters runtime errors."
-                        },
-                        "Catch": {
-                            "$ref": "common.json#/definitions/catch",
-                            "description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
-                        },
-                        "Items": {
-                            "oneOf": [
-                                {
-                                    "type": "array",
-                                    "errorMessage": "Incorrect type. Expected one of array, JSONata expression."
-                                },
-                                {
-                                    "$ref": "common.json#/definitions/jsonata"
-                                }
-                            ],
-                            "description": "An array or JSONata expression identifying where in the state input the array field is found."
-                        },
-                        "Output": {
-                            "$ref": "common.json#/definitions/output"
-                        }
-                    }
+                "States": {
+                  "$ref": "states.json#/definitions/states"
                 }
-            ]
+              },
+              "required": ["StartAt", "States"]
+            },
+            "ItemReader": {
+              "type": "object",
+              "description": "Specifies the location of the dataset from which the Map state reads its input data.",
+              "properties": {
+                "ReaderConfig": {
+                  "type": "object",
+                  "description": "A JSON object that specifies where to read the items instead of from the effective input.",
+                  "properties": {
+                    "InputType": {
+                      "type": "string",
+                      "description": "A string that specifies the type of Amazon S3 data source.",
+                      "minLength": 1,
+                      "enum": ["CSV", "JSON", "MANIFEST"]
+                    },
+                    "CSVHeaders": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "CSVHeaderLocation": {
+                      "type": "string",
+                      "description": "A string that specifies the location of the CSV column header.",
+                      "minLength": 1,
+                      "enum": ["FIRST_ROW", "GIVEN"]
+                    },
+                    "MaxItems": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                        },
+                        {
+                          "$ref": "common.json#/definitions/jsonata"
+                        }
+                      ],
+                      "description": "An integer or JSONata expression that limits the number of data items passed to the Map state.",
+                      "minimum": 0
+                    },
+                    "MaxItemsPath": {
+                      "$ref": "common.json#/definitions/referencePath",
+                      "description": "A reference path to an integer that limits the number of data items passed to the Map state."
+                    }
+                  }
+                },
+                "Resource": {
+                  "type": "string",
+                  "description": "The Amazon S3 API action Step Functions must invoke depending on the specified dataset.",
+                  "examples": ["arn:aws:states:::s3:getObject", "arn:aws:states:::s3:listObjectsV2"]
+                },
+                "Arguments": {
+                  "$ref": "common.json#/definitions/arguments",
+                  "description": "A JSON object or JSONata expression that specifies the Amazon S3 bucket name and object key or prefix in which the dataset is stored.",
+                  "properties": {
+                    "Bucket": {
+                      "type": "string",
+                      "description": "A string that specifies the Amazon S3 bucket name in which the dataset is stored.",
+                      "minLength": 1
+                    },
+                    "Key": {
+                      "type": "string",
+                      "description": "A string that specifies Amazon S3 object key in which the dataset is stored.",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "Parameters": {
+                  "type": "object",
+                  "description": "A JSON object that specifies the Amazon S3 bucket name and object key or prefix in which the dataset is stored.",
+                  "properties": {
+                    "Bucket": {
+                      "type": "string",
+                      "description": "A string that specifies the Amazon S3 bucket name in which the dataset is stored.",
+                      "minLength": 1
+                    },
+                    "Key": {
+                      "type": "string",
+                      "description": "A string that specifies Amazon S3 object key in which the dataset is stored.",
+                      "minLength": 1
+                    },
+                    "Bucket.$": {
+                      "type": "string",
+                      "description": "",
+                      "minLength": 1
+                    },
+                    "Prefix.$": {
+                      "type": "string",
+                      "description": "",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            },
+            "ItemSelector": {
+              "type": ["number", "string", "boolean", "object", "array", "null"],
+              "description": "A JSON object or value that overrides each single element of the item array."
+            },
+            "ItemBatcher": {
+              "type": "object",
+              "description": "A JSON object that specifies how to batch the items for the ItemProcessor.",
+              "properties": {
+                "BatchInput": {
+                  "type": ["number", "string", "boolean", "object", "array", "null"],
+                  "description": "Specifies a fixed JSON input to include in each batch passed to each child workflow execution."
+                },
+                "MaxItemsPerBatch": {
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                    },
+                    {
+                      "$ref": "common.json#/definitions/jsonata"
+                    }
+                  ],
+                  "description": "An integer or JSONata expression that limits the maximum number of items of each sub-array.",
+                  "minimum": 1
+                },
+                "MaxItemsPerBatchPath": {
+                  "$ref": "common.json#/definitions/referencePath",
+                  "description": "A reference path to an integer that limits the maximum number of items of each sub-array."
+                },
+                "MaxInputBytesPerBatch": {
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                    },
+                    {
+                      "$ref": "common.json#/definitions/jsonata"
+                    }
+                  ],
+                  "description": "An integer or JSONata expression that limits the maximum size in bytes of each sub-array.",
+                  "minimum": 1
+                },
+                "MaxInputBytesPerBatchPath": {
+                  "$ref": "common.json#/definitions/referencePath",
+                  "description": "A reference path to an integer that limits the maximum size in bytes of each sub-array."
+                }
+              }
+            },
+            "ResultWriter": {
+              "type": "object",
+              "description": "A JSON object that specifies where to write the results instead of to the Map state's result.",
+              "properties": {
+                "Resource": {
+                  "type": "string",
+                  "description": "A string that specifies the Amazon S3 API action Step Functions must invoke depending on the specified dataset.",
+                  "examples": ["arn:aws:states:::s3:putObject"]
+                },
+                "Arguments": {
+                  "$ref": "common.json#/definitions/arguments",
+                  "description": "A JSON object that specifies the Amazon S3 resource to export the results to.",
+                  "properties": {
+                    "Bucket": {
+                      "type": "string",
+                      "description": "A string that specifies the Amazon S3 bucket name to export the results to.",
+                      "minLength": 1
+                    },
+                    "Prefix": {
+                      "type": "string",
+                      "description": "A string that specifies the Amazon S3 object prefix to export the results to.",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "Parameters": {
+                  "type": "object",
+                  "description": "A JSON object that specifies the Amazon S3 resource to export the results to.",
+                  "properties": {
+                    "Bucket": {
+                      "type": "string",
+                      "description": "A string that specifies the Amazon S3 bucket name to export the results to.",
+                      "minLength": 1
+                    },
+                    "Prefix": {
+                      "type": "string",
+                      "description": "A string that specifies the Amazon S3 object prefix to export the results to.",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            },
+            "ItemProcessor": {
+              "type": "object",
+              "description": "A JSON object that defines a state machine which will process each item or batch of items of the array.",
+              "properties": {
+                "ProcessorConfig": {
+                  "type": "object",
+                  "description": "A JSON object that specifies the Map state processing mode and definition.",
+                  "properties": {
+                    "Mode": {
+                      "type": "string",
+                      "description": "The Map state processing mode.",
+                      "minLength": 1,
+                      "enum": ["DISTRIBUTED", "INLINE"]
+                    },
+                    "ExecutionType": {
+                      "type": "string",
+                      "description": "The execution type for the Map workflow.",
+                      "minLength": 1,
+                      "enum": ["EXPRESS", "STANDARD"]
+                    }
+                  }
+                },
+                "StartAt": {
+                  "type": "string",
+                  "description": "A string that must exactly match (is case sensitive) the name of one of the state objects.",
+                  "minLength": 1
+                },
+                "States": {
+                  "$ref": "states.json#/definitions/states"
+                }
+              },
+              "required": ["StartAt", "States"]
+            },
+            "Label": {
+              "type": "string",
+              "description": "A string that uniquely identifies a Map state.",
+              "minLength": 1
+            },
+            "ToleratedFailurePercentage": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                },
+                {
+                  "$ref": "common.json#/definitions/jsonata"
+                }
+              ],
+              "description": "An integer or JSONata expression that provides an upper bound on the percentage of items that may fail.",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "ToleratedFailurePercentagePath": {
+              "$ref": "common.json#/definitions/referencePath",
+              "description": "A reference path to an integer that provides an upper bound on the percentage of items that may fail."
+            },
+            "ToleratedFailureCount": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                },
+                {
+                  "$ref": "common.json#/definitions/jsonata"
+                }
+              ],
+              "description": "An integer or JSONata expression that provides an upper bound on how many items may fail.",
+              "minimum": 0
+            },
+            "ToleratedFailureCountPath": {
+              "$ref": "common.json#/definitions/referencePath",
+              "description": "A reference path to an integer that provides an upper bound on how many items may fail."
+            },
+            "MaxConcurrency": {
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
+                },
+                {
+                  "$ref": "common.json#/definitions/jsonata"
+                }
+              ],
+              "description": "Provides an upper bound on how many invocations of the Iterator may run in parallel.\n\nThe default value is 0, which places no limit on parallelism and iterations are invoked as concurrently as possible.",
+              "minimum": 0
+            },
+            "MaxConcurrencyPath": {
+              "$ref": "common.json#/definitions/referencePath",
+              "description": "A reference path to an integer that provides an upper bound on how many invocations of the Iterator may run in parallel.",
+              "minimum": 0
+            },
+            "Retry": {
+              "$ref": "common.json#/definitions/retry",
+              "description": "Contains an array of objects, called Retriers, that define a retry policy if the state encounters runtime errors."
+            },
+            "Catch": {
+              "$ref": "common.json#/definitions/catch",
+              "description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
+            },
+            "Items": {
+              "oneOf": [
+                {
+                  "type": "array",
+                  "errorMessage": "Incorrect type. Expected one of array, JSONata expression."
+                },
+                {
+                  "$ref": "common.json#/definitions/jsonata"
+                }
+              ],
+              "description": "An array or JSONata expression identifying where in the state input the array field is found."
+            },
+            "Output": {
+              "$ref": "common.json#/definitions/output"
+            }
+          }
         }
+      ]
     }
+  }
 }
