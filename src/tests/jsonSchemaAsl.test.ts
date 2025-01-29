@@ -16,7 +16,7 @@ function toDocument(text: string): { textDoc: TextDocument, jsonDoc: JSONDocumen
     return { textDoc, jsonDoc };
 }
 
-suite('JSON Schema Validation for ASL', () => {
+describe('JSON Schema Validation for ASL', () => {
     test('JSON Schema Validation works', async () => {
         const { textDoc, jsonDoc } = toDocument('{}');
 

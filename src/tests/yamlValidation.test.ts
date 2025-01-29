@@ -53,7 +53,7 @@ import {
     documentValidParametersJsonPath,
     documentValidResultSelectorIntrinsicFunction,
     documentValidResultSelectorJsonPath,
-} from './yasl-strings/validationStrings'
+} from './yaml-strings/validationStrings'
 
 import { toDocument } from './utils/testUtilities'
 
@@ -104,8 +104,8 @@ async function testValidations(options: TestValidationOptions) {
     })
 }
 
-suite('ASL YAML context-aware validation', () => {
-    suite('Invalid YAML Input', () => {
+describe('ASL YAML context-aware validation', () => {
+    describe('Invalid YAML Input', () => {
         test("Empty string doesn't throw errors", async () => {
             await assert.doesNotReject(getValidations(''))
         })
@@ -145,7 +145,7 @@ suite('ASL YAML context-aware validation', () => {
         })
     })
 
-    suite('Default of Choice state', () => {
+    describe('Default of Choice state', () => {
         test('Shows diagnostic for invalid state name', async () => {
             await testValidations({
                 json: documentChoiceInvalidDefault,
@@ -186,7 +186,7 @@ suite('ASL YAML context-aware validation', () => {
         })
     })
 
-    suite('StartAt', () => {
+    describe('StartAt', () => {
         test("Shows Diagnostic for state name that doesn't exist", async () => {
             await testValidations({
                 json: documentStartAtInvalid,
@@ -228,7 +228,7 @@ suite('ASL YAML context-aware validation', () => {
         })
     })
 
-    suite('Next', () => {
+    describe('Next', () => {
         test("Shows Diagnostic for state name that doesn't exist", async () => {
             await testValidations({
                 json: documentInvalidNext,
@@ -285,7 +285,7 @@ suite('ASL YAML context-aware validation', () => {
         })
     })
 
-    suite('Unreachable State', () => {
+    describe('Unreachable State', () => {
         test('Shows diagnostic for an unreachable state', async () => {
             await testValidations({
                 json: documentUnreachableState,
@@ -330,7 +330,7 @@ suite('ASL YAML context-aware validation', () => {
         })
     })
 
-    suite('Terminal State', () => {
+    describe('Terminal State', () => {
         test('Shows diagnostic for lack of terminal state', async () => {
             await testValidations({
                 json: documentNoTerminalState,
@@ -378,7 +378,7 @@ suite('ASL YAML context-aware validation', () => {
         })
     })
 
-    suite('Catch property of "Parallel" and "Task" state', async () => {
+    describe('Catch property of "Parallel" and "Task" state', () => {
         test('Does not show diagnostic on valid next property within Catch block of Task state', async () => {
             await testValidations({
                 json: documentTaskCatchTemplate,
@@ -453,7 +453,7 @@ suite('ASL YAML context-aware validation', () => {
         })
     })
 
-    suite('Additional properties that are not valid', async () => {
+    describe('Additional properties that are not valid', () => {
         test('Shows diagnostics for additional invalid properties of a given state', async () => {
             await testValidations({
                 json: documentInvalidPropertiesState,
@@ -573,7 +573,7 @@ suite('ASL YAML context-aware validation', () => {
         })
     })
 
-    suite('Test validation of Resource arn for Task State', async () => {
+    describe('Test validation of Resource arn for Task State', () => {
         test('Does not show diagnostic on invalid arn', async () => {
             await testValidations({
                 json: documentTaskInvalidArn,
@@ -589,7 +589,7 @@ suite('ASL YAML context-aware validation', () => {
         })
     })
 
-    suite('Test validation of Properties field', async () => {
+    describe('Test validation of Properties field', () => {
         test('Does not show diagnostics for valid JSON paths', async () => {
             await testValidations({
                 json: documentValidParametersJsonPath,
@@ -706,7 +706,7 @@ suite('ASL YAML context-aware validation', () => {
         })
     })
 
-    suite('ASL Improvements', async () => {
+    describe('ASL Improvements', () => {
         test('Does not show diagnostics for valid document containing ASL Improvements', async () => {
             await testValidations({
                 json: documentValidAslImprovements,
@@ -714,7 +714,7 @@ suite('ASL YAML context-aware validation', () => {
             })
         })
 
-        suite('Test validation of ResultSelector field', async () => {
+        describe('Test validation of ResultSelector field', () => {
             test('Does not show diagnostics for valid JSON paths', async () => {
                 await testValidations({
                     json: documentValidResultSelectorJsonPath,

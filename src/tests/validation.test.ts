@@ -139,8 +139,8 @@ async function testValidations(options: TestValidationOptions) {
 
 }
 
-suite('ASL context-aware validation', () => {
-    suite('Invalid JSON Input', () => {
+describe('ASL context-aware validation', () => {
+    describe('Invalid JSON Input', () => {
         test("Empty string doesn't throw errors", async () => {
             await getValidations('')
         })
@@ -153,7 +153,7 @@ suite('ASL context-aware validation', () => {
         })
     })
 
-    suite('Default of Choice state', () => {
+    describe('Default of Choice state', () => {
         test('Shows diagnostic for invalid state name', async () => {
             await testValidations({
                 json: documentChoiceInvalidDefault,
@@ -195,7 +195,7 @@ suite('ASL context-aware validation', () => {
         })
     })
 
-    suite('StartAt', () => {
+    describe('StartAt', () => {
         test('Shows Diagnostic for state name that doesn\'t exist', async () => {
             await testValidations({
                 json: documentStartAtInvalid,
@@ -235,7 +235,7 @@ suite('ASL context-aware validation', () => {
         })
     })
 
-    suite('Map State', () => {
+    describe('Map State', () => {
 
         test('Doesn\'t show diagnostics for valid processor config', async () => {
             await testValidations({
@@ -262,7 +262,7 @@ suite('ASL context-aware validation', () => {
 
     })
 
-    suite('Next', () => {
+    describe('Next', () => {
         test('Shows Diagnostic for state name that doesn\'t exist', async () => {
             await testValidations({
                 json: documentInvalidNext,
@@ -324,7 +324,7 @@ suite('ASL context-aware validation', () => {
         })
     })
 
-    suite('Unreachable State', () => {
+    describe('Unreachable State', () => {
         test('Shows diagnostic for an unreachable state', async () => {
             await testValidations({
                 json: documentUnreachableState,
@@ -369,7 +369,7 @@ suite('ASL context-aware validation', () => {
         })
     })
 
-    suite('Terminal State', () => {
+    describe('Terminal State', () => {
         test('Shows diagnostic for lack of terminal state', async () => {
             await testValidations({
                 json: documentNoTerminalState,
@@ -415,7 +415,7 @@ suite('ASL context-aware validation', () => {
         })
     })
 
-    suite('Catch property of "Parallel" and "Task" state', async () => {
+    describe('Catch property of "Parallel" and "Task" state', () => {
         test('Does not show diagnostic on valid next property within Catch block of Task state', async () => {
             await testValidations({
                 json: documentTaskCatchTemplate,
@@ -508,7 +508,7 @@ suite('ASL context-aware validation', () => {
         })
     })
 
-    suite('Additional properties that are not valid', async () => {
+    describe('Additional properties that are not valid', () => {
         test('Shows diagnostics for additional invalid properties of a given state', async () => {
             await testValidations({
                 json: documentInvalidPropertiesState,
@@ -635,7 +635,7 @@ suite('ASL context-aware validation', () => {
         })
     })
 
-    suite('Test validation of Resource arn for Task State', async () => {
+    describe('Test validation of Resource arn for Task State', () => {
         test('Does not show diagnostic on invalid arn', async () => {
             await testValidations({
                 json: documentTaskInvalidArn,
@@ -651,7 +651,7 @@ suite('ASL context-aware validation', () => {
         })
     })
 
-    suite('Test validation of Properties field', async () => {
+    describe('Test validation of Properties field', () => {
         test('Does not show diagnostics for valid JSON paths', async () => {
             await testValidations({
                 json: documentValidParametersJsonPath,
@@ -738,7 +738,7 @@ suite('ASL context-aware validation', () => {
         })
     })
 
-    suite('ASL Improvements', async () => {
+    describe('ASL Improvements', () => {
         test('Does not show diagnostics for valid document containing ASL Improvements', async () => {
             await testValidations({
                 json: documentValidAslImprovements,
@@ -746,7 +746,7 @@ suite('ASL context-aware validation', () => {
             })
         })
 
-        suite('Test validation of ResultSelector field', async () => {
+        describe('Test validation of ResultSelector field', () => {
             test('Does not show diagnostics for valid JSON paths', async () => {
                 await testValidations({
                     json: documentValidResultSelectorJsonPath,
@@ -829,8 +829,8 @@ suite('ASL context-aware validation', () => {
         })
     });
 
-    suite('Fail state', async () => {
-        suite('Valid Error, ErrorPath, Cause & CausePath combinations', async () => {
+    describe('Fail state', () => {
+        describe('Valid Error, ErrorPath, Cause & CausePath combinations', () => {
             test('Fail state with Error and Cause valid', async () => {
                 await testValidations({
                     json: documentFailErrorAndCauseValid,
@@ -895,7 +895,7 @@ suite('ASL context-aware validation', () => {
             })
         });
 
-        suite('JsonPath, Context Object and Intrinsic Functions', async () => {
+        describe('JsonPath, Context Object and Intrinsic Functions', () => {
             test('Fail state ErrorPath and CausePath Context object valid', async () => {
                 await testValidations({
                     json: documentFailErrorPathAndCausePathContextValid,
@@ -981,7 +981,7 @@ suite('ASL context-aware validation', () => {
 
         });
 
-        suite('Invalid Error, ErrorPath, Cause & CausePath combinations', async () => {
+        describe('Invalid Error, ErrorPath, Cause & CausePath combinations', () => {
             test('Fail state Error and ErrorPath combination invalid', async () => {
                 await testValidations({
                     json: documentFailErrorAndErrorPathInvalid,
@@ -1010,8 +1010,8 @@ suite('ASL context-aware validation', () => {
         });
     });
 
-    suite('Retry', async () => {
-        suite('Task retry', async () => {
+    describe('Retry', () => {
+        describe('Task retry', () => {
             test('Task retry valid', async () => {
                 await testValidations({
                     json: documentTaskRetryValid,
@@ -1081,7 +1081,7 @@ suite('ASL context-aware validation', () => {
         });
     });
 
-    suite('Test validation with JSONata fields', async () => {
+    describe('Test validation with JSONata fields', () => {
         test('does not show diagnostic error on valid states', async () => {
             const validJSONataStates = [
                 documentTaskJSONata,
@@ -1102,7 +1102,7 @@ suite('ASL context-aware validation', () => {
             await testValidations({
                 json: documentTaskJSONataInvalid,
                 diagnostics: [{
-                    message: 'Value is not accepted. Valid values: \"JSONata\", \"JSONPath\".',
+                    message: 'Value is not accepted. Valid values: "JSONata", "JSONPath".',
                     start: [5, 23],
                     end: [5, 33],
                     code: 1
@@ -1126,7 +1126,7 @@ suite('ASL context-aware validation', () => {
         })
     });
 
-    suite('Assign property', async () => {
+    describe('Assign property', () => {
         test('Should be valid for all state types', async () => {
             const testCases = [
                 documentTaskWithAssign,
@@ -1183,7 +1183,7 @@ suite('ASL context-aware validation', () => {
         })
 
         test('Should be invalid for all non-object types', async () => {
-            const errorMessage = 'Incorrect type. Expected \"object\".'
+            const errorMessage = 'Incorrect type. Expected "object".'
             /* tslint:disable:no-null-keyword */
             const assignCases = [null, 'NO', 1234, true]
             for (const assignCase of assignCases) {

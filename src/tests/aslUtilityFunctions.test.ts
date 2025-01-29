@@ -69,7 +69,7 @@ function toDocument(text: string): { textDoc: TextDocument, jsonDoc: ASTTree } {
     return { textDoc, jsonDoc };
 }
 
-suite('Utility functions for extracting data from AST Tree', () => {
+describe('Utility functions for extracting data from AST Tree', () => {
     test('getListOfStateNamesFromStateNode - retrieves list of states from state node', async () => {
         const { jsonDoc } = toDocument(document)
         const stateNode = jsonDoc.root!.children![1] as PropertyASTNode

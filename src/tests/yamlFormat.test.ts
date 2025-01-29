@@ -15,7 +15,7 @@ async function getFormat(yaml: string, range: Range, formattingOptions: Formatti
     return ls.format(textDoc, range, formattingOptions);
 }
 
-suite('ASL YAML format', () => {
+describe('ASL YAML format', () => {
     test('Format does not remove comments', async () => {
         const yaml = `
         # this is my comment
