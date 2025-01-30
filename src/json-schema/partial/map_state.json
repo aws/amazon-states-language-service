@@ -1,16 +1,16 @@
 {
-  "definitions": {
+  "$defs": {
     "mapState": {
       "description": "The Map state can be used to run a set of steps for each element of an input array. While the Parallel state executes multiple branches of steps using the same input, a Map state will execute the same steps for multiple entries of an array in the state input.",
       "allOf": [
         {
-          "$ref": "common.json#/definitions/basics"
+          "$ref": "common.json#/$defs/basics"
         },
         {
-          "$ref": "common.json#/definitions/inputOutputResult"
+          "$ref": "common.json#/$defs/inputOutputResult"
         },
         {
-          "$ref": "common.json#/definitions/endOrTransition"
+          "$ref": "common.json#/$defs/endOrTransition"
         },
         {
           "properties": {
@@ -18,15 +18,15 @@
               "enum": ["Map"]
             },
             "Parameters": {
-              "$ref": "common.json#/definitions/parameters",
+              "$ref": "common.json#/$defs/parameters",
               "description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions."
             },
             "ResultSelector": {
-              "$ref": "common.json#/definitions/resultSelector",
+              "$ref": "common.json#/$defs/resultSelector",
               "description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
             },
             "ItemsPath": {
-              "$ref": "common.json#/definitions/referencePath",
+              "$ref": "common.json#/$defs/referencePath",
               "description": "Reference path identifying where in the effective input the array field is found."
             },
             "Iterator": {
@@ -39,7 +39,7 @@
                   "minLength": 1
                 },
                 "States": {
-                  "$ref": "states.json#/definitions/states"
+                  "$ref": "states.json#/$defs/states"
                 }
               },
               "required": ["StartAt", "States"]
@@ -50,6 +50,7 @@
               "properties": {
                 "ReaderConfig": {
                   "type": "object",
+                  "$id": "mapState/ReaderConfig",
                   "description": "A JSON object that specifies where to read the items instead of from the effective input.",
                   "properties": {
                     "InputType": {
@@ -78,14 +79,14 @@
                           "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
                         },
                         {
-                          "$ref": "common.json#/definitions/jsonata"
+                          "$ref": "common.json#/$defs/jsonata"
                         }
                       ],
                       "description": "An integer or JSONata expression that limits the number of data items passed to the Map state.",
                       "minimum": 0
                     },
                     "MaxItemsPath": {
-                      "$ref": "common.json#/definitions/referencePath",
+                      "$ref": "common.json#/$defs/referencePath",
                       "description": "A reference path to an integer that limits the number of data items passed to the Map state."
                     }
                   }
@@ -96,7 +97,7 @@
                   "examples": ["arn:aws:states:::s3:getObject", "arn:aws:states:::s3:listObjectsV2"]
                 },
                 "Arguments": {
-                  "$ref": "common.json#/definitions/arguments",
+                  "$ref": "common.json#/$defs/arguments",
                   "description": "A JSON object or JSONata expression that specifies the Amazon S3 bucket name and object key or prefix in which the dataset is stored.",
                   "properties": {
                     "Bucket": {
@@ -158,14 +159,14 @@
                       "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
                     },
                     {
-                      "$ref": "common.json#/definitions/jsonata"
+                      "$ref": "common.json#/$defs/jsonata"
                     }
                   ],
                   "description": "An integer or JSONata expression that limits the maximum number of items of each sub-array.",
                   "minimum": 1
                 },
                 "MaxItemsPerBatchPath": {
-                  "$ref": "common.json#/definitions/referencePath",
+                  "$ref": "common.json#/$defs/referencePath",
                   "description": "A reference path to an integer that limits the maximum number of items of each sub-array."
                 },
                 "MaxInputBytesPerBatch": {
@@ -175,20 +176,21 @@
                       "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
                     },
                     {
-                      "$ref": "common.json#/definitions/jsonata"
+                      "$ref": "common.json#/$defs/jsonata"
                     }
                   ],
                   "description": "An integer or JSONata expression that limits the maximum size in bytes of each sub-array.",
                   "minimum": 1
                 },
                 "MaxInputBytesPerBatchPath": {
-                  "$ref": "common.json#/definitions/referencePath",
+                  "$ref": "common.json#/$defs/referencePath",
                   "description": "A reference path to an integer that limits the maximum size in bytes of each sub-array."
                 }
               }
             },
             "ResultWriter": {
               "type": "object",
+              "$id": "mapState/ResultWriter",
               "description": "A JSON object that specifies where to write the results instead of to the Map state's result.",
               "properties": {
                 "Resource": {
@@ -197,7 +199,7 @@
                   "examples": ["arn:aws:states:::s3:putObject"]
                 },
                 "Arguments": {
-                  "$ref": "common.json#/definitions/arguments",
+                  "$ref": "common.json#/$defs/arguments",
                   "description": "A JSON object that specifies the Amazon S3 resource to export the results to.",
                   "properties": {
                     "Bucket": {
@@ -258,7 +260,7 @@
                   "minLength": 1
                 },
                 "States": {
-                  "$ref": "states.json#/definitions/states"
+                  "$ref": "states.json#/$defs/states"
                 }
               },
               "required": ["StartAt", "States"]
@@ -275,7 +277,7 @@
                   "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
                 },
                 {
-                  "$ref": "common.json#/definitions/jsonata"
+                  "$ref": "common.json#/$defs/jsonata"
                 }
               ],
               "description": "An integer or JSONata expression that provides an upper bound on the percentage of items that may fail.",
@@ -283,7 +285,7 @@
               "maximum": 100
             },
             "ToleratedFailurePercentagePath": {
-              "$ref": "common.json#/definitions/referencePath",
+              "$ref": "common.json#/$defs/referencePath",
               "description": "A reference path to an integer that provides an upper bound on the percentage of items that may fail."
             },
             "ToleratedFailureCount": {
@@ -293,14 +295,14 @@
                   "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
                 },
                 {
-                  "$ref": "common.json#/definitions/jsonata"
+                  "$ref": "common.json#/$defs/jsonata"
                 }
               ],
               "description": "An integer or JSONata expression that provides an upper bound on how many items may fail.",
               "minimum": 0
             },
             "ToleratedFailureCountPath": {
-              "$ref": "common.json#/definitions/referencePath",
+              "$ref": "common.json#/$defs/referencePath",
               "description": "A reference path to an integer that provides an upper bound on how many items may fail."
             },
             "MaxConcurrency": {
@@ -310,23 +312,23 @@
                   "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
                 },
                 {
-                  "$ref": "common.json#/definitions/jsonata"
+                  "$ref": "common.json#/$defs/jsonata"
                 }
               ],
               "description": "Provides an upper bound on how many invocations of the Iterator may run in parallel.\n\nThe default value is 0, which places no limit on parallelism and iterations are invoked as concurrently as possible.",
               "minimum": 0
             },
             "MaxConcurrencyPath": {
-              "$ref": "common.json#/definitions/referencePath",
+              "$ref": "common.json#/$defs/referencePath",
               "description": "A reference path to an integer that provides an upper bound on how many invocations of the Iterator may run in parallel.",
               "minimum": 0
             },
             "Retry": {
-              "$ref": "common.json#/definitions/retry",
+              "$ref": "common.json#/$defs/retry",
               "description": "Contains an array of objects, called Retriers, that define a retry policy if the state encounters runtime errors."
             },
             "Catch": {
-              "$ref": "common.json#/definitions/catch",
+              "$ref": "common.json#/$defs/catch",
               "description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
             },
             "Items": {
@@ -336,13 +338,13 @@
                   "errorMessage": "Incorrect type. Expected one of array, JSONata expression."
                 },
                 {
-                  "$ref": "common.json#/definitions/jsonata"
+                  "$ref": "common.json#/$defs/jsonata"
                 }
               ],
               "description": "An array or JSONata expression identifying where in the state input the array field is found."
             },
             "Output": {
-              "$ref": "common.json#/definitions/output"
+              "$ref": "common.json#/$defs/output"
             }
           }
         }

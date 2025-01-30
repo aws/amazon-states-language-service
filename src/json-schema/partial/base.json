@@ -7,10 +7,10 @@
       "enum": ["1.0"]
     },
     "Comment": {
-      "$ref": "common.json#/definitions/comment"
+      "$ref": "common.json#/$defs/comment"
     },
     "TimeoutSeconds": {
-      "$ref": "common.json#/definitions/seconds",
+      "$ref": "common.json#/$defs/seconds",
       "description": "The maximum number of seconds an execution of the state machine can run. If it runs longer than the specified time, the execution fails with a States.Timeout error."
     },
     "StartAt": {
@@ -19,11 +19,12 @@
       "minLength": 1
     },
     "States": {
-      "$ref": "states.json#/definitions/states"
+      "$ref": "states.json#/$defs/states"
     },
     "QueryLanguage": {
-      "$ref": "common.json#/definitions/queryLanguage"
+      "$ref": "common.json#/$defs/queryLanguage"
     }
   },
-  "required": ["States", "StartAt"]
+  "required": ["States", "StartAt"],
+  "$defs": {}
 }

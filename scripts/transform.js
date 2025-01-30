@@ -3,27 +3,25 @@
  * SPDX-License-Identifier: MIT
  */
 
-const $RefParser = require('@apidevtools/json-schema-ref-parser');
-const path = require('path');
-const fs = require('fs');
-const util = require('util');
+const $RefParser = require('@apidevtools/json-schema-ref-parser')
+const path = require('path')
+const fs = require('fs')
+const util = require('util')
 
-const writeFile = util.promisify(fs.writeFile);
+const writeFile = util.promisify(fs.writeFile)
 
-const SCHEMA_PATH = '../src/json-schema/';
-const BUNDLED_FILE_NAME = 'bundled.json';
+const SCHEMA_PATH = '../src/json-schema/'
+const BUNDLED_FILE_NAME = 'bundled.json'
 
 async function parseSchema() {
+  try {
+    const bundled = await $RefParser.bundle(path.resolve(__dirname, SCHEMA_PATH, 'partial/base.json'))
+    const bundledJSON = JSON.stringify(bundled, null, 2)
 
-	try {
-		const bundled = await $RefParser.bundle(path.resolve(__dirname, SCHEMA_PATH, 'partial/base.json'));
-		const bundledJSON = JSON.stringify(bundled, null, '\t');
-
-		writeFile(path.resolve(__dirname, SCHEMA_PATH, BUNDLED_FILE_NAME), bundledJSON);
-	}
-	catch (err) {
-		console.log(err);
-	}
+    writeFile(path.resolve(__dirname, SCHEMA_PATH, BUNDLED_FILE_NAME), bundledJSON)
+  } catch (err) {
+    console.log(err)
+  }
 }
 
-parseSchema();
+parseSchema()

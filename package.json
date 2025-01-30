@@ -28,7 +28,7 @@
     "watch": "tsc -b -w",
     "test-watch": " NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test": "jest --collectCoverage",
-    "bundle-schema": "node ./scripts/transform.js"
+    "bundle-schema": "node ./scripts/transform.js && prettier src/json-schema/bundled.json --write"
   },
   "devDependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.7.3",

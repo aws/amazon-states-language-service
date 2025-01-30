@@ -272,7 +272,8 @@
                       "arn:aws:states:::sqs:sendMessage.waitForTaskToken",
                       "arn:aws:states:::states:startExecution",
                       "arn:aws:states:::states:startExecution.sync",
-                      "arn:aws:states:::states:startExecution.waitForTaskToken"
+                      "arn:aws:states:::states:startExecution.waitForTaskToken",
+                      "arn:aws:states:::http:invoke"
                     ]
                   },
                   "Parameters": {
@@ -2054,6 +2055,7 @@
                     "properties": {
                       "ReaderConfig": {
                         "type": "object",
+                        "$id": "mapState/ReaderConfig",
                         "description": "A JSON object that specifies where to read the items instead of from the effective input.",
                         "properties": {
                           "InputType": {
@@ -2193,6 +2195,7 @@
                   },
                   "ResultWriter": {
                     "type": "object",
+                    "$id": "mapState/ResultWriter",
                     "description": "A JSON object that specifies where to write the results instead of to the Map state's result.",
                     "properties": {
                       "Resource": {
@@ -2363,5 +2366,6 @@
       "enum": ["JSONata", "JSONPath"]
     }
   },
-  "required": ["States", "StartAt"]
+  "required": ["States", "StartAt"],
+  "$defs": {}
 }
