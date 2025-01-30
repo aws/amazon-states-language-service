@@ -1,5 +1,5 @@
 {
-  "definitions": {
+  "$defs": {
     "basics": {
       "type": "object",
       "properties": {
@@ -10,10 +10,10 @@
           "enum": ["Pass", "Succeed", "Fail", "Task", "Choice", "Wait", "Parallel", "Map"]
         },
         "QueryLanguage": {
-          "$ref": "#/definitions/queryLanguage"
+          "$ref": "#/$defs/queryLanguage"
         },
         "Comment": {
-          "$ref": "#/definitions/comment"
+          "$ref": "#/$defs/comment"
         }
       },
       "required": ["Type"]
@@ -35,7 +35,7 @@
           "description": "A path that specifies where to place the Result, relative to the raw input. If the raw input has a field at the location addressed by the ResultPath value then in the output that field is discarded and overwritten by the state's result. Otherwise, a new field is created in the state output, with intervening fields constructed as necessary.",
           "oneOf": [
             {
-              "$ref": "#/definitions/referencePath"
+              "$ref": "#/$defs/referencePath"
             },
             {
               "type": "null"
@@ -154,11 +154,11 @@
         "type": "object",
         "properties": {
           "ErrorEquals": {
-            "$ref": "#/definitions/errors",
+            "$ref": "#/$defs/errors",
             "description": "A non-empty array of Error Names. The retry policy for this Retrier is implemented if the reported error matches one of the Error Names."
           },
           "IntervalSeconds": {
-            "$ref": "#/definitions/seconds",
+            "$ref": "#/$defs/seconds",
             "description": "A positive integer representing the number of seconds before the first retry attempt. (Default: 1, Maximum: 99999999)"
           },
           "MaxAttempts": {
@@ -170,10 +170,10 @@
           "BackoffRate": {
             "type": "number",
             "description": "A number (>= 1) which is the multiplier that increases the retry interval on each attempt. (Default: 2.0)",
-            "minimum": 1.0
+            "minimum": 1
           },
           "Comment": {
-            "$ref": "#/definitions/comment"
+            "$ref": "#/$defs/comment"
           },
           "MaxDelaySeconds": {
             "type": "integer",
@@ -198,7 +198,7 @@
         "type": "object",
         "properties": {
           "ErrorEquals": {
-            "$ref": "#/definitions/errors",
+            "$ref": "#/$defs/errors",
             "description": "A non-empty array of Error Names. The state machine transitions to this Catcher's fallback state if the reported error matches one of the Error Names."
           },
           "Next": {
@@ -209,7 +209,7 @@
           "ResultPath": {
             "oneOf": [
               {
-                "$ref": "#/definitions/referencePath",
+                "$ref": "#/$defs/referencePath",
                 "description": "A path that specifies where to place the Result, relative to the raw input. If the raw input has a field at the location addressed by the ResultPath value then in the output that field is discarded and overwritten by the state's result. Otherwise, a new field is created in the state output, with intervening fields constructed as necessary."
               },
               {
@@ -218,13 +218,13 @@
             ]
           },
           "Output": {
-            "$ref": "#/definitions/output"
+            "$ref": "#/$defs/output"
           },
           "Comment": {
-            "$ref": "#/definitions/comment"
+            "$ref": "#/$defs/comment"
           },
           "Assign": {
-            "$ref": "#/definitions/assign"
+            "$ref": "#/$defs/assign"
           }
         },
         "required": ["ErrorEquals", "Next"]
@@ -237,7 +237,7 @@
           "errorMessage": "Incorrect type. Expected one of object, JSONata expression."
         },
         {
-          "$ref": "common.json#/definitions/jsonata"
+          "$ref": "common.json#/$defs/jsonata"
         }
       ],
       "description": "An object or JSONata expression to define the Argument of this task state."

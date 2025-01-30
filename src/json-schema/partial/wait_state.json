@@ -1,16 +1,16 @@
 {
-  "definitions": {
+  "$defs": {
     "waitState": {
       "description": "A Wait state delays the state machine from continuing for a specified time. You can choose either a relative time, specified in seconds from when the state begins, or an absolute end time, specified as a timestamp.",
       "allOf": [
         {
-          "$ref": "common.json#/definitions/basics"
+          "$ref": "common.json#/$defs/basics"
         },
         {
-          "$ref": "common.json#/definitions/inputOutput"
+          "$ref": "common.json#/$defs/inputOutput"
         },
         {
-          "$ref": "common.json#/definitions/endOrTransition"
+          "$ref": "common.json#/$defs/endOrTransition"
         },
         {
           "properties": {
@@ -20,11 +20,11 @@
             "Seconds": {
               "oneOf": [
                 {
-                  "$ref": "common.json#/definitions/seconds",
+                  "$ref": "common.json#/$defs/seconds",
                   "errorMessage": "Incorrect type. Expected one of integer, JSONata expression."
                 },
                 {
-                  "$ref": "common.json#/definitions/jsonata"
+                  "$ref": "common.json#/$defs/jsonata"
                 }
               ],
               "description": "A time, in seconds, to wait before beginning the state specified in the \"Next\" field."
@@ -32,25 +32,25 @@
             "Timestamp": {
               "oneOf": [
                 {
-                  "$ref": "common.json#/definitions/timestamp",
+                  "$ref": "common.json#/$defs/timestamp",
                   "errorMessage": "Incorrect type. Expected one of timestamp, JSONata expression."
                 },
                 {
-                  "$ref": "common.json#/definitions/jsonata"
+                  "$ref": "common.json#/$defs/jsonata"
                 }
               ],
               "description": "An absolute time to wait until beginning the state specified in the \"Next\" field.\n\nTimestamps must conform to the RFC3339 profile of ISO 8601, with the further restrictions that an uppercase T must separate the date and time portions, and an uppercase Z must denote that a numeric time zone offset is not present, for example, 2016-08-18T17:33:00Z."
             },
             "SecondsPath": {
-              "$ref": "common.json#/definitions/referencePath",
+              "$ref": "common.json#/$defs/referencePath",
               "description": "A time, in seconds, to wait before beginning the state specified in the \"Next\" field, specified using a path from the state's input data."
             },
             "TimestampPath": {
-              "$ref": "common.json#/definitions/referencePath",
+              "$ref": "common.json#/$defs/referencePath",
               "description": "An absolute time to wait until beginning the state specified in the \"Next\" field, specified using a path from the state's input data."
             },
             "Output": {
-              "$ref": "common.json#/definitions/output"
+              "$ref": "common.json#/$defs/output"
             }
           },
           "oneOf": [

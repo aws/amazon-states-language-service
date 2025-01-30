@@ -1,16 +1,16 @@
 {
-  "definitions": {
+  "$defs": {
     "parallelState": {
       "description": "The Parallel state can be used to create parallel branches of execution in your state machine.",
       "allOf": [
         {
-          "$ref": "common.json#/definitions/basics"
+          "$ref": "common.json#/$defs/basics"
         },
         {
-          "$ref": "common.json#/definitions/inputOutputResult"
+          "$ref": "common.json#/$defs/inputOutputResult"
         },
         {
-          "$ref": "common.json#/definitions/endOrTransition"
+          "$ref": "common.json#/$defs/endOrTransition"
         },
         {
           "properties": {
@@ -18,11 +18,11 @@
               "enum": ["Parallel"]
             },
             "Parameters": {
-              "$ref": "common.json#/definitions/parameters",
+              "$ref": "common.json#/$defs/parameters",
               "description": "Used to pass information to the API actions of connected resources. The Parameters can use a mix of static JSON, JsonPath and intrinsic functions."
             },
             "ResultSelector": {
-              "$ref": "common.json#/definitions/resultSelector",
+              "$ref": "common.json#/$defs/resultSelector",
               "description": "Used to transform the result. The ResultSelector can use a mix of static JSON, JsonPath and intrinsic functions."
             },
             "Branches": {
@@ -37,25 +37,25 @@
                     "description": "A string that must exactly match (is case sensitive) the name of one of the state objects."
                   },
                   "States": {
-                    "$ref": "states.json#/definitions/states"
+                    "$ref": "states.json#/$defs/states"
                   }
                 },
                 "required": ["StartAt", "States"]
               }
             },
             "Retry": {
-              "$ref": "common.json#/definitions/retry",
+              "$ref": "common.json#/$defs/retry",
               "description": "Contains an array of objects, called Retriers, that define a retry policy if the state encounters runtime errors."
             },
             "Catch": {
-              "$ref": "common.json#/definitions/catch",
+              "$ref": "common.json#/$defs/catch",
               "description": "Contains an array of objects, called Catchers, that define a fallback state. This state is executed if the state encounters runtime errors and its retry policy is exhausted or isn't defined."
             },
             "Arguments": {
-              "$ref": "common.json#/definitions/arguments"
+              "$ref": "common.json#/$defs/arguments"
             },
             "Output": {
-              "$ref": "common.json#/definitions/output"
+              "$ref": "common.json#/$defs/output"
             }
           },
           "required": ["Branches"]

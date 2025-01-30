@@ -1,10 +1,10 @@
 {
-  "definitions": {
+  "$defs": {
     "failState": {
       "description": "A Fail state stops the execution of the state machine and marks it as a failure.",
       "allOf": [
         {
-          "$ref": "common.json#/definitions/basics"
+          "$ref": "common.json#/$defs/basics"
         },
         {
           "properties": {
@@ -12,7 +12,7 @@
               "enum": ["Fail"]
             },
             "Comment": {
-              "$ref": "common.json#/definitions/comment"
+              "$ref": "common.json#/$defs/comment"
             },
             "Error": {
               "type": "string",
