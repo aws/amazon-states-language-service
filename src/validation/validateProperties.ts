@@ -17,9 +17,7 @@ export default function (oneStateValueNode: ObjectASTNode, document: TextDocumen
   const diagnostics: Diagnostic[] = []
 
   if (typeof stateType === 'string') {
-    // tslint:disable-next-line no-unsafe-any
     const hasCommonProperties = !!schema.StateTypes[stateType]?.hasCommonProperties
-    // tslint:disable-next-line no-unsafe-any
     const stateProperties = schema.StateTypes[stateType]?.Properties
 
     if (!stateProperties) {
@@ -28,7 +26,6 @@ export default function (oneStateValueNode: ObjectASTNode, document: TextDocumen
 
     const allowedProperties = hasCommonProperties ? { ...schema.Common, ...stateProperties } : { ...stateProperties }
 
-    // tslint:disable-next-line no-unsafe-any
     diagnostics.push(...getDiagnosticsForNode(oneStateValueNode, document, allowedProperties))
   }
 

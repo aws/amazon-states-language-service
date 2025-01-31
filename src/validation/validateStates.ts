@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-/* tslint:disable:cyclomatic-complexity */
-
 import {
   Diagnostic,
   DiagnosticSeverity,
@@ -272,7 +270,6 @@ export default function validateStates(
             ?.valueNode?.value
 
           const nextNodeValue = nextPropNode?.valueNode?.value
-          const stateName = prop.keyNode.value
 
           if (endPropNode && endPropNode.valueNode?.value === true) {
             hasTerminalState = true

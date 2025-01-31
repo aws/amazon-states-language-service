@@ -6,17 +6,16 @@
 import * as assert from 'assert'
 import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver'
 import { MESSAGES } from '../constants/diagnosticStrings'
-import { getLanguageService, Position, Range } from '../service'
-
+import { ASLLanguageServiceParams, getLanguageService, Position, Range } from '../service'
 import {
   documentChoiceDefaultBeforeChoice,
   documentChoiceInvalidDefault,
   documentChoiceInvalidNext,
+  documentChoiceWaitJSONata,
   documentChoiceNextBeforeChoice,
   documentChoiceNoDefault,
   documentChoiceValidDefault,
   documentChoiceValidNext,
-  documentChoiceWaitJSONata,
   documentChoiceWithAssign,
   documentDistributedMapInvalidNextInNestedState,
   documentFailCauseAndCausePathInvalid,
@@ -85,7 +84,6 @@ import {
   documentValidResultSelectorIntrinsicFunction,
   documentValidResultSelectorJsonPath,
 } from './json-strings/validationStrings'
-
 import { toDocument } from './utils/testUtilities'
 
 const JSON_SCHEMA_MULTIPLE_SCHEMAS_MSG = 'Matches multiple schemas when only one must validate.'
@@ -101,17 +99,17 @@ export interface TestValidationOptions {
   filterMessages?: string[]
 }
 
-async function getValidations(json: string) {
+async function getValidations(json: string, params: ASLLanguageServiceParams = {}) {
   const { textDoc, jsonDoc } = toDocument(json)
-  const ls = getLanguageService({})
+  const ls = getLanguageService(params)
 
   return await ls.doValidation(textDoc, jsonDoc)
 }
 
-async function testValidations(options: TestValidationOptions) {
+async function testValidations(options: TestValidationOptions, params: ASLLanguageServiceParams = {}) {
   const { json, diagnostics, filterMessages } = options
 
-  let res = await getValidations(json)
+  let res = await getValidations(json, params)
 
   res = res.filter((diagnostic) => {
     if (filterMessages && filterMessages.find((message) => message === diagnostic.message)) {
@@ -1125,7 +1123,6 @@ describe('ASL context-aware validation', () => {
       })
     })
   })
-
   describe('Assign property', () => {
     test('Should be valid for all state types', async () => {
       const testCases = [
@@ -1144,7 +1141,6 @@ describe('ASL context-aware validation', () => {
     })
 
     test('Should be valid in choice state when it is added at top level', async () => {
-      /* tslint:disable:no-unsafe-any */
       const asl = JSON.parse(documentChoiceWithAssign)
       asl.States.Choice.Assign = {}
       await testValidations({
@@ -1177,7 +1173,6 @@ describe('ASL context-aware validation', () => {
     })
 
     test('Should be valid if value is undefined', async () => {
-      /* tslint:disable:no-unsafe-any */
       const asl = JSON.parse(documentTaskWithAssign)
       asl.States.HelloWorld.Assign = undefined
       await testValidations({
@@ -1188,10 +1183,8 @@ describe('ASL context-aware validation', () => {
 
     test('Should be invalid for all non-object types', async () => {
       const errorMessage = 'Incorrect type. Expected "object".'
-      /* tslint:disable:no-null-keyword */
       const assignCases = [null, 'NO', 1234, true]
       for (const assignCase of assignCases) {
-        /* tslint:disable:no-unsafe-any */
         const asl = JSON.parse(documentTaskWithAssign)
         asl.States.HelloWorld.Assign = assignCase
         await testValidations({
@@ -1206,7 +1199,6 @@ describe('ASL context-aware validation', () => {
         })
       }
 
-      /* tslint:disable:no-unsafe-any */
       const aslWithArrayForAssign = JSON.parse(documentTaskWithAssign)
       aslWithArrayForAssign.States.HelloWorld.Assign = ['']
       await testValidations({

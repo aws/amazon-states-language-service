@@ -3,11 +3,11 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { QueryLanguages } from '../asl-utils'
 import {
   ArrayASTNode,
   ASTNode,
   JSONDocument,
-  LanguageServiceParams,
   ObjectASTNode,
   PropertyASTNode,
   StringASTNode,
@@ -102,8 +102,7 @@ export function findClosestAncestorStateNode(node: ASTNode): PropertyASTNode | u
   } else if (!node.parent) {
     return undefined
   }
-
-  return findClosestAncestorStateNode(node.parent!)
+  return findClosestAncestorStateNode(node.parent)
 }
 
 /** Extracts the list of state names from given property node named "States" */
@@ -128,4 +127,55 @@ export function getListOfStateNamesFromStateNode(node: PropertyASTNode, ignoreCo
   } else {
     throw new Error('Not a state name property node')
   }
+}
+
+interface AncestorASTNodeInfo {
+  node: PropertyASTNode
+  nodeName: string
+}
+/** Finds the closest ancestor property given node names */
+export function findClosestAncestorNodeByName(node: ASTNode, NodeName: string[]): AncestorASTNodeInfo | undefined {
+  if (isPropertyNode(node) && NodeName.includes(node.keyNode.value)) {
+    return { node, nodeName: node.keyNode.value }
+  }
+  if (!node.parent) {
+    return undefined
+  }
+
+  return findClosestAncestorNodeByName(node.parent, NodeName)
+}
+
+/**
+ * Get the state name, type, and query language of current node
+ */
+export function getStateInfo(
+  node: ASTNode,
+): { stateName: string; stateType: string | undefined; queryLanguage: QueryLanguages | undefined } | undefined {
+  const parent = node.parent
+  if (isPropertyNode(node) && parent && isChildOfStates(node.parent)) {
+    let stateType: string | undefined
+    let queryLanguage: QueryLanguages | undefined = undefined
+    if (node.valueNode && isObjectNode(node.valueNode)) {
+      const typeProperty = node.valueNode.properties.find((property) => property.keyNode.value === 'Type')
+      const queryLanguageValue = node.valueNode.properties
+        .find((property) => property.keyNode.value === 'QueryLanguage')
+        ?.valueNode?.value?.toString()
+      stateType = typeProperty?.valueNode?.value?.toString() ?? undefined
+      if (queryLanguageValue === QueryLanguages.JSONata) {
+        queryLanguage = QueryLanguages.JSONata
+      } else if (queryLanguageValue === QueryLanguages.JSONPath) {
+        queryLanguage = QueryLanguages.JSONPath
+      }
+    }
+
+    return {
+      stateName: node.keyNode.value,
+      stateType,
+      queryLanguage,
+    }
+  } else if (!parent) {
+    return undefined
+  }
+
+  return getStateInfo(node.parent)
 }

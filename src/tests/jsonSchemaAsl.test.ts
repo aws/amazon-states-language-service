@@ -10,7 +10,6 @@ function toDocument(text: string): { textDoc: TextDocument; jsonDoc: JSONDocumen
   const textDoc = TextDocument.create('foo://bar/file.asl', 'json', 0, text)
 
   const ls = getLanguageService({})
-  // tslint:disable-next-line: no-inferred-empty-object-type
   const jsonDoc = ls.parseJSONDocument(textDoc) as JSONDocument
 
   return { textDoc, jsonDoc }
