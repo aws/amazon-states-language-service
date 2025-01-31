@@ -4,19 +4,23 @@
  */
 
 import { CompletionList, JSONDocument, Position, TextDocument } from 'vscode-json-languageservice'
-
-import { ASLOptions, ASTTree, findNodeAtLocation } from '../utils/astUtilityFunctions'
-
+import { buildPreviousStatesMap, Asl, QueryLanguages } from '../asl-utils'
+import { ASLOptions, ASTTree, findNodeAtLocation, getStateInfo } from '../utils/astUtilityFunctions'
 import completeSnippets from './completeSnippets'
 import completeStateNames from './completeStateNames'
+import completeVariables from './completeVariables'
+import completeJSONata from './completeJSONata'
+import { LANGUAGE_IDS } from '../constants/constants'
 
-export default function completeAsl(
+let asl: Asl = {}
+
+export default async function completeAsl(
   document: TextDocument,
   position: Position,
   doc: JSONDocument,
   jsonCompletions: CompletionList | null,
   aslOptions?: ASLOptions,
-): CompletionList {
+): Promise<CompletionList> {
   const offset = document.offsetAt(position)
   const rootNode = (doc as ASTTree).root
 
@@ -38,6 +42,37 @@ export default function completeAsl(
     completionList = {
       isIncomplete: false,
       items: snippetsList,
+    }
+  }
+
+  if (document.languageId === LANGUAGE_IDS.JSON) {
+    const text = document.getText()
+    // we are using the last valid asl for autocompletion list generation
+    // skip to store asl when it is invalid
+    try {
+      asl = JSON.parse(text)
+    } catch (_err) {
+      // noop
+    }
+
+    // prepare dynamic variable list
+    buildPreviousStatesMap(asl)
+  }
+
+  const { queryLanguage } = (node && getStateInfo(node)) || {}
+  const isJSONataState = queryLanguage === QueryLanguages.JSONata || asl.QueryLanguage === QueryLanguages.JSONata
+
+  if (isJSONataState) {
+    const jsonataList = await completeJSONata(node, offset, document, asl)
+
+    if (jsonataList?.items) {
+      completionList.items = completionList.items.concat(jsonataList.items)
+    }
+  } else {
+    const variableList = completeVariables(node, offset, document, asl)
+
+    if (variableList?.items) {
+      completionList.items = completionList.items.concat(variableList.items)
     }
   }
 

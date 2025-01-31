@@ -23,7 +23,7 @@ import { getLanguageService as getAslYamlLanguageService } from './yaml/aslYamlL
 
 export * from 'vscode-json-languageservice'
 
-interface ASLLanguageServiceParams extends LanguageServiceParams {
+export interface ASLLanguageServiceParams extends LanguageServiceParams {
   aslOptions?: ASLOptions
 }
 
@@ -88,6 +88,5 @@ export const getYamlLanguageService = function (params: ASLLanguageServiceParams
       ignoreColonOffset: true,
     },
   })
-
   return getAslYamlLanguageService(params, ASL_SCHEMA, aslLanguageService)
 }

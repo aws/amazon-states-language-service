@@ -120,7 +120,7 @@ export const document6 = `
   "StartAt": "First",
   "States": {
       "FirstState": {
-        "Type": "Task"
+        "Type": "Task",
       },
       "ChoiceState": {},
       "FirstMatchState": {},

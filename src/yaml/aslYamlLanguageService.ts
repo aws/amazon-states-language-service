@@ -84,7 +84,7 @@ export const getLanguageService = function (
     ...builtInParams,
   })
 
-  const requestServiceMock = async function (uri: string): Promise<string> {
+  const requestServiceMock = async function (_uri: string): Promise<string> {
     return new Promise<string>((c) => {
       c(JSON.stringify(schema))
     })
@@ -167,7 +167,7 @@ export const getLanguageService = function (
       },
     }
 
-    const aslCompletions: CompletionList = doCompleteAsl(
+    const aslCompletions: CompletionList = await doCompleteAsl(
       processedDocument,
       tempPositionForCompletions,
       currentDoc,

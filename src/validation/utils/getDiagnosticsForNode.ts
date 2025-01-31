@@ -25,7 +25,7 @@ interface SchemaObject {
   [property: string]: SchemaObject | boolean | string
 }
 
-function isObject(obj: any): obj is object {
+function isObject(obj: unknown): obj is object {
   return obj === Object(obj)
 }
 
