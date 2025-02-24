@@ -7,7 +7,8 @@ import type jsonata from 'jsonata'
 import type { FunctionParam, JsonataFunctionsMap } from './functions'
 
 // There are additional properties in the object not specified in the library's typescript interface
-export interface ExprNode extends jsonata.ExprNode {
+export interface ExprNode extends Omit<jsonata.ExprNode, 'lhs'> {
+  lhs?: jsonata.ExprNode | jsonata.ExprNode[]
   body?: jsonata.ExprNode
   then?: jsonata.ExprNode
   else?: jsonata.ExprNode

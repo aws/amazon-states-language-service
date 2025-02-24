@@ -2,6 +2,7 @@
  * Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  * SPDX-License-Identifier: MIT
  */
+
 import merge from 'lodash/merge'
 import get from 'lodash/get'
 import {

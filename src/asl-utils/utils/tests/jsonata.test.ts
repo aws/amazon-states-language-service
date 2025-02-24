@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { FunctionParam } from '../../utils/jsonata'
+import { FunctionParam } from '../jsonata'
 import {
   MAX_AST_DEPTH,
   exprPropertiesToRecurse,

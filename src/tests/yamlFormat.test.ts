@@ -5,8 +5,9 @@
 
 import * as assert from 'assert'
 import { FormattingOptions, TextEdit } from 'vscode-languageserver-types'
-import { getYamlLanguageService, Position, Range } from '../service'
+import { Position, Range } from '../service'
 import { toDocument } from './utils/testUtilities'
+import { getYamlLanguageService } from '../yamlLanguageService'
 
 async function getFormat(yaml: string, range: Range, formattingOptions: FormattingOptions): Promise<TextEdit[]> {
   const { textDoc } = toDocument(yaml, true)
