@@ -124,8 +124,18 @@ export interface ItemBatcher {
   MaxInputBytesPerBatchPath?: string
 }
 
+export enum DistributedMapResultWriterOutputType {
+  JSON = 'JSON',
+  JSONL = 'JSONL',
+}
+export enum DistributedMapResultWriterTransformation {
+  NONE = 'NONE',
+  FLATTEN = 'FLATTEN',
+  COMPACT = 'COMPACT',
+}
+
 export interface ResultWriter {
-  Resource: string
+  Resource?: string
   Parameters?: {
     Bucket?: string
     Key?: string
@@ -142,12 +152,17 @@ export interface ResultWriter {
         ExpectedBucketOwner?: string
       }
     | JSONataExpression
+  WriterConfig?: {
+    OutputType?: DistributedMapResultWriterOutputType
+    Transformation?: DistributedMapResultWriterTransformation
+  }
 }
 
 export interface ItemReader {
   ReaderConfig?: {
     InputType?: ParsingInputType
     CSVHeaderLocation?: CSVHeaderLocationType
+    CSVDelimiter?: CSVDelimiterType
     MaxItems?: number | JSONataExpression
     MaxItemsPath?: string
     CSVHeaders?: string[]
@@ -185,12 +200,21 @@ export enum MapExecutionType {
 export enum ParsingInputType {
   CSV = 'CSV',
   JSON = 'JSON',
+  JSONL = 'JSONL',
   MANIFEST = 'MANIFEST',
 }
 
 export enum CSVHeaderLocationType {
   FIRST_ROW = 'FIRST_ROW',
   GIVEN = 'GIVEN',
+}
+
+export enum CSVDelimiterType {
+  COMMA = 'COMMA',
+  PIPE = 'PIPE',
+  SEMICOLON = 'SEMICOLON',
+  TAB = 'TAB',
+  SPACE = 'SPACE',
 }
 
 export interface ProcessorConfig {
