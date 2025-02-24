@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { FunctionParam } from '../../utils/jsonata'
+import { FunctionParam } from '../jsonata'
 import {
   MAX_AST_DEPTH,
   exprPropertiesToRecurse,
@@ -26,10 +26,21 @@ jest.mock('jsonata', () => {
 
 describe('jsonataHelper', () => {
   describe('getJSONataAST', () => {
-    it('should call JSONata library function with the correct parameters', async () => {
+    it('should call JSONata library function with the correct default parameters', async () => {
       const result = await getJSONataAST('myString')
       expect(jsonataSpy).toHaveBeenCalledWith('myString', {
         recover: true,
+      })
+
+      expect(result).toBeTruthy()
+    })
+
+    it('should call JSONata library function with the correct provided parameters', async () => {
+      const result = await getJSONataAST('myString', {
+        recover: false,
+      })
+      expect(jsonataSpy).toHaveBeenCalledWith('myString', {
+        recover: false,
       })
 
       expect(result).toBeTruthy()

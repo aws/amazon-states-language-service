@@ -2,8 +2,9 @@
   "name": "amazon-states-language-service",
   "description": "Amazon States Language Service",
   "author": "Amazon Web Services",
-  "main": "out/service.js",
-  "types": "out/service.d.ts",
+  "main": "dist-cjs/service.js",
+  "module": "dist/service.js",
+  "types": "dist/service.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/aws/amazon-states-language-service"
@@ -21,14 +22,16 @@
     "prepare": "husky",
     "prettify": "prettier 'src/**/*' --write",
     "prepublish": "npm run compile",
-    "clean": "rm -rf build out node_modules",
+    "clean": "rm -rf build dist-cjs dist node_modules",
     "lint": "eslint --ext .ts .",
     "lint:fix": "eslint --ext .ts . --fix",
-    "compile": "npm run lint && rm -rf out/* && npm run bundle-schema && tsc -b",
+    "compile": "npm run lint && rm -rf dist-cjs/* dist/* && npm run bundle-schema && npm run build:cjs && npm run build:esm",
+    "build:esm": "tsc --outDir dist --module esnext --target esnext --moduleResolution bundler",
+    "build:cjs": "tsc --outDir dist-cjs --module commonjs",
     "watch": "tsc -b -w",
-    "test-watch": " NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test-watch": "YAML_SERVICE=enabled jest --watch",
     "test": "jest --collectCoverage",
-    "bundle-schema": "node ./scripts/transform.js && prettier src/json-schema/bundled.json --write"
+    "bundle-schema": "node ./scripts/transform.js && prettier src/json-schema/ --write"
   },
   "devDependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.7.3",

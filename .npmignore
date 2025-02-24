@@ -1,12 +1,27 @@
-.vscode/
-.github/
-build/
-out/tests/
-out/**/*.js.map
-out/*/*/*.d.ts
+# source folder
 src/
 test/
-.gitignore
-tslint.yaml
-.mocharc.yml
 scripts/
+
+# config files
+coverage/
+
+.vscode/
+.github/
+.husky/
+
+.gitignore
+babel.config.js
+jest.config.js
+.prettierrc.json
+.lintstagedrc
+.eslintrc.js
+
+# tests and source map from build output
+build/
+
+dist-cjs/tests/
+dist-cjs/**/*.js.map
+dist-cjs/*/*/*.d.ts
+dist/**/*.js.map
+dist/tests/

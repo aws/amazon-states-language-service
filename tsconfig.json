@@ -1,20 +1,15 @@
 {
-	"compilerOptions": {
-		"module": "commonjs",
-		"target": "es6",
-		"outDir": "out",
-		"rootDir": "src",
-		"sourceMap": true,
-		"resolveJsonModule": true,
-		"esModuleInterop": true,
-		"declaration": true,
-		"strictNullChecks": true,
-		"skipLibCheck": true
-	},
-	"include": [
-		"src"
-	],
-	"exclude": [
-		"node_modules"
-	]
+  "compilerOptions": {
+    "target": "es6",
+    "rootDir": "src",
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "strictNullChecks": true,
+    "skipLibCheck": true,
+    "module": "CommonJS"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

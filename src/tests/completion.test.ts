@@ -424,7 +424,7 @@ describe('ASL context-aware completion', () => {
       })
     })
 
-    test('Suggests JSONata functions and variables when at the correct position with global JSONata and variables is disabled', async () => {
+    test('Suggests JSONata functions and variables when at the correct position with global JSONata', async () => {
       const functions = await getJSONataFunctionList()
       const functionLabels = Array.from(functions.keys())
       const variableLabels = ['$var_lambda1', '$states']
