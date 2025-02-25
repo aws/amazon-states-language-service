@@ -2413,3 +2413,160 @@ export const documentInvalidFailWithAssign = `{
       }
   }
 }`
+
+export const documentMapResultWriter = `
+{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "ResultPath": "$.array",
+          "MaxConcurrency": 2,
+          "Next": "Final State",
+          "ItemProcessor": {
+              "StartAt": "Pass",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "End": true
+                  }
+              },
+              "ProcessorConfig": {
+                "ExecutionType": "EXPRESS",
+                "Mode": "DISTRIBUTED"
+              }
+          },
+          "ResultWriter": {
+            "WriterConfig": {
+              "OutputType": "JSON"
+            }
+          }
+      },
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}
+`
+
+export const documentMapResultWriterMissingOutputType = `
+{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "ResultPath": "$.array",
+          "MaxConcurrency": 2,
+          "Next": "Final State",
+          "ItemProcessor": {
+              "StartAt": "Pass",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "End": true
+                  }
+              },
+              "ProcessorConfig": {
+                "ExecutionType": "EXPRESS",
+                "Mode": "DISTRIBUTED"
+              }
+          },
+          "ResultWriter": {
+            "WriterConfig": {}
+          }
+      },
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}
+`
+
+export const documentMapItemReader = `
+{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "ResultPath": "$.array",
+          "MaxConcurrency": 2,
+          "Next": "Final State",
+          "ItemProcessor": {
+              "StartAt": "Pass",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "End": true
+                  }
+              },
+              "ProcessorConfig": {
+                "ExecutionType": "EXPRESS",
+                "Mode": "DISTRIBUTED"
+              }
+          },
+      "ItemReader": {
+        "Resource": "arn:aws:states:::s3:getObject",
+        "ReaderConfig": {
+          "InputType": "CSV",
+          "CSVHeaderLocation": "FIRST_ROW"
+        },
+        "Parameters": {
+          "Bucket": "abc",
+          "Key": "def"
+        }
+      }
+      },
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}
+`
+
+export const documentMapItemReaderWithInputTypeJSONL = `
+{
+  "StartAt": "Map",
+  "States": {
+      "Map": {
+          "Type": "Map",
+          "ItemsPath": "$.array",
+          "ResultPath": "$.array",
+          "MaxConcurrency": 2,
+          "Next": "Final State",
+          "ItemProcessor": {
+              "StartAt": "Pass",
+              "States": {
+                  "Pass": {
+                      "Type": "Pass",
+                      "End": true
+                  }
+              },
+              "ProcessorConfig": {
+                "ExecutionType": "EXPRESS",
+                "Mode": "DISTRIBUTED"
+              }
+          },  
+      "ItemReader": {
+        "Resource": "arn:aws:states:::s3:getObject",
+        "ReaderConfig": {
+          "InputType": "JSONL"
+        },
+        "Parameters": {
+          "Bucket": "abc",
+          "Key": "def"
+        }
+      }
+      },
+      "Final State": {
+          "Type": "Pass",
+          "End": true
+      }
+  }
+}
+`

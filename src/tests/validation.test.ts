@@ -83,6 +83,10 @@ import {
   documentValidParametersJsonPath,
   documentValidResultSelectorIntrinsicFunction,
   documentValidResultSelectorJsonPath,
+  documentMapResultWriter,
+  documentMapResultWriterMissingOutputType,
+  documentMapItemReader,
+  documentMapItemReaderWithInputTypeJSONL,
 } from './json-strings/validationStrings'
 import { toDocument } from './utils/testUtilities'
 
@@ -253,6 +257,40 @@ describe('ASL context-aware validation', () => {
             end: [10, 25],
           },
         ],
+      })
+    })
+
+    test("Doesn't show diagnostics for valid ResultWriter", async () => {
+      await testValidations({
+        json: documentMapResultWriter,
+        diagnostics: [],
+      })
+    })
+
+    test('Shows diagnostics for valid ResultWriter', async () => {
+      await testValidations({
+        json: documentMapResultWriterMissingOutputType,
+        diagnostics: [
+          {
+            message: 'Missing property "OutputType".',
+            start: [24, 12],
+            end: [24, 26],
+          },
+        ],
+      })
+    })
+
+    test("Doesn't show diagnostics for ItemReader", async () => {
+      await testValidations({
+        json: documentMapItemReader,
+        diagnostics: [],
+      })
+    })
+
+    test("Doesn't show diagnostics for valid InputType JSONL", async () => {
+      await testValidations({
+        json: documentMapItemReaderWithInputTypeJSONL,
+        diagnostics: [],
       })
     })
   })

@@ -56,8 +56,8 @@
                     "InputType": {
                       "type": "string",
                       "description": "A string that specifies the type of Amazon S3 data source.",
-                      "minLength": 1,
-                      "enum": ["CSV", "JSON", "MANIFEST"]
+                      "enum": ["CSV", "JSON", "JSONL", "MANIFEST"],
+                      "minLength": 1
                     },
                     "CSVHeaders": {
                       "type": "array",
@@ -88,6 +88,12 @@
                     "MaxItemsPath": {
                       "$ref": "common.json#/$defs/referencePath",
                       "description": "A reference path to an integer that limits the number of data items passed to the Map state."
+                    },
+                    "CSVDelimiter": {
+                      "type": "string",
+                      "description": "A string that specifies the delimiter used to separate values in the CSV file.",
+                      "minLength": 1,
+                      "enum": ["COMMA", "PIPE", "SEMICOLON", "TAB", "SPACE"]
                     }
                   }
                 },
@@ -229,6 +235,25 @@
                       "minLength": 1
                     }
                   }
+                },
+                "WriterConfig": {
+                  "type": "object",
+                  "description": "A JSON object that specifies the configuration for the results of the map.",
+                  "properties": {
+                    "OutputType": {
+                      "type": "string",
+                      "description": "A string that specifies the type in which Map state results are formatted.",
+                      "minLength": 1,
+                      "enum": ["JSON", "JSONL"]
+                    },
+                    "Transformation": {
+                      "type": "string",
+                      "description": "A string that specifies how the Map state results transformed before returning.",
+                      "minLength": 1,
+                      "enum": ["NONE", "FLATTENED", "COMPACT"]
+                    }
+                  },
+                  "required": ["OutputType"]
                 }
               }
             },
