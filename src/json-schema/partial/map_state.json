@@ -250,7 +250,7 @@
                       "type": "string",
                       "description": "A string that specifies how the Map state results transformed before returning.",
                       "minLength": 1,
-                      "enum": ["NONE", "FLATTENED", "COMPACT"]
+                      "enum": ["NONE", "FLATTEN", "COMPACT"]
                     }
                   },
                   "required": ["OutputType"]
