@@ -41,7 +41,7 @@ const jsonataFunctionsList: Record<string, FunctionType> = {
     ],
     category: 'string',
     description:
-      'Casts the `arg` parameter to a string using the following casting rules\n\n   - Strings are unchanged\n   - Functions are converted to an empty string\n   - Numeric infinity and NaN throw an error because they cannot be represented as a JSON number\n\nIf `arg` is not specified (i.e. this function is invoked with no arguments), then the context value is used as the value of `arg`.\n\nIf `prettify` is true, then "prettified" JSON is produced. i.e One line per field and lines will be indented based on the field depth.\n\n__Examples__\n\n- `$string(5)` => `"5"`\n- `[1..5].$string()` => `["1", "2", "3", "4", "5"]`',
+      'Casts the `arg` parameter to a string using the following casting rules\n\n   - Strings are unchanged\n   - Functions are converted to an empty string\n   - Numeric infinity and NaN throw an error because they cannot be represented as a JSON number\n   - All other values are converted to a JSON string\n\nIf `arg` is not specified (i.e. this function is invoked with no arguments), then the context value is used as the value of `arg`.\n\nIf `prettify` is true, then "prettified" JSON is produced. i.e One line per field and lines will be indented based on the field depth.\n\n__Examples__\n\n- `$string(5)` => `"5"`\n- `[1..5].$string()` => `["1", "2", "3", "4", "5"]`',
   },
   $length: {
     params: [

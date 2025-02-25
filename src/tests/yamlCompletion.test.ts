@@ -6,7 +6,8 @@
 import * as assert from 'assert'
 import { CompletionItemKind, InsertTextFormat } from 'vscode-json-languageservice'
 import { stateSnippets } from '../completion/completeSnippets'
-import { getYamlLanguageService, Position, Range } from '../service'
+import { Position, Range } from '../service'
+import { getYamlLanguageService } from '../yamlLanguageService'
 import { asTextEdit, toDocument } from './utils/testUtilities'
 import {
   document1,

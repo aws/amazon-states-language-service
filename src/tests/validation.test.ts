@@ -4,9 +4,7 @@
  */
 
 import * as assert from 'assert'
-import { Diagnostic, DiagnosticSeverity } from 'vscode-languageserver'
 import { MESSAGES } from '../constants/diagnosticStrings'
-import { ASLLanguageServiceParams, getLanguageService, Position, Range } from '../service'
 import {
   documentChoiceDefaultBeforeChoice,
   documentChoiceInvalidDefault,
@@ -88,57 +86,9 @@ import {
   documentMapItemReader,
   documentMapItemReaderWithInputTypeJSONL,
 } from './json-strings/validationStrings'
-import { toDocument } from './utils/testUtilities'
+import { getValidations, testValidations } from './utils/testUtilities'
 
 const JSON_SCHEMA_MULTIPLE_SCHEMAS_MSG = 'Matches multiple schemas when only one must validate.'
-
-export interface TestValidationOptions {
-  json: string
-  diagnostics: {
-    message: string
-    start: [number, number]
-    end: [number, number]
-    code?: string | number | undefined
-  }[]
-  filterMessages?: string[]
-}
-
-async function getValidations(json: string, params: ASLLanguageServiceParams = {}) {
-  const { textDoc, jsonDoc } = toDocument(json)
-  const ls = getLanguageService(params)
-
-  return await ls.doValidation(textDoc, jsonDoc)
-}
-
-async function testValidations(options: TestValidationOptions, params: ASLLanguageServiceParams = {}) {
-  const { json, diagnostics, filterMessages } = options
-
-  let res = await getValidations(json, params)
-
-  res = res.filter((diagnostic) => {
-    if (filterMessages && filterMessages.find((message) => message === diagnostic.message)) {
-      return false
-    }
-
-    return true
-  })
-
-  assert.strictEqual(res.length, diagnostics.length)
-
-  res.forEach((item, index) => {
-    const leftPos = Position.create(...diagnostics[index].start)
-    const rightPos = Position.create(...diagnostics[index].end)
-
-    const diagnostic = Diagnostic.create(
-      Range.create(leftPos, rightPos),
-      diagnostics[index].message,
-      DiagnosticSeverity.Error,
-      diagnostics[index].code,
-    )
-
-    assert.deepStrictEqual(diagnostic, item)
-  })
-}
 
 describe('ASL context-aware validation', () => {
   describe('Invalid JSON Input', () => {
