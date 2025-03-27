@@ -7,7 +7,8 @@ import type jsonata from 'jsonata'
 import type { FunctionParam, JsonataFunctionsMap } from './functions'
 
 // There are additional properties in the object not specified in the library's typescript interface
-export interface ExprNode extends jsonata.ExprNode {
+export interface ExprNode extends Omit<jsonata.ExprNode, 'lhs'> {
+  lhs?: jsonata.ExprNode | jsonata.ExprNode[]
   body?: jsonata.ExprNode
   then?: jsonata.ExprNode
   else?: jsonata.ExprNode
@@ -120,14 +121,17 @@ let jsonataLibrary: typeof import('jsonata') | null = null
  * @param input JSONata string to parse
  * @returns The root node of the JSONata AST
  */
-export async function getJSONataAST(input: string): Promise<ExprNode> {
+export async function getJSONataAST(
+  input: string,
+  params: jsonata.JsonataOptions = {
+    recover: true,
+  },
+): Promise<ExprNode> {
   if (!jsonataLibrary) {
     jsonataLibrary = (await import('jsonata')).default
   }
 
-  return jsonataLibrary(input, {
-    recover: true,
-  }).ast()
+  return jsonataLibrary(input, params).ast()
 }
 
 export async function getJSONataFunctionList(): Promise<JsonataFunctionsMap> {

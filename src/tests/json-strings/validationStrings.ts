@@ -2197,6 +2197,7 @@ export const documentMapJSONata = `{
       "QueryLanguage": "JSONata",
       "ItemSelector": "{% $states %}",
       "ResultWriter": {
+        "Resource": "arn:aws:states:::s3:putObject",
         "Arguments": "{% $states %}"
       }
     }

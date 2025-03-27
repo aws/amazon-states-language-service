@@ -5,7 +5,8 @@
 
 import * as assert from 'assert'
 import { MESSAGES, YAML_PARSER_MESSAGES } from '../constants/diagnosticStrings'
-import { Diagnostic, DiagnosticSeverity, getYamlLanguageService, Position, Range } from '../service'
+import { Diagnostic, DiagnosticSeverity, Position, Range } from '../service'
+import { getYamlLanguageService } from '../yamlLanguageService'
 
 import {
   documentChoiceDefaultBeforeChoice,
@@ -55,19 +56,9 @@ import {
   documentValidResultSelectorJsonPath,
 } from './yaml-strings/validationStrings'
 
-import { toDocument } from './utils/testUtilities'
+import { toDocument, TestValidationOptions } from './utils/testUtilities'
 
 const JSON_SCHEMA_MULTIPLE_SCHEMAS_MSG = 'Matches multiple schemas when only one must validate.'
-
-export interface TestValidationOptions {
-  json: string
-  diagnostics: {
-    message: string
-    start: [number, number]
-    end: [number, number]
-  }[]
-  filterMessages?: string[]
-}
 
 async function getValidations(json: string) {
   const { textDoc, jsonDoc } = toDocument(json, true)
