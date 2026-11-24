@@ -139,7 +139,7 @@
     },
     "jsonata": {
       "type": "string",
-      "pattern": "^{%(.*)%}$"
+      "pattern": "^{%([\\s\\S]*)%}$"
     },
     "parameters": {
       "type": ["number", "string", "boolean", "object", "array", "null"]

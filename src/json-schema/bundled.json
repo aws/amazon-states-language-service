@@ -2369,7 +2369,7 @@
                       },
                       {
                         "type": "string",
-                        "pattern": "^{%(.*)%}$"
+                        "pattern": "^{%([\\s\\S]*)%}$"
                       }
                     ],
                     "description": "An array or JSONata expression identifying where in the state input the array field is found."

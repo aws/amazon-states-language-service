@@ -9,6 +9,7 @@ import {
   documentChoiceDefaultBeforeChoice,
   documentChoiceInvalidDefault,
   documentChoiceInvalidNext,
+  documentChoiceMultilineJSONata,
   documentChoiceWaitJSONata,
   documentChoiceNextBeforeChoice,
   documentChoiceNoDefault,
@@ -1079,6 +1080,13 @@ describe('ASL context-aware validation', () => {
           json: definition,
           diagnostics: [],
         })
+      })
+    })
+
+    test('does not show diagnostic error on a JSONata expression that spans several lines', async () => {
+      await testValidations({
+        json: documentChoiceMultilineJSONata,
+        diagnostics: [],
       })
     })
 
