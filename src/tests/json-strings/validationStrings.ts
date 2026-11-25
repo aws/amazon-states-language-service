@@ -2270,6 +2270,27 @@ export const documentChoiceWaitJSONata = `{
   }
 }`
 
+export const documentChoiceMultilineJSONata = `{
+  "QueryLanguage": "JSONata",
+  "StartAt": "Choice",
+  "States": {
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Next": "Pass",
+          "Condition": "{% (\\n  $i := $states.input;\\n  $type($i) = 'object'\\n) %}"
+        }
+      ],
+      "Default": "Pass"
+    },
+    "Pass": {
+      "Type": "Pass",
+      "End": true
+    }
+  }
+}`
+
 export const documentTaskWithAssign = `{
   "Comment": "An example of the Amazon States Language using a Task state with Assign field",
   "StartAt": "HelloWorld",
